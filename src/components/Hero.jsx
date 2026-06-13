@@ -69,7 +69,7 @@ const Hero = () => {
       id="home"
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
     >
-      <motion.div style={{ y: gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]" willChange="transform">
+      <motion.div style={{ y: gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]">
         <div
           className="absolute inset-0"
           style={{
@@ -80,18 +80,18 @@ const Hero = () => {
         />
       </motion.div>
 
-      <motion.div style={{ y: blobsY }} className="absolute inset-0 z-0" willChange="transform">
-        <div className="absolute top-16 left-10 w-72 h-72 bg-accent-blue/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-24 right-10 w-72 h-72 bg-accent-cyan/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-purple/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-3xl" />
+      <motion.div style={{ y: blobsY }} className="absolute inset-0 z-0">
+        <div className="absolute top-16 left-10 w-72 h-72 bg-accent-blue/20 rounded-full blur-2xl" />
+        <div className="absolute bottom-24 right-10 w-72 h-72 bg-accent-cyan/20 rounded-full blur-2xl" />
+        <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-purple/15 rounded-full blur-2xl" />
+        <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-2xl" />
       </motion.div>
 
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        style={{ y: contentY, opacity: contentOpacity, willChange: 'transform, opacity' }}
+        style={{ y: contentY, opacity: contentOpacity }}
         className="relative z-10 text-center px-4 max-w-4xl"
       >
         <motion.div variants={itemVariants} className="mb-6">

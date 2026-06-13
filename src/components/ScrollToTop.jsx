@@ -34,7 +34,7 @@ const ScrollToTop = () => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-accent-blue to-accent-cyan text-white shadow-lg shadow-accent-blue/30 hover:shadow-xl hover:shadow-accent-blue/50 transition-all duration-300"
+          className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-accent-blue to-accent-cyan text-white shadow-lg shadow-accent-blue/30 hover:shadow-xl hover:shadow-accent-blue/50 transition-[background,box-shadow,transform] duration-300"
         >
           <FiArrowUp size={24} />
         </motion.button>

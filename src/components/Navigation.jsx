@@ -39,7 +39,7 @@ const Navigation = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed w-full z-50 transition-all duration-500 ${
+      className={`fixed w-full z-50 transition-[background,box-shadow,border-color] duration-500 ${
         isScrolled ? 'glass shadow-lg shadow-black/5' : 'bg-transparent'
       }`}
     >

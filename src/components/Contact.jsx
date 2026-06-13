@@ -53,7 +53,7 @@ const Contact = () => {
     <section ref={ref} id="contact" className="relative py-24 px-4 overflow-hidden">
       <motion.div
         style={{ y: fast }}
-        className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-3xl"
+        className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
       ></motion.div>
 
       <div className="max-w-4xl mx-auto relative z-10">

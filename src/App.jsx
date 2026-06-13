@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import Navigation from './components/Navigation'
 import AnimatedBackground from './components/AnimatedBackground'
 import ScrollProgressBar from './components/ScrollProgressBar'
+import Cursor from './components/Cursor'
 import Hero from './components/Hero'
 import About from './components/About'
 import Skills from './components/Skills'
@@ -15,6 +16,7 @@ import ScrollToTop from './components/ScrollToTop'
 function App() {
   return (
     <div className="relative bg-gradient-light min-h-screen text-light-800">
+      <Cursor />
       <AnimatedBackground />
       <ScrollProgressBar />
       <Navigation />

@@ -96,8 +96,8 @@ h1 {
   position: relative;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
-  backdrop-filter: blur(24px) saturate(200%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow:
     0 8px 32px -8px rgba(31, 41, 55, 0.12),
@@ -189,9 +189,9 @@ h1 {
   50% { transform: translateY(-8px); }
 }
 
-.float-slow { animation: floaty 6s ease-in-out infinite; will-change: transform; }
-.float-medium { animation: floaty 4.5s ease-in-out infinite; will-change: transform; }
-.float-fast { animation: floaty 3.5s ease-in-out infinite; will-change: transform; }
+.float-slow { animation: floaty 6s ease-in-out infinite; }
+.float-medium { animation: floaty 4.5s ease-in-out infinite; }
+.float-fast { animation: floaty 3.5s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .float-slow, .float-medium, .float-fast { animation: none; }
@@ -218,18 +218,19 @@ h1 {
 /* ── Glow Pulse ───────────────────────────────────── */
 
 @keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
-  50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.3); }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 
 .glow-pulse {
   animation: glowPulse 3s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
 }
 
 /* ── Smooth Transitions ───────────────────────────── */
 
 .transition-smooth {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
 /* ── Premium Button Glass ─────────────────────────── */
@@ -243,7 +244,10 @@ h1 {
   box-shadow:
     0 4px 16px -4px rgba(31, 41, 55, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-glass:hover {
@@ -262,7 +266,7 @@ h1 {
   -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 2px 8px -2px rgba(31, 41, 55, 0.06);
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .tag-glass:hover {
@@ -277,11 +281,95 @@ h1 {
   -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .tag-glass-dark:hover {
   background: rgba(30, 41, 59, 0.85);
   border-color: rgba(255, 255, 255, 0.25);
   box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Custom Cursor ────────────────────────────────── */
+
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+@keyframes waterWobble {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(15%, -10%) scale(1.1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-5%, 15%) scale(0.9);
+    opacity: 0.2;
+  }
+  75% {
+    transform: translate(-15%, -5%) scale(1.05);
+    opacity: 0.45;
+  }
+}
+
+@keyframes waterCaustic1 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.28;
+  }
+  33% {
+    transform: translate(20%, -15%) rotate(120deg) scale(1.15);
+    opacity: 0.4;
+  }
+  66% {
+    transform: translate(-10%, 10%) rotate(240deg) scale(0.85);
+    opacity: 0.2;
+  }
+}
+
+@keyframes waterCaustic2 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.15;
+  }
+  40% {
+    transform: translate(-15%, 20%) rotate(-120deg) scale(1.2);
+    opacity: 0.3;
+  }
+  80% {
+    transform: translate(10%, -10%) rotate(-240deg) scale(0.8);
+    opacity: 0.12;
+  }
+}
+
+@keyframes waterCaustic3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translate(-12%, 8%) scale(1.3) rotate(180deg);
+    opacity: 0.25;
+  }
+}
+
+@keyframes magneticSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(-50%) translateY(-12px) scale(0.6);
+    opacity: 0;
+  }
 }

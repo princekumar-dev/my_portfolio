@@ -112,11 +112,11 @@ const Projects = () => {
     <section ref={ref} id="projects" className="relative py-24 px-4 overflow-hidden">
       <motion.div
         style={{ y: fast }}
-        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-3xl"
+        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"
       ></motion.div>
       <motion.div
         style={{ y: slow }}
-        className="absolute bottom-0 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-3xl"
+        className="absolute bottom-0 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-2xl"
       ></motion.div>
 
       <div className="max-w-6xl mx-auto relative z-10">

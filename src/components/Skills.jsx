@@ -40,11 +40,11 @@ const Skills = () => {
     <section ref={ref} id="skills" className="relative py-24 px-4 overflow-hidden">
       <motion.div
         style={{ y: fast }}
-        className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-3xl"
+        className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
       />
       <motion.div
         style={{ y: slow }}
-        className="absolute top-10 right-0 w-64 h-64 bg-accent-blue/10 rounded-full blur-3xl"
+        className="absolute top-10 right-0 w-64 h-64 bg-accent-blue/10 rounded-full blur-2xl"
       />
 
       <div className="max-w-6xl mx-auto relative z-10">

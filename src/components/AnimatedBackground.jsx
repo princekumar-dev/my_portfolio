@@ -69,7 +69,6 @@ const AnimatedBackground = () => {
     <div
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-      style={{ willChange: 'transform' }}
     >
       <motion.div
         style={{ y: gridY }}
@@ -90,34 +89,34 @@ const AnimatedBackground = () => {
       </motion.div>
 
       <motion.div
-        style={{ x: blob1X, y: blob1Y, willChange: 'transform' }}
+        style={{ x: blob1X, y: blob1Y }}
         className="absolute -top-32 -left-24 h-[28rem] w-[28rem]"
       >
         <motion.div
           {...drift}
-          className="h-full w-full rounded-full bg-accent-blue/25 blur-3xl"
+          className="h-full w-full rounded-full bg-accent-blue/25 blur-2xl"
         />
       </motion.div>
 
       <motion.div
-        style={{ x: blob2X, y: blob2Y, willChange: 'transform' }}
+        style={{ x: blob2X, y: blob2Y }}
         className="absolute top-1/3 -right-24 h-[24rem] w-[24rem]"
       >
         <motion.div
           {...drift}
           transition={{ ...(drift.transition || {}), duration: 20 }}
-          className="h-full w-full rounded-full bg-accent-cyan/25 blur-3xl"
+          className="h-full w-full rounded-full bg-accent-cyan/25 blur-2xl"
         />
       </motion.div>
 
       <motion.div
-        style={{ x: blob3X, y: blob3Y, willChange: 'transform' }}
+        style={{ x: blob3X, y: blob3Y }}
         className="absolute bottom-0 left-1/3 h-[22rem] w-[22rem]"
       >
         <motion.div
           {...drift}
           transition={{ ...(drift.transition || {}), duration: 24 }}
-          className="h-full w-full rounded-full bg-accent-purple/20 blur-3xl"
+          className="h-full w-full rounded-full bg-accent-purple/20 blur-2xl"
         />
       </motion.div>
     </div>
