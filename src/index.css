@@ -401,3 +401,30 @@ h1 {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Open to Work badge pulse ring */
+@keyframes pulseRing {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* Badge shimmer sweep */
+.badge-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.badge-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.4) 45%,
+    rgba(255, 255, 255, 0.4) 55%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmerSweep 4s ease-in-out infinite;
+  pointer-events: none;
+}

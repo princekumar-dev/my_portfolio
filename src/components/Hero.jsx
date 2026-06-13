@@ -10,6 +10,7 @@ const Hero = () => {
   const sectionRef = useRef(null)
   const [displayed, setDisplayed] = useState('')
   const [typingDone, setTypingDone] = useState(false)
+  const [badgeVisible, setBadgeVisible] = useState(false)
   const mouseX = useMotionValue(0)
   const arrowX = useSpring(mouseX, { stiffness: 150, damping: 20 })
 
@@ -23,7 +24,10 @@ const Hero = () => {
         setDisplayed(FULL_NAME.slice(0, i))
         if (i >= FULL_NAME.length) {
           clearInterval(interval)
-          cursorTimeout = setTimeout(() => setTypingDone(true), 800)
+          cursorTimeout = setTimeout(() => {
+            setTypingDone(true)
+            setTimeout(() => setBadgeVisible(true), 300)
+          }, 800)
         }
       }, TYPING_SPEED)
     }, START_DELAY)
@@ -126,6 +130,25 @@ const Hero = () => {
         style={{ y: contentY, opacity: contentOpacity }}
         className="relative z-10 text-center px-4 max-w-4xl"
       >
+        <motion.div variants={itemVariants} className="mb-6 flex justify-center">
+          {badgeVisible && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="badge-shimmer inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-green-500/25 bg-green-500/[0.06] backdrop-blur-sm"
+            >
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-60" style={{ animation: 'pulseRing 2s ease-out infinite' }} />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+              </span>
+              <span className="text-sm font-semibold text-green-600 tracking-wide" style={{ fontFamily: 'Sora, sans-serif' }}>
+                Open to Opportunities
+              </span>
+            </motion.div>
+          )}
+        </motion.div>
+
         <motion.div variants={itemVariants} className="mb-6">
           <span className="eyebrow text-accent-blue">Welcome to my portfolio</span>
         </motion.div>
