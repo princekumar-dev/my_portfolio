@@ -32,7 +32,8 @@ export default {
           blue: '#3B82F6',
           cyan: '#06B6D4',
           purple: '#8B5CF6',
-          indigo: '#6366F1'
+          indigo: '#6366F1',
+          pink: '#E1306C'
         }
       },
       backgroundImage: {

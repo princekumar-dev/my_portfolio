@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { FiMail, FiLinkedin, FiGithub } from 'react-icons/fi'
+import { SiInstagram } from 'react-icons/si'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
 
@@ -46,6 +47,13 @@ const Contact = () => {
       value: 'princekumar-dev',
       href: 'https://github.com/princekumar-dev',
       color: 'text-accent-cyan'
+    },
+    {
+      icon: SiInstagram,
+      label: 'Instagram',
+      value: '@prince_r_94',
+      href: 'https://instagram.com/prince_r_94',
+      color: 'text-accent-pink'
     }
   ]
 
@@ -82,7 +90,7 @@ const Contact = () => {
 
           <motion.div
             variants={containerVariants}
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
             {contactLinks.map((link) => {
               const Icon = link.icon
