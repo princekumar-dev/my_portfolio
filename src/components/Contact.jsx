@@ -103,7 +103,7 @@ const Contact = () => {
                         <motion.div
                           whileHover={{ rotate: 360 }}
                           transition={{ duration: 0.8, ease: 'easeInOut' }}
-                          className={`relative flex h-16 w-16 items-center justify-center rounded-2xl bg-white/60 border border-white/70 backdrop-blur-md ${link.color}`}
+                          className={`relative flex h-16 w-16 items-center justify-center rounded-2xl tag-glass ${link.color}`}
                         >
                           <Icon size={32} />
                         </motion.div>

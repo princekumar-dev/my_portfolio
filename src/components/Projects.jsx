@@ -72,7 +72,7 @@ const Projects = () => {
             {project.technologies.map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1 text-xs rounded-full bg-white/50 text-accent-blue border border-accent-blue/30 backdrop-blur-sm"
+                className="tag-glass px-3 py-1 text-xs rounded-full text-accent-blue"
               >
                 {tech}
               </span>
@@ -86,7 +86,7 @@ const Projects = () => {
               rel="noopener noreferrer"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent-blue/10 text-accent-blue hover:bg-accent-blue/20 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue"
             >
               <FiGithub size={18} />
               <span className="text-sm font-semibold">Code</span>
@@ -97,7 +97,7 @@ const Projects = () => {
               rel="noopener noreferrer"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent-purple/10 text-accent-purple hover:bg-accent-purple/20 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-purple"
             >
               <FiExternalLink size={18} />
               <span className="text-sm font-semibold">Demo</span>

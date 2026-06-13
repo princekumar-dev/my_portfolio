@@ -5,25 +5,24 @@ import { FiArrowUp } from 'react-icons/fi'
 const ScrollToTop = () => {
   const [isVisible, setIsVisible] = useState(false)
 
-  const toggleVisibility = () => {
-    if (window.scrollY > 300) {
-      setIsVisible(true)
-    } else {
-      setIsVisible(false)
-    }
-  }
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    })
-  }
-
   useEffect(() => {
-    window.addEventListener('scroll', toggleVisibility)
+    let ticking = false
+    const toggleVisibility = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setIsVisible(window.scrollY > 300)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+    window.addEventListener('scroll', toggleVisibility, { passive: true })
     return () => window.removeEventListener('scroll', toggleVisibility)
   }, [])
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <AnimatePresence>
@@ -35,7 +34,7 @@ const ScrollToTop = () => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-accent-blue to-accent-cyan text-white shadow-lg hover:shadow-accent-blue/50 transition-all"
+          className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-accent-blue to-accent-cyan text-white shadow-lg shadow-accent-blue/30 hover:shadow-xl hover:shadow-accent-blue/50 transition-all duration-300"
         >
           <FiArrowUp size={24} />
         </motion.button>

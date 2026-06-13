@@ -11,7 +11,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -28,7 +27,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Luxury serif display headings */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-weight: 700;
@@ -40,7 +38,6 @@ h1 {
   letter-spacing: -0.025em;
 }
 
-/* Small uppercase eyebrow / label accent */
 .eyebrow {
   font-family: 'Sora', sans-serif;
   font-weight: 600;
@@ -49,7 +46,6 @@ h1 {
   font-size: 0.8rem;
 }
 
-/* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -67,85 +63,225 @@ h1 {
   background: linear-gradient(180deg, #06B6D4, #3B82F6);
 }
 
-/* Text Selection */
 ::selection {
   background: #3B82F6;
   color: #fff;
 }
 
-/* Glassmorphism */
+/* ── Premium Glassmorphism ─────────────────────────── */
+
 .glass {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 4px 24px -4px rgba(31, 41, 55, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .glass-dark {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 24px -4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/* Premium translucent card: layered glass with inner highlight + soft shadow */
+/* ── Premium Frosted Card ─────────────────────────── */
+
 .glass-card {
   position: relative;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.45) 100%);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow:
-    0 10px 30px -12px rgba(31, 41, 55, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  transition: box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    0 8px 32px -8px rgba(31, 41, 55, 0.12),
+    0 2px 8px -2px rgba(31, 41, 55, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.3);
+  transition:
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Inner shimmer highlight */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity 0.4s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(59, 130, 246, 0.45);
+  border-color: rgba(59, 130, 246, 0.35);
   box-shadow:
-    0 24px 50px -16px rgba(59, 130, 246, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    0 20px 50px -12px rgba(59, 130, 246, 0.2),
+    0 8px 20px -8px rgba(59, 130, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
 }
 
-/* Gradient hairline border on hover (premium edge light) */
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* ── Gradient Edge Light (Premium Border) ─────────── */
+
+.glass-edge {
+  position: relative;
+  overflow: hidden;
+}
+
 .glass-edge::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(59,130,246,0.6), rgba(6,182,212,0.4), rgba(139,92,246,0.5));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.5),
+    rgba(6, 182, 212, 0.35),
+    rgba(139, 92, 246, 0.45),
+    rgba(59, 130, 246, 0.3)
+  );
+  background-size: 300% 300%;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.5s ease;
   pointer-events: none;
+  animation: edgeShimmer 4s ease infinite;
 }
 
 .glass-edge:hover::after {
   opacity: 1;
 }
 
-/* Floating animations for skill icon blocks */
+@keyframes edgeShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ── Floating Animations ──────────────────────────── */
+
 @keyframes floaty {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
 }
 
-.float-slow { animation: floaty 6s ease-in-out infinite; }
-.float-medium { animation: floaty 4.5s ease-in-out infinite; }
-.float-fast { animation: floaty 3.5s ease-in-out infinite; }
+.float-slow { animation: floaty 6s ease-in-out infinite; will-change: transform; }
+.float-medium { animation: floaty 4.5s ease-in-out infinite; will-change: transform; }
+.float-fast { animation: floaty 3.5s ease-in-out infinite; will-change: transform; }
 
 @media (prefers-reduced-motion: reduce) {
   .float-slow, .float-medium, .float-fast { animation: none; }
 }
 
-/* Smooth transitions */
+/* ── Shimmer Loading Effect ───────────────────────── */
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+/* ── Glow Pulse ───────────────────────────────────── */
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.3); }
+}
+
+.glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* ── Smooth Transitions ───────────────────────────── */
+
 .transition-smooth {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Premium Button Glass ─────────────────────────── */
+
+.btn-glass {
+  position: relative;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 4px 16px -4px rgba(31, 41, 55, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 8px 24px -4px rgba(59, 130, 246, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+/* ── Premium Tag / Badge ──────────────────────────── */
+
+.tag-glass {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 8px -2px rgba(31, 41, 55, 0.06);
+  transition: all 0.3s ease;
+}
+
+.tag-glass:hover {
+  background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Dark variant for white/near-white icons */
+.tag-glass-dark {
+  background: rgba(30, 41, 59, 0.75);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.tag-glass-dark:hover {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.25);
 }

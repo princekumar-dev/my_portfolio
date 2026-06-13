@@ -1,21 +1,46 @@
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { FiArrowDown } from 'react-icons/fi'
+
+const FULL_NAME = 'Prince R'
+const TYPING_SPEED = 80
+const START_DELAY = 600
 
 const Hero = () => {
   const sectionRef = useRef(null)
+  const [displayed, setDisplayed] = useState('')
+  const [typingDone, setTypingDone] = useState(false)
 
-  // Scroll-linked parallax scoped to the hero section.
+  useEffect(() => {
+    let interval
+    let cursorTimeout
+    const startTimeout = setTimeout(() => {
+      let i = 0
+      interval = setInterval(() => {
+        i++
+        setDisplayed(FULL_NAME.slice(0, i))
+        if (i >= FULL_NAME.length) {
+          clearInterval(interval)
+          cursorTimeout = setTimeout(() => setTypingDone(true), 800)
+        }
+      }, TYPING_SPEED)
+    }, START_DELAY)
+    return () => {
+      clearTimeout(startTimeout)
+      clearInterval(interval)
+      clearTimeout(cursorTimeout)
+    }
+  }, [])
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
   })
-  const smooth = useSpring(scrollYProgress, { stiffness: 80, damping: 24 })
+  const smooth = useSpring(scrollYProgress, { stiffness: 150, damping: 35 })
 
-  const blobsY = useTransform(smooth, [0, 1], [0, 220])
-  const midY = useTransform(smooth, [0, 1], [0, 120])
-  const gridY = useTransform(smooth, [0, 1], [0, 80])
-  const contentY = useTransform(smooth, [0, 1], [0, -60])
+  const blobsY = useTransform(smooth, [0, 1], [0, 200])
+  const gridY = useTransform(smooth, [0, 1], [0, 60])
+  const contentY = useTransform(smooth, [0, 1], [0, -40])
   const contentOpacity = useTransform(smooth, [0, 0.8], [1, 0])
 
   const containerVariants = {
@@ -23,32 +48,20 @@ const Hero = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.12,
-        delayChildren: 0.2,
+        staggerChildren: 0.1,
+        delayChildren: 0.15,
       },
     },
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 16 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: 'easeOut' },
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
     },
   }
-
-  const wordVariants = {
-    hidden: { opacity: 0, y: 40, rotateX: -40 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      rotateX: 0,
-      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-    },
-  }
-
-  const name = 'Prince R'.split(' ')
 
   return (
     <section
@@ -56,11 +69,7 @@ const Hero = () => {
       id="home"
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
     >
-      {/* Parallax depth layers (moncy.dev style) */}
-      <motion.div
-        style={{ y: gridY }}
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]"
-      >
+      <motion.div style={{ y: gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]" willChange="transform">
         <div
           className="absolute inset-0"
           style={{
@@ -71,43 +80,34 @@ const Hero = () => {
         />
       </motion.div>
 
-      <motion.div style={{ y: blobsY }} className="absolute inset-0 z-0">
-        <div className="absolute top-16 left-10 w-72 h-72 bg-accent-blue/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-24 right-10 w-72 h-72 bg-accent-cyan/20 rounded-full blur-3xl"></div>
-      </motion.div>
-
-      <motion.div style={{ y: midY }} className="absolute inset-0 z-0">
-        <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-purple/15 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-3xl"></div>
+      <motion.div style={{ y: blobsY }} className="absolute inset-0 z-0" willChange="transform">
+        <div className="absolute top-16 left-10 w-72 h-72 bg-accent-blue/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-24 right-10 w-72 h-72 bg-accent-cyan/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-purple/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-3xl" />
       </motion.div>
 
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        style={{ y: contentY, opacity: contentOpacity }}
+        style={{ y: contentY, opacity: contentOpacity, willChange: 'transform, opacity' }}
         className="relative z-10 text-center px-4 max-w-4xl"
       >
         <motion.div variants={itemVariants} className="mb-6">
           <span className="eyebrow text-accent-blue">Welcome to my portfolio</span>
         </motion.div>
 
-        <motion.h1
-          className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-light-900"
-          style={{ perspective: 800 }}
-        >
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-light-900 h-[1.2em]">
           <span className="bg-gradient-to-r from-accent-blue via-accent-purple to-accent-cyan bg-clip-text text-transparent">
-            {name.map((word, i) => (
-              <motion.span
-                key={i}
-                variants={wordVariants}
-                className="inline-block mr-3"
-              >
-                {word}
-              </motion.span>
-            ))}
+            {displayed}
           </span>
-        </motion.h1>
+          <span
+            className={`inline-block w-[3px] h-[0.85em] ml-1 align-middle bg-accent-blue transition-opacity duration-300 ${
+              typingDone ? 'opacity-0' : 'opacity-100 animate-pulse'
+            }`}
+          />
+        </h1>
 
         <motion.p
           variants={itemVariants}
@@ -142,7 +142,7 @@ const Hero = () => {
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 glass-card glass-edge rounded-full font-semibold text-accent-blue hover:text-accent-blue transition-all"
+            className="px-8 py-3 btn-glass rounded-full font-semibold text-accent-blue transition-all"
           >
             Download Resume
           </motion.a>

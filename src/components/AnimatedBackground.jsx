@@ -8,43 +8,35 @@ import {
   useTransform,
 } from 'framer-motion'
 
-// Fixed, full-viewport animated aurora background.
-// Blobs drift continuously, follow the cursor, AND shift as the page scrolls
-// (scroll-driven parallax) for a moncy.dev feel.
 const AnimatedBackground = () => {
   const reduceMotion = useReducedMotion()
 
-  // Normalized pointer position (-1..1), spring-smoothed for a soft trailing effect.
   const pointerX = useMotionValue(0)
   const pointerY = useMotionValue(0)
-  const mx = useSpring(pointerX, { stiffness: 40, damping: 20 })
-  const my = useSpring(pointerY, { stiffness: 40, damping: 20 })
+  const mx = useSpring(pointerX, { stiffness: 50, damping: 25 })
+  const my = useSpring(pointerY, { stiffness: 50, damping: 25 })
   const frame = useRef(0)
 
-  // Page scroll progress (0..1) -> spring-smoothed scroll value.
   const { scrollYProgress } = useScroll()
   const scroll = useSpring(scrollYProgress, {
-    stiffness: 60,
-    damping: 24,
+    stiffness: 150,
+    damping: 35,
     restDelta: 0.001,
   })
 
-  // Each blob combines a mouse offset with a scroll offset at a different
-  // depth/direction, so the background visibly updates as you scroll.
   const mouseScale = reduceMotion ? 0 : 1
   const scrollScale = reduceMotion ? 0 : 1
 
-  const blob1X = useTransform([mx, scroll], ([m, s]) => m * 60 * mouseScale + s * -80 * scrollScale)
-  const blob1Y = useTransform([my, scroll], ([m, s]) => m * 60 * mouseScale + s * 260 * scrollScale)
+  const blob1X = useTransform(mx, (m) => m * 60 * mouseScale)
+  const blob1Y = useTransform([my, scroll], ([m, s]) => m * 50 * mouseScale + s * 200 * scrollScale)
 
-  const blob2X = useTransform([my, scroll], ([m, s]) => m * -45 * mouseScale + s * 120 * scrollScale)
-  const blob2Y = useTransform([mx, scroll], ([m, s]) => m * -45 * mouseScale + s * -200 * scrollScale)
+  const blob2X = useTransform(my, (m) => m * -40 * mouseScale)
+  const blob2Y = useTransform([mx, scroll], ([m, s]) => m * -35 * mouseScale + s * -160 * scrollScale)
 
-  const blob3X = useTransform([mx, scroll], ([m, s]) => m * 30 * mouseScale + s * 60 * scrollScale)
-  const blob3Y = useTransform([my, scroll], ([m, s]) => m * 30 * mouseScale + s * -300 * scrollScale)
+  const blob3X = useTransform(mx, (m) => m * 25 * mouseScale)
+  const blob3Y = useTransform(scroll, (s) => s * -220 * scrollScale)
 
-  // Subtle grid drifts upward as the page scrolls.
-  const gridY = useTransform(scroll, [0, 1], reduceMotion ? [0, 0] : [0, -120])
+  const gridY = useTransform(scroll, [0, 1], reduceMotion ? [0, 0] : [0, -100])
 
   useEffect(() => {
     if (reduceMotion) return
@@ -59,7 +51,7 @@ const AnimatedBackground = () => {
       })
     }
 
-    window.addEventListener('pointermove', handlePointer)
+    window.addEventListener('pointermove', handlePointer, { passive: true })
     return () => {
       window.removeEventListener('pointermove', handlePointer)
       cancelAnimationFrame(frame.current)
@@ -69,16 +61,16 @@ const AnimatedBackground = () => {
   const drift = reduceMotion
     ? {}
     : {
-        animate: { scale: [1, 1.15, 1], opacity: [0.5, 0.7, 0.5] },
-        transition: { duration: 14, repeat: Infinity, ease: 'easeInOut' },
+        animate: { scale: [1, 1.12, 1], opacity: [0.5, 0.65, 0.5] },
+        transition: { duration: 16, repeat: Infinity, ease: 'easeInOut' },
       }
 
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      style={{ willChange: 'transform' }}
     >
-      {/* Subtle grid that drifts on scroll */}
       <motion.div
         style={{ y: gridY }}
         className="absolute inset-0 opacity-[0.35]"
@@ -97,9 +89,8 @@ const AnimatedBackground = () => {
         />
       </motion.div>
 
-      {/* Mouse- and scroll-reactive aurora blobs */}
       <motion.div
-        style={{ x: blob1X, y: blob1Y }}
+        style={{ x: blob1X, y: blob1Y, willChange: 'transform' }}
         className="absolute -top-32 -left-24 h-[28rem] w-[28rem]"
       >
         <motion.div
@@ -109,23 +100,23 @@ const AnimatedBackground = () => {
       </motion.div>
 
       <motion.div
-        style={{ x: blob2X, y: blob2Y }}
+        style={{ x: blob2X, y: blob2Y, willChange: 'transform' }}
         className="absolute top-1/3 -right-24 h-[24rem] w-[24rem]"
       >
         <motion.div
           {...drift}
-          transition={{ ...(drift.transition || {}), duration: 18 }}
+          transition={{ ...(drift.transition || {}), duration: 20 }}
           className="h-full w-full rounded-full bg-accent-cyan/25 blur-3xl"
         />
       </motion.div>
 
       <motion.div
-        style={{ x: blob3X, y: blob3Y }}
+        style={{ x: blob3X, y: blob3Y, willChange: 'transform' }}
         className="absolute bottom-0 left-1/3 h-[22rem] w-[22rem]"
       >
         <motion.div
           {...drift}
-          transition={{ ...(drift.transition || {}), duration: 22 }}
+          transition={{ ...(drift.transition || {}), duration: 24 }}
           className="h-full w-full rounded-full bg-accent-purple/20 blur-3xl"
         />
       </motion.div>

@@ -20,10 +20,17 @@ const Navigation = () => {
   const active = useActiveSection(sectionIds)
 
   useEffect(() => {
+    let ticking = false
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 50)
+          ticking = false
+        })
+        ticking = true
+      }
     }
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -32,8 +39,8 @@ const Navigation = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'glass shadow-lg' : 'bg-transparent'
+      className={`fixed w-full z-50 transition-all duration-500 ${
+        isScrolled ? 'glass shadow-lg shadow-black/5' : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

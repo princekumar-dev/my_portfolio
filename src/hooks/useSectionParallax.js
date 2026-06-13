@@ -14,8 +14,8 @@ export function useSectionParallax({ slowDistance = 60, fastDistance = 120 } = {
     offset: ['start end', 'end start'],
   })
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 80,
-    damping: 24,
+    stiffness: 120,
+    damping: 35,
     restDelta: 0.001,
   })
 

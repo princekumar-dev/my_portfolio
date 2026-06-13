@@ -29,14 +29,14 @@ const Experience = () => {
       variants={itemVariants}
       className="relative pl-8 pb-12"
     >
-      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-accent-blue border-4 border-white shadow"></div>
+      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-accent-blue border-4 border-white shadow-md glow-pulse"></div>
       {index !== experienceData.length - 1 && (
         <div className="absolute left-1.5 top-4 w-0.5 h-24 bg-gradient-to-b from-accent-blue to-transparent"></div>
       )}
 
       <motion.div
         whileHover={{ x: 10 }}
-        className="glass border border-light-200 hover:border-accent-blue/40 rounded-xl p-6 transition-all duration-300 shadow-sm hover:shadow-lg"
+        className="glass-card glass-edge rounded-xl p-6 cursor-default"
       >
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-xl font-bold text-accent-blue">{exp.position}</h3>

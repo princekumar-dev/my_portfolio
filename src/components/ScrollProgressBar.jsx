@@ -4,14 +4,14 @@ import { motion, useScroll, useSpring } from 'framer-motion'
 const ScrollProgressBar = () => {
   const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
+    stiffness: 150,
+    damping: 35,
     restDelta: 0.001,
   })
 
   return (
     <motion.div
-      style={{ scaleX }}
+      style={{ scaleX, willChange: 'transform' }}
       className="fixed top-0 left-0 right-0 z-[60] h-1 origin-left bg-gradient-to-r from-accent-blue via-accent-purple to-accent-cyan"
     />
   )

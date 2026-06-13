@@ -51,7 +51,7 @@ const About = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div variants={itemVariants} className="glass-card rounded-2xl p-8 space-y-6">
+            <motion.div variants={itemVariants} className="glass-card glass-edge rounded-2xl p-8 space-y-6">
               <p className="text-light-600 text-lg leading-relaxed">
                 I'm an AI & Data Science engineer with a strong foundation in modern web and machine learning
                 technologies. With experience in building scalable applications and solving complex problems,

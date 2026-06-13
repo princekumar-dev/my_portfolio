@@ -1,9 +1,6 @@
-import { useRef } from 'react'
+import { useRef, useCallback } from 'react'
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion'
 
-// Reusable card with a 3D cursor-follow tilt and a soft moving glare,
-// for a moncy.dev-style interactive feel. Falls back to a plain wrapper
-// when the user prefers reduced motion.
 const TiltCard = ({
   children,
   className = '',
@@ -13,36 +10,38 @@ const TiltCard = ({
 }) => {
   const reduceMotion = useReducedMotion()
   const cardRef = useRef(null)
+  const frameRef = useRef(0)
 
-  // Normalized pointer position within the card (-0.5..0.5).
   const px = useMotionValue(0)
   const py = useMotionValue(0)
 
   const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [maxTilt, -maxTilt]), {
-    stiffness: 150,
-    damping: 18,
+    stiffness: 200,
+    damping: 25,
   })
   const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-maxTilt, maxTilt]), {
-    stiffness: 150,
-    damping: 18,
+    stiffness: 200,
+    damping: 25,
   })
 
-  // Glare highlight follows the cursor across the card surface.
   const glareX = useTransform(px, [-0.5, 0.5], ['0%', '100%'])
   const glareY = useTransform(py, [-0.5, 0.5], ['0%', '100%'])
 
-  const handleMove = (e) => {
+  const handleMove = useCallback((e) => {
     if (reduceMotion) return
-    const rect = cardRef.current?.getBoundingClientRect()
-    if (!rect) return
-    px.set((e.clientX - rect.left) / rect.width - 0.5)
-    py.set((e.clientY - rect.top) / rect.height - 0.5)
-  }
+    cancelAnimationFrame(frameRef.current)
+    frameRef.current = requestAnimationFrame(() => {
+      const rect = cardRef.current?.getBoundingClientRect()
+      if (!rect) return
+      px.set((e.clientX - rect.left) / rect.width - 0.5)
+      py.set((e.clientY - rect.top) / rect.height - 0.5)
+    })
+  }, [reduceMotion, px, py])
 
-  const handleLeave = () => {
+  const handleLeave = useCallback(() => {
     px.set(0)
     py.set(0)
-  }
+  }, [px, py])
 
   if (reduceMotion) {
     return (
@@ -57,7 +56,7 @@ const TiltCard = ({
       ref={cardRef}
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', transformPerspective: 900 }}
+      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', transformPerspective: 900, willChange: 'transform' }}
       whileHover={{ y: -10 }}
       className={`relative ${className}`}
       {...rest}
