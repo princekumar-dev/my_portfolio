@@ -3,24 +3,26 @@ import { experienceData } from '../data/experienceData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 
 const Experience = () => {
-  const { ref, fast } = useSectionParallax({ fastDistance: 100 })
+  const { ref, fast, opacity } = useSectionParallax({ fastDistance: 100, preset: 'default', opacityFade: true })
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
       },
     },
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -50 },
+    hidden: { opacity: 0, x: -40, scale: 0.97 },
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: 0.8 },
+      scale: 1,
+      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
     },
   }
 
@@ -57,7 +59,7 @@ const Experience = () => {
   )
 
   return (
-    <section ref={ref} id="experience" className="relative py-20 px-4 overflow-hidden">
+    <motion.section ref={ref} id="experience" className="relative py-20 px-4 overflow-hidden" style={{ opacity }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
@@ -86,7 +88,7 @@ const Experience = () => {
           ))}
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }
 

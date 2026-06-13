@@ -5,7 +5,7 @@ import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
 
 const Contact = () => {
-  const { ref, fast } = useSectionParallax({ fastDistance: 100 })
+  const { ref, fast, opacity } = useSectionParallax({ fastDistance: 100, preset: 'soft', opacityFade: true })
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -30,7 +30,7 @@ const Contact = () => {
     {
       icon: FiMail,
       label: 'Email',
-      value: 'prince55833kuma@gmail.com',
+      value: 'prince55833kumar@gmail.com',
       href: 'mailto:prince55833kuma@gmail.com',
       color: 'text-accent-blue'
     },
@@ -58,7 +58,7 @@ const Contact = () => {
   ]
 
   return (
-    <section ref={ref} id="contact" className="relative py-24 px-4 overflow-hidden">
+    <motion.section ref={ref} id="contact" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
@@ -117,7 +117,7 @@ const Contact = () => {
                         </motion.div>
                       </div>
                       <h3 className="text-xl font-bold text-accent-blue mb-2">{link.label}</h3>
-                      <p className="text-light-600 text-center text-sm">{link.value}</p>
+                      <p className="text-light-600 text-center text-sm break-all">{link.value}</p>
                     </a>
                   </TiltCard>
                 </motion.div>
@@ -126,7 +126,7 @@ const Contact = () => {
           </motion.div>
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }
 

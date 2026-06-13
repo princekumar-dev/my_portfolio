@@ -1,5 +1,5 @@
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import { useRef, useState, useEffect } from 'react'
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { FiArrowDown } from 'react-icons/fi'
 
 const FULL_NAME = 'Prince R'
@@ -10,6 +10,8 @@ const Hero = () => {
   const sectionRef = useRef(null)
   const [displayed, setDisplayed] = useState('')
   const [typingDone, setTypingDone] = useState(false)
+  const mouseX = useMotionValue(0)
+  const arrowX = useSpring(mouseX, { stiffness: 150, damping: 20 })
 
   useEffect(() => {
     let interval
@@ -32,6 +34,15 @@ const Hero = () => {
     }
   }, [])
 
+  useEffect(() => {
+    const handleMouse = (e) => {
+      const nx = (e.clientX / window.innerWidth - 0.5) * 20
+      mouseX.set(nx)
+    }
+    window.addEventListener('mousemove', handleMouse, { passive: true })
+    return () => window.removeEventListener('mousemove', handleMouse)
+  }, [mouseX])
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
@@ -40,8 +51,10 @@ const Hero = () => {
 
   const blobsY = useTransform(smooth, [0, 1], [0, 200])
   const gridY = useTransform(smooth, [0, 1], [0, 60])
+  const microY = useTransform(smooth, [0, 1], [0, 35])
   const contentY = useTransform(smooth, [0, 1], [0, -40])
   const contentOpacity = useTransform(smooth, [0, 0.8], [1, 0])
+  const microOpacity = useTransform(smooth, [0, 0.6, 1], [0, 0.6, 0])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -87,6 +100,25 @@ const Hero = () => {
         <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-2xl" />
       </motion.div>
 
+      {/* Micro depth layer - ultra-slow floating particles */}
+      <motion.div style={{ y: microY, opacity: microOpacity }} className="absolute inset-0 z-0 pointer-events-none">
+        {[...Array(12)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: `${2 + (i % 3)}px`,
+              height: `${2 + (i % 3)}px`,
+              background: i % 3 === 0 ? 'rgba(59,130,246,0.3)' : i % 3 === 1 ? 'rgba(139,92,246,0.25)' : 'rgba(6,182,212,0.25)',
+              top: `${10 + (i * 7.3) % 80}%`,
+              left: `${5 + (i * 8.1) % 90}%`,
+              animation: `particleFloat ${3 + (i % 4) * 0.8}s ease-in-out infinite`,
+              animationDelay: `${i * 0.5}s`,
+            }}
+          />
+        ))}
+      </motion.div>
+
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -99,7 +131,7 @@ const Hero = () => {
         </motion.div>
 
         <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-light-900 h-[1.2em]">
-          <span className="bg-gradient-to-r from-accent-blue via-accent-purple to-accent-cyan bg-clip-text text-transparent">
+          <span className="hero-shimmer bg-gradient-to-r from-accent-blue via-accent-purple to-accent-cyan bg-clip-text text-transparent">
             {displayed}
           </span>
           <span
@@ -152,6 +184,7 @@ const Hero = () => {
       <motion.div
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
+        style={{ x: arrowX }}
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10"
       >
         <FiArrowDown className="text-accent-blue text-2xl" />

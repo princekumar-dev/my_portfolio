@@ -15,21 +15,23 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.07 },
+    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
   },
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 30, scale: 0.95, rotateX: 8 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    scale: 1,
+    rotateX: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   },
 }
 
 const Skills = () => {
-  const { ref, slow, fast } = useSectionParallax({ slowDistance: 50, fastDistance: 110 })
+  const { ref, slow, fast, opacity } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy', opacityFade: true })
 
   const allSkills = Object.entries(skillsData).map(([category, skills]) => ({
     category,
@@ -37,7 +39,7 @@ const Skills = () => {
   }))
 
   return (
-    <section ref={ref} id="skills" className="relative py-24 px-4 overflow-hidden">
+    <motion.section ref={ref} id="skills" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
@@ -126,7 +128,7 @@ const Skills = () => {
           </div>
         ))}
       </div>
-    </section>
+    </motion.section>
   )
 }
 

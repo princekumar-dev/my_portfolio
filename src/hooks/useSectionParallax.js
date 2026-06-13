@@ -1,11 +1,18 @@
 import { useRef } from 'react'
 import { useScroll, useSpring, useTransform, useReducedMotion } from 'framer-motion'
 
-// Reusable scoped scroll parallax for a section.
-// Attach `ref` to the section root. `slow` and `fast` are spring-smoothed
-// motion values that move as the section scrolls through the viewport.
-// When the user prefers reduced motion, both values stay at 0 (no parallax).
-export function useSectionParallax({ slowDistance = 60, fastDistance = 120 } = {}) {
+const PRESETS = {
+  snappy:  { stiffness: 200, damping: 35, restDelta: 0.001 },
+  default: { stiffness: 120, damping: 35, restDelta: 0.001 },
+  soft:    { stiffness: 80,  damping: 30, restDelta: 0.001 },
+}
+
+export function useSectionParallax({
+  slowDistance = 60,
+  fastDistance = 120,
+  preset = 'default',
+  opacityFade = false,
+} = {}) {
   const ref = useRef(null)
   const reduceMotion = useReducedMotion()
 
@@ -13,11 +20,9 @@ export function useSectionParallax({ slowDistance = 60, fastDistance = 120 } = {
     target: ref,
     offset: ['start end', 'end start'],
   })
-  const smooth = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 35,
-    restDelta: 0.001,
-  })
+
+  const springConfig = PRESETS[preset] || PRESETS.default
+  const smooth = useSpring(scrollYProgress, springConfig)
 
   const slow = useTransform(
     smooth,
@@ -30,5 +35,9 @@ export function useSectionParallax({ slowDistance = 60, fastDistance = 120 } = {
     reduceMotion ? [0, 0] : [fastDistance, -fastDistance]
   )
 
-  return { ref, smooth, slow, fast }
+  const opacity = opacityFade
+    ? useTransform(smooth, [0, 0.2, 0.8, 1], reduceMotion ? [1, 1, 1, 1] : [0, 1, 1, 0])
+    : null
+
+  return { ref, smooth, slow, fast, opacity }
 }

@@ -96,7 +96,7 @@ const TiltCard = ({
         transformPerspective: 1200,
         willChange: 'transform',
       }}
-      whileHover={{ y: -6, scale: 1.01 }}
+      whileHover={{ y: -6, scale: 1.01, rotateX: 2, rotateY: -2 }}
       transition={{ type: 'spring', stiffness: 200, damping: 25 }}
       className={`relative ${className}`}
       {...rest}

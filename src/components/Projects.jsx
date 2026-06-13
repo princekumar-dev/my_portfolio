@@ -10,24 +10,27 @@ const statusStyles = {
 }
 
 const Projects = () => {
-  const { ref, slow, fast } = useSectionParallax({ slowDistance: 50, fastDistance: 110 })
+  const { ref, slow, fast, opacity } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy', opacityFade: true })
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
       },
     },
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 50 },
+    hidden: { opacity: 0, y: 50, scale: 0.96, rotateX: 6 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8 },
+      scale: 1,
+      rotateX: 0,
+      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
     },
   }
 
@@ -109,7 +112,7 @@ const Projects = () => {
   )
 
   return (
-    <section ref={ref} id="projects" className="relative py-24 px-4 overflow-hidden">
+    <motion.section ref={ref} id="projects" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"
@@ -146,7 +149,7 @@ const Projects = () => {
           ))}
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }
 

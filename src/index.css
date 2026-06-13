@@ -373,3 +373,31 @@ h1 {
     opacity: 0;
   }
 }
+
+/* Hero text shimmer sweep */
+.hero-shimmer {
+  position: relative;
+}
+.hero-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.35) 45%,
+    rgba(255, 255, 255, 0.35) 55%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmerSweep 3s ease-in-out infinite;
+  animation-delay: 1.5s;
+  pointer-events: none;
+}
+
+@keyframes shimmerSweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

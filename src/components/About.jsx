@@ -2,29 +2,31 @@ import { motion } from 'framer-motion'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 
 const About = () => {
-  const { ref, slow, fast } = useSectionParallax({ slowDistance: 60, fastDistance: 100 })
+  const { ref, slow, fast, opacity } = useSectionParallax({ slowDistance: 60, fastDistance: 100, preset: 'soft', opacityFade: true })
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
       },
     },
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -50 },
+    hidden: { opacity: 0, x: -40, scale: 0.97 },
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: 0.8 },
+      scale: 1,
+      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
     },
   }
 
   return (
-    <section ref={ref} id="about" className="relative py-24 px-4 overflow-hidden">
+    <motion.section ref={ref} id="about" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"
@@ -86,7 +88,7 @@ const About = () => {
           </div>
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }
 
