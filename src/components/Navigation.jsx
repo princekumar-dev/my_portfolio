@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { FiSun, FiMoon } from 'react-icons/fi'
 import { useActiveSection } from '../hooks/useActiveSection'
@@ -51,6 +51,8 @@ const Navigation = () => {
   const active = useActiveSection(sectionIds)
   const { isDark, toggleTheme } = useTheme()
   const lastScrollY = useRef(0)
+  const menuRef = useRef(null)
+  const menuButtonRef = useRef(null)
 
   useEffect(() => {
     const menuOpen = () => setIsOpen(true)
@@ -88,6 +90,27 @@ const Navigation = () => {
       document.body.style.overflow = ''
     }
     return () => { document.body.style.overflow = '' }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen || !menuRef.current) return
+    const menu = menuRef.current
+    const focusable = menu.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])')
+    if (focusable.length === 0) return
+    focusable[0].focus()
+
+    const handleKeyDown = (e) => {
+      if (e.key !== 'Tab') return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus() }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus() }
+      }
+    }
+    menu.addEventListener('keydown', handleKeyDown)
+    return () => menu.removeEventListener('keydown', handleKeyDown)
   }, [isOpen])
 
   const blurAmount = 8 + scrollDepth * 16
@@ -135,6 +158,7 @@ const Navigation = () => {
                 <a
                   key={item.name}
                   href={item.href}
+                  aria-current={isActive ? 'page' : undefined}
                   className="relative px-3 py-1.5 text-sm font-medium transition-colors duration-300 rounded-full"
                 >
                   {isActive && (
@@ -179,6 +203,7 @@ const Navigation = () => {
         <AnimatePresence>
           {isOpen && (
             <motion.div
+              ref={menuRef}
               id="mobile-menu"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}

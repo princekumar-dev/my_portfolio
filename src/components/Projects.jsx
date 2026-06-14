@@ -113,17 +113,6 @@ const Projects = () => {
                 <FiGithub size={18} />
                 <span className="text-sm font-semibold">Code</span>
               </motion.a>
-              <motion.a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-purple"
-              >
-                <FiExternalLink size={18} />
-                <span className="text-sm font-semibold">Demo</span>
-              </motion.a>
             </div>
           </div>
         </div>
@@ -132,7 +121,7 @@ const Projects = () => {
   )
 
   return (
-    <motion.section ref={ref} id="projects" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
+    <motion.section ref={ref} id="projects" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"

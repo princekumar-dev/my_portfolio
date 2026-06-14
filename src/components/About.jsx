@@ -79,7 +79,7 @@ const About = () => {
   }
 
   return (
-    <motion.section ref={ref} id="about" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
+    <motion.section ref={ref} id="about" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"

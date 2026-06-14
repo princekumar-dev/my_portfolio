@@ -29,8 +29,7 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-.dark body,
-body.dark {
+.dark body {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
   color: #e2e8f0;
 }
@@ -536,11 +535,10 @@ h1 {
     transparent 60%
   );
   background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
   animation: shimmerSweep 3s ease-in-out infinite;
   animation-delay: 1.5s;
   pointer-events: none;
+  mix-blend-mode: overlay;
 }
 
 @keyframes shimmerSweep {

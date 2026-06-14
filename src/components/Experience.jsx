@@ -102,7 +102,7 @@ const Experience = () => {
   )
 
   return (
-    <motion.section ref={ref} id="experience" className="relative py-20 px-4 overflow-hidden" style={{ opacity }}>
+    <motion.section ref={ref} id="experience" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
@@ -115,6 +115,7 @@ const Experience = () => {
           viewport={{ once: true }}
           className="text-4xl md:text-5xl font-bold mb-16 text-center"
         >
+          <span className="eyebrow text-accent-blue block mb-3">Where I've worked</span>
           <span className="animated-gradient-text">
             Experience
           </span>

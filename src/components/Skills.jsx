@@ -84,7 +84,7 @@ const Skills = () => {
   } : itemVariants
 
   return (
-    <motion.section ref={ref} id="skills" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
+    <motion.section ref={ref} id="skills" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"

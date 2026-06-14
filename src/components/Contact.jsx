@@ -74,7 +74,7 @@ const Contact = () => {
   }
 
   return (
-    <motion.section ref={ref} id="contact" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
+    <motion.section ref={ref} id="contact" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
@@ -143,28 +143,31 @@ const Contact = () => {
               <form onSubmit={handleSubmit} className="glass-card glass-edge rounded-2xl p-8 space-y-5">
                 <div className="floating-label-group">
                   <input
+                    id="contact-name"
                     type="text"
                     placeholder=" "
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                   />
-                  <label>Your Name</label>
+                  <label htmlFor="contact-name">Your Name</label>
                 </div>
 
                 <div className="floating-label-group">
                   <input
+                    id="contact-email"
                     type="email"
                     placeholder=" "
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                   />
-                  <label>Email Address</label>
+                  <label htmlFor="contact-email">Email Address</label>
                 </div>
 
                 <div className="floating-label-group">
                   <textarea
+                    id="contact-message"
                     placeholder=" "
                     rows={4}
                     value={formData.message}
@@ -172,7 +175,7 @@ const Contact = () => {
                     required
                     className="resize-none"
                   />
-                  <label>Your Message</label>
+                  <label htmlFor="contact-message">Your Message</label>
                 </div>
 
                 <motion.button
