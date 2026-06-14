@@ -4,77 +4,86 @@ import { motion, useMotionValue, useSpring, useTransform, useReducedMotion, useI
 const TiltCard = ({
   children,
   className = '',
-  maxTilt = 8,
+  maxTilt = 12,
   glare = true,
+  borderGlow = true,
+  float = true,
   ...rest
 }) => {
   const reduceMotion = useReducedMotion()
   const cardRef = useRef(null)
-  const frameRef = useRef(0)
+  const rafRef = useRef(0)
+  const hoverRef = useRef(false)
   const isInView = useInView(cardRef, { margin: '-50px' })
 
   const px = useMotionValue(0)
   const py = useMotionValue(0)
 
-  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [maxTilt, -maxTilt]), {
-    stiffness: 400,
-    damping: 15,
-    mass: 0.4,
+  const springCfg = { stiffness: 500, damping: 25, mass: 0.4 }
+  const rotateX = useSpring(useTransform(py, v => -v * maxTilt * 2), springCfg)
+  const rotateY = useSpring(useTransform(px, v => v * maxTilt * 2), springCfg)
+
+  const glareX = useTransform(px, v => `${(v + 0.5) * 100}%`)
+  const glareY = useTransform(py, v => `${(v + 0.5) * 100}%`)
+  const glareOpacity = useTransform(px, [-0.5, 0, 0.5], [0.3, 0, 0.3])
+
+  const glowX = useTransform(px, v => `${(v + 0.5) * 60 + 20}%`)
+  const glowY = useTransform(py, v => `${(v + 0.5) * 60 + 20}%`)
+  const glowOpacity = useTransform([px, py], ([x, y]) => {
+    const d2 = x * x + y * y
+    return Math.min((d2 < 0.0001 ? 0 : Math.sqrt(d2)) * 2.5, 0.55)
   })
-  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-maxTilt, maxTilt]), {
-    stiffness: 400,
-    damping: 15,
-    mass: 0.4,
+
+  const shadowX = useTransform(px, v => v * 20)
+  const shadowY = useTransform(py, v => v * 20)
+  const shadowBlur = useTransform([px, py], ([x, y]) => {
+    const d2 = x * x + y * y
+    return 15 + (d2 < 0.0001 ? 0 : Math.sqrt(d2)) * 50
   })
 
-  const glareX = useTransform(px, [-0.5, 0.5], ['0%', '100%'])
-  const glareY = useTransform(py, [-0.5, 0.5], ['0%', '100%'])
-  const glareOpacity = useTransform(px, [-0.5, 0, 0.5], [0.15, 0, 0.15])
+  const glareBg = useTransform([glareX, glareY], ([gx, gy]) =>
+    `radial-gradient(circle at ${gx} ${gy}, rgba(255,255,255,0.45), transparent 55%)`
+  )
+  const glowBg = useTransform([glowX, glowY], ([gx, gy]) =>
+    `radial-gradient(circle at ${gx} ${gy}, rgba(99,102,241,0.4), rgba(168,85,247,0.15), transparent 60%)`
+  )
+  const shadowVal = useTransform([shadowX, shadowY, shadowBlur], ([sx, sy, sb]) =>
+    `${sx}px ${sy}px ${sb}px rgba(0,0,0,0.2), ${sx * 0.4}px ${sy * 0.4}px ${sb * 0.4}px rgba(99,102,241,0.08)`
+  )
 
-  useEffect(() => {
-    if (!cardRef.current || reduceMotion || !isInView) return
-
-    let scrollFrame
-    const handleScroll = () => {
-      cancelAnimationFrame(scrollFrame)
-      scrollFrame = requestAnimationFrame(() => {
-        const rect = cardRef.current?.getBoundingClientRect()
-        if (!rect) return
-        if (rect.bottom < -100 || rect.top > window.innerHeight + 100) return
-        const centerX = rect.left + rect.width / 2
-        const centerY = rect.top + rect.height / 2
-        const viewCenterX = window.innerWidth / 2
-        const viewCenterY = window.innerHeight / 2
-        const dx = (centerX - viewCenterX) / viewCenterX
-        const dy = (centerY - viewCenterY) / viewCenterY
-        px.set(dx * 0.25)
-        py.set(dy * 0.2)
-      })
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      cancelAnimationFrame(scrollFrame)
-    }
-  }, [reduceMotion, isInView, px, py])
-
-  const handleMove = useCallback((e) => {
-    if (reduceMotion) return
-    cancelAnimationFrame(frameRef.current)
-    frameRef.current = requestAnimationFrame(() => {
+  const setPointer = useCallback((ex, ey) => {
+    cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(() => {
       const rect = cardRef.current?.getBoundingClientRect()
       if (!rect) return
-      px.set((e.clientX - rect.left) / rect.width - 0.5)
-      py.set((e.clientY - rect.top) / rect.height - 0.5)
+      px.set((ex - rect.left) / rect.width - 0.5)
+      py.set((ey - rect.top) / rect.height - 0.5)
     })
-  }, [reduceMotion, px, py])
-
-  const handleLeave = useCallback(() => {
-    px.set(0)
-    py.set(0)
   }, [px, py])
+
+  const handleMove = useCallback((e) => {
+    if (!hoverRef.current) return
+    setPointer(e.clientX, e.clientY)
+  }, [setPointer])
+
+  const handleTouch = useCallback((e) => {
+    const t = e.touches[0]
+    if (t) setPointer(t.clientX, t.clientY)
+  }, [setPointer])
+
+  useEffect(() => {
+    if (reduceMotion || !isInView) return
+    const el = cardRef.current
+    if (!el) return
+
+    const unsubX = px.onChange((v) => {
+      el.style.setProperty('--mx', `${(v + 0.5) * 100}%`)
+    })
+    const unsubY = py.onChange((v) => {
+      el.style.setProperty('--my', `${(v + 0.5) * 100}%`)
+    })
+    return () => { unsubX(); unsubY() }
+  }, [reduceMotion, isInView, px, py])
 
   if (reduceMotion) {
     return (
@@ -84,40 +93,78 @@ const TiltCard = ({
     )
   }
 
-  return (
+  const tiltContent = (
     <motion.div
       ref={cardRef}
+      onPointerEnter={() => { hoverRef.current = true }}
       onPointerMove={handleMove}
-      onPointerLeave={handleLeave}
+      onPointerLeave={() => {
+        hoverRef.current = false
+        px.set(0)
+        py.set(0)
+      }}
+      onTouchMove={handleTouch}
+      onTouchEnd={() => { px.set(0); py.set(0) }}
       style={{
         rotateX,
         rotateY,
         transformStyle: 'preserve-3d',
-        transformPerspective: 1200,
-        willChange: 'transform',
+        transformPerspective: 800,
       }}
-      whileHover={{ y: -6, scale: 1.01, rotateX: 2, rotateY: -2 }}
-      transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+      whileHover={{ scale: 1.025 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 22 }}
       className={`relative ${className}`}
       {...rest}
     >
       {children}
+
       {glare && (
         <motion.div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-[inherit]"
           style={{
-            background: useTransform(
-              [glareX, glareY],
-              ([gx, gy]) =>
-                `radial-gradient(circle at ${gx} ${gy}, rgba(255,255,255,0.35), transparent 55%)`
-            ),
+            contain: 'layout style paint',
+            willChange: 'opacity',
+            background: glareBg,
             opacity: glareOpacity,
-            transition: 'opacity 0.3s ease',
           }}
         />
       )}
+
+      {borderGlow && (
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[inherit]"
+          style={{
+            contain: 'layout style paint',
+            willChange: 'opacity',
+            background: glowBg,
+            opacity: glowOpacity,
+            mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            maskComposite: 'exclude',
+            WebkitMaskComposite: 'xor',
+            padding: '1.5px',
+          }}
+        />
+      )}
+
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-[inherit]"
+        style={{
+          contain: 'layout style paint',
+          boxShadow: shadowVal,
+        }}
+      />
     </motion.div>
+  )
+
+  if (!float) return tiltContent
+
+  return (
+    <div className="tilt-float">
+      {tiltContent}
+    </div>
   )
 }
 
