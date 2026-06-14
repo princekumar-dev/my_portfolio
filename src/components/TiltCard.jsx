@@ -1,5 +1,9 @@
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion, useInView } from 'framer-motion'
+
+const isTouchDevice = () =>
+  typeof window !== 'undefined' &&
+  ('ontouchstart' in window || navigator.maxTouchPoints > 0)
 
 const TiltCard = ({
   children,
@@ -11,6 +15,7 @@ const TiltCard = ({
   ...rest
 }) => {
   const reduceMotion = useReducedMotion()
+  const [touchDevice] = useState(isTouchDevice)
   const cardRef = useRef(null)
   const rafRef = useRef(0)
   const hoverRef = useRef(false)
@@ -19,7 +24,10 @@ const TiltCard = ({
   const px = useMotionValue(0)
   const py = useMotionValue(0)
 
-  const springCfg = { stiffness: 500, damping: 25, mass: 0.4 }
+  const springCfg = touchDevice
+    ? { stiffness: 300, damping: 30, mass: 0.6 }
+    : { stiffness: 500, damping: 25, mass: 0.4 }
+
   const rotateX = useSpring(useTransform(py, v => -v * maxTilt * 2), springCfg)
   const rotateY = useSpring(useTransform(px, v => v * maxTilt * 2), springCfg)
 
@@ -62,14 +70,9 @@ const TiltCard = ({
   }, [px, py])
 
   const handleMove = useCallback((e) => {
-    if (!hoverRef.current) return
+    if (!hoverRef.current || touchDevice) return
     setPointer(e.clientX, e.clientY)
-  }, [setPointer])
-
-  const handleTouch = useCallback((e) => {
-    const t = e.touches[0]
-    if (t) setPointer(t.clientX, t.clientY)
-  }, [setPointer])
+  }, [setPointer, touchDevice])
 
   useEffect(() => {
     if (reduceMotion || !isInView) return
@@ -103,22 +106,21 @@ const TiltCard = ({
         px.set(0)
         py.set(0)
       }}
-      onTouchMove={handleTouch}
-      onTouchEnd={() => { px.set(0); py.set(0) }}
-      style={{
+      style={touchDevice ? {} : {
         rotateX,
         rotateY,
         transformStyle: 'preserve-3d',
         transformPerspective: 800,
       }}
-      whileHover={{ scale: 1.025 }}
+      whileHover={touchDevice ? undefined : { scale: 1.025 }}
+      whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 400, damping: 22 }}
       className={`relative ${className}`}
       {...rest}
     >
       {children}
 
-      {glare && (
+      {glare && !touchDevice && (
         <motion.div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-[inherit]"
@@ -131,7 +133,7 @@ const TiltCard = ({
         />
       )}
 
-      {borderGlow && (
+      {borderGlow && !touchDevice && (
         <motion.div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-[inherit]"
@@ -148,21 +150,23 @@ const TiltCard = ({
         />
       )}
 
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-[inherit]"
-        style={{
-          contain: 'layout style paint',
-          boxShadow: shadowVal,
-        }}
-      />
+      {!touchDevice && (
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[inherit]"
+          style={{
+            contain: 'layout style paint',
+            boxShadow: shadowVal,
+          }}
+        />
+      )}
     </motion.div>
   )
 
   if (!float) return tiltContent
 
   return (
-    <div className="tilt-float">
+    <div className={touchDevice ? '' : 'tilt-float'}>
       {tiltContent}
     </div>
   )

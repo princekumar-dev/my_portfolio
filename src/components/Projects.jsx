@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { FiGithub, FiExternalLink } from 'react-icons/fi'
+import { useState, useEffect } from 'react'
 import { projectsData } from '../data/projectsData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
@@ -11,19 +12,31 @@ const statusStyles = {
 
 const Projects = () => {
   const { ref, slow, fast, opacity } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy', opacityFade: true })
+  const [touchDevice, setTouchDevice] = useState(false)
+
+  useEffect(() => {
+    setTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  }, [])
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
+        staggerChildren: touchDevice ? 0.08 : 0.15,
         delayChildren: 0.1,
       },
     },
   }
 
-  const itemVariants = {
+  const itemVariants = touchDevice ? {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    },
+  } : {
     hidden: { opacity: 0, y: 50, scale: 0.96, rotateX: 6 },
     visible: {
       opacity: 1,

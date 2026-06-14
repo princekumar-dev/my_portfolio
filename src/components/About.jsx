@@ -1,5 +1,34 @@
-import { motion } from 'framer-motion'
+import { motion, useMotionValue, useTransform, useInView } from 'framer-motion'
 import { useSectionParallax } from '../hooks/useSectionParallax'
+import { useRef, useEffect, useState } from 'react'
+
+const AnimatedCounter = ({ target, duration = 2 }) => {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true })
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (!isInView) return
+    let start = 0
+    const end = parseInt(target)
+    const incrementTime = (duration * 1000) / end
+    const step = Math.max(1, Math.floor(end / 60))
+
+    const timer = setInterval(() => {
+      start += step
+      if (start >= end) {
+        setCount(end)
+        clearInterval(timer)
+      } else {
+        setCount(start)
+      }
+    }, incrementTime * step)
+
+    return () => clearInterval(timer)
+  }, [isInView, target, duration])
+
+  return <span ref={ref}>{count}+</span>
+}
 
 const About = () => {
   const { ref, slow, fast, opacity } = useSectionParallax({ slowDistance: 60, fastDistance: 100, preset: 'soft', opacityFade: true })
@@ -79,7 +108,9 @@ const About = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-accent-blue to-accent-cyan opacity-10"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center float-slow">
-                    <div className="text-7xl font-bold bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent mb-3">5+</div>
+                    <div className="text-7xl font-bold bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent mb-3">
+                      <AnimatedCounter target={5} />
+                    </div>
                     <p className="text-light-600 text-lg">Projects Completed</p>
                   </div>
                 </div>

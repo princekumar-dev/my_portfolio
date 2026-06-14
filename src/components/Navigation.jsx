@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { FiMenu, FiX } from 'react-icons/fi'
+import { motion, AnimatePresence } from 'framer-motion'
+import { FiMenu, FiX, FiSun, FiMoon } from 'react-icons/fi'
 import { useActiveSection } from '../hooks/useActiveSection'
+import { useTheme } from '../context/ThemeContext'
 
 const navItems = [
   { name: 'Home', href: '#home', id: 'home' },
@@ -9,6 +10,7 @@ const navItems = [
   { name: 'Skills', href: '#skills', id: 'skills' },
   { name: 'Projects', href: '#projects', id: 'projects' },
   { name: 'Experience', href: '#experience', id: 'experience' },
+  { name: 'Certifications', href: '#certifications', id: 'certifications' },
   { name: 'Contact', href: '#contact', id: 'contact' }
 ]
 
@@ -18,6 +20,7 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const active = useActiveSection(sectionIds)
+  const { isDark, toggleTheme } = useTheme()
 
   useEffect(() => {
     let ticking = false
@@ -34,8 +37,18 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [isOpen])
+
   return (
     <motion.nav
+      aria-label="Main navigation"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
@@ -77,37 +90,64 @@ const Navigation = () => {
             })}
           </div>
 
-          <button
-            className="md:hidden text-accent-blue"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-          </button>
+          <div className="flex items-center gap-3">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="p-2 rounded-full text-light-600 hover:text-accent-blue hover:bg-accent-blue/10 transition-colors duration-200"
+            >
+              {isDark ? <FiSun size={18} /> : <FiMoon size={18} />}
+            </motion.button>
+
+            <button
+              className="md:hidden text-accent-blue"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
+            >
+              {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+            </button>
+          </div>
         </div>
 
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="md:hidden pb-4 space-y-2"
-          >
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className={`block px-4 py-2 transition-colors ${
-                  active === item.id
-                    ? 'text-accent-blue font-semibold'
-                    : 'text-light-600 hover:text-accent-blue'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                {item.name}
-              </a>
-            ))}
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              id="mobile-menu"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="md:hidden overflow-hidden rounded-b-xl mb-2"
+              style={{
+                background: isDark
+                  ? 'rgba(15, 23, 42, 0.95)'
+                  : 'rgba(255, 255, 255, 0.95)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              }}
+            >
+              <div className="py-2 space-y-1">
+                {navItems.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className={`block px-4 py-2.5 transition-colors duration-200 ${
+                      active === item.id
+                        ? 'text-accent-blue font-semibold bg-accent-blue/5'
+                        : 'text-light-600 hover:text-accent-blue hover:bg-accent-blue/5'
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.name}
+                  </a>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.nav>
   )

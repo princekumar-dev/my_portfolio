@@ -30,8 +30,8 @@ const Contact = () => {
     {
       icon: FiMail,
       label: 'Email',
-      value: 'prince55833kumar@gmail.com',
-      href: 'mailto:prince55833kuma@gmail.com',
+      value: 'prince55833kumar',
+      href: 'mailto:prince55833kumar@gmail.com',
       color: 'text-accent-blue'
     },
     {
@@ -101,9 +101,10 @@ const Contact = () => {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`${link.label} (opens in new tab)`}
                       className="flex flex-col items-center p-8"
                     >
-                      <div className="relative mb-4 float-medium">
+                      <div className="relative mb-4">
                         <span
                           aria-hidden="true"
                           className="absolute inset-0 rounded-2xl blur-xl opacity-40 group-hover:opacity-70 transition-opacity duration-300 bg-accent-blue"

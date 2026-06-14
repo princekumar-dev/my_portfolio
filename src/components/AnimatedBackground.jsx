@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   motion,
   useReducedMotion,
@@ -10,6 +10,14 @@ import {
 
 const AnimatedBackground = () => {
   const reduceMotion = useReducedMotion()
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const pointerX = useMotionValue(0)
   const pointerY = useMotionValue(0)
@@ -39,7 +47,7 @@ const AnimatedBackground = () => {
   const gridY = useTransform(scroll, [0, 1], reduceMotion ? [0, 0] : [0, -100])
 
   useEffect(() => {
-    if (reduceMotion) return
+    if (reduceMotion || isMobile) return
 
     const handlePointer = (e) => {
       cancelAnimationFrame(frame.current)
@@ -56,14 +64,20 @@ const AnimatedBackground = () => {
       window.removeEventListener('pointermove', handlePointer)
       cancelAnimationFrame(frame.current)
     }
-  }, [reduceMotion, pointerX, pointerY])
+  }, [reduceMotion, isMobile, pointerX, pointerY])
 
-  const drift = reduceMotion
+  const drift = (reduceMotion || isMobile)
     ? {}
     : {
         animate: { scale: [1, 1.12, 1], opacity: [0.5, 0.65, 0.5] },
         transition: { duration: 16, repeat: Infinity, ease: 'easeInOut' },
       }
+
+  if (isMobile && reduceMotion) return null
+
+  const blobSize1 = isMobile ? 'h-[18rem] w-[18rem]' : 'h-[28rem] w-[28rem]'
+  const blobSize2 = isMobile ? 'h-[15rem] w-[15rem]' : 'h-[24rem] w-[24rem]'
+  const blobSize3 = isMobile ? 'h-[13rem] w-[13rem]' : 'h-[22rem] w-[22rem]'
 
   return (
     <div
@@ -91,7 +105,7 @@ const AnimatedBackground = () => {
 
       <motion.div
         style={{ x: blob1X, y: blob1Y, willChange: 'transform' }}
-        className="absolute -top-32 -left-24 h-[28rem] w-[28rem]"
+        className={`absolute -top-32 -left-24 ${blobSize1}`}
       >
         <motion.div
           {...drift}
@@ -101,7 +115,7 @@ const AnimatedBackground = () => {
 
       <motion.div
         style={{ x: blob2X, y: blob2Y, willChange: 'transform' }}
-        className="absolute top-1/3 -right-24 h-[24rem] w-[24rem]"
+        className={`absolute top-1/3 -right-24 ${blobSize2}`}
       >
         <motion.div
           {...drift}
@@ -110,16 +124,18 @@ const AnimatedBackground = () => {
         />
       </motion.div>
 
-      <motion.div
-        style={{ x: blob3X, y: blob3Y, willChange: 'transform' }}
-        className="absolute bottom-0 left-1/3 h-[22rem] w-[22rem]"
-      >
+      {!isMobile && (
         <motion.div
-          {...drift}
-          transition={{ ...(drift.transition || {}), duration: 24 }}
-          className="h-full w-full rounded-full bg-accent-purple/20 blur-xl"
-        />
-      </motion.div>
+          style={{ x: blob3X, y: blob3Y, willChange: 'transform' }}
+          className={`absolute bottom-0 left-1/3 ${blobSize3}`}
+        >
+          <motion.div
+            {...drift}
+            transition={{ ...(drift.transition || {}), duration: 24 }}
+            className="h-full w-full rounded-full bg-accent-purple/20 blur-xl"
+          />
+        </motion.div>
+      )}
     </div>
   )
 }

@@ -11,6 +11,7 @@ const Hero = () => {
   const [displayed, setDisplayed] = useState('')
   const [typingDone, setTypingDone] = useState(false)
   const [badgeVisible, setBadgeVisible] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const mouseX = useMotionValue(0)
   const arrowX = useSpring(mouseX, { stiffness: 150, damping: 20 })
 
@@ -39,12 +40,19 @@ const Hero = () => {
   }, [])
 
   useEffect(() => {
-    const handleMouse = (e) => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  useEffect(() => {
+    const handlePointer = (e) => {
       const nx = (e.clientX / window.innerWidth - 0.5) * 20
       mouseX.set(nx)
     }
-    window.addEventListener('mousemove', handleMouse, { passive: true })
-    return () => window.removeEventListener('mousemove', handleMouse)
+    window.addEventListener('pointermove', handlePointer, { passive: true })
+    return () => window.removeEventListener('pointermove', handlePointer)
   }, [mouseX])
 
   const { scrollYProgress } = useScroll({
@@ -98,15 +106,19 @@ const Hero = () => {
       </motion.div>
 
       <motion.div style={{ y: blobsY }} className="absolute inset-0 z-0">
-        <div className="absolute top-16 left-10 w-72 h-72 bg-accent-blue/20 rounded-full blur-2xl" />
-        <div className="absolute bottom-24 right-10 w-72 h-72 bg-accent-cyan/20 rounded-full blur-2xl" />
-        <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-purple/15 rounded-full blur-2xl" />
-        <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-2xl" />
+        <div className={`absolute top-16 left-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-blue/20 rounded-full ${isMobile ? 'blur-xl' : 'blur-2xl'}`} />
+        <div className={`absolute bottom-24 right-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-cyan/20 rounded-full ${isMobile ? 'blur-xl' : 'blur-2xl'}`} />
+        {!isMobile && (
+          <>
+            <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-purple/15 rounded-full blur-2xl" />
+            <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-2xl" />
+          </>
+        )}
       </motion.div>
 
       {/* Micro depth layer - ultra-slow floating particles */}
       <motion.div style={{ y: microY, opacity: microOpacity }} className="absolute inset-0 z-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
+        {[...Array(isMobile ? 6 : 12)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full"

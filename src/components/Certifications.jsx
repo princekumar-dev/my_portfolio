@@ -4,7 +4,7 @@ import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
 
 const Certifications = () => {
-  const { ref, fast } = useSectionParallax({ fastDistance: 100 })
+  const { ref, fast, opacity } = useSectionParallax({ fastDistance: 100, opacityFade: true })
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -46,7 +46,7 @@ const Certifications = () => {
   )
 
   return (
-    <section ref={ref} className="relative py-24 px-4 overflow-hidden">
+    <section ref={ref} id="certifications" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"

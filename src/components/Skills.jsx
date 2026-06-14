@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
 import { skillsData } from '../data/skillsData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 
@@ -9,6 +10,35 @@ const levelStyles = {
   Expert: 'bg-accent-blue/10 text-accent-blue border-accent-blue/30',
   Intermediate: 'bg-accent-cyan/10 text-accent-cyan border-accent-cyan/30',
   Beginner: 'bg-accent-purple/10 text-accent-purple border-accent-purple/30',
+}
+
+const levelPercent = {
+  Expert: 90,
+  Intermediate: 65,
+  Beginner: 35,
+}
+
+const levelBarColors = {
+  Expert: 'from-accent-blue to-accent-cyan',
+  Intermediate: 'from-accent-cyan to-accent-purple',
+  Beginner: 'from-accent-purple to-accent-pink',
+}
+
+const ProgressBar = ({ level }) => {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true })
+  const percent = levelPercent[level] || 50
+
+  return (
+    <div ref={ref} className="mt-2 w-full h-1.5 bg-light-200/50 rounded-full overflow-hidden">
+      <motion.div
+        initial={{ width: 0 }}
+        animate={isInView ? { width: `${percent}%` } : { width: 0 }}
+        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+        className={`h-full rounded-full bg-gradient-to-r ${levelBarColors[level] || levelBarColors.Intermediate}`}
+      />
+    </div>
+  )
 }
 
 const containerVariants = {
@@ -32,11 +62,26 @@ const itemVariants = {
 
 const Skills = () => {
   const { ref, slow, fast, opacity } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy', opacityFade: true })
+  const [touchDevice, setTouchDevice] = useState(false)
+
+  useEffect(() => {
+    setTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  }, [])
 
   const allSkills = Object.entries(skillsData).map(([category, skills]) => ({
     category,
     skills,
   }))
+
+  const mobileItemVariants = touchDevice ? {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    },
+  } : itemVariants
 
   return (
     <motion.section ref={ref} id="skills" className="relative py-24 px-4 overflow-hidden" style={{ opacity }}>
@@ -93,33 +138,41 @@ const Skills = () => {
                 return (
                   <motion.div
                     key={skill.name}
-                    variants={itemVariants}
-                    className="glass-card glass-edge group rounded-2xl p-6 text-center cursor-default"
+                    variants={mobileItemVariants}
+                    className="glass-card glass-edge group rounded-2xl p-6 cursor-default"
                   >
-                    <div className="relative mb-5 inline-block">
-                      <span
-                        aria-hidden="true"
-                        className="absolute inset-0 rounded-2xl blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-300"
-                        style={{ backgroundColor: isDarkLogo ? DARK_LOGO_GLOW[skill.name] : skill.color }}
-                      />
-                      <div
+                    <div className="relative mb-4 inline-block">
+                      {!touchDevice && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-0 rounded-2xl blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-300"
+                          style={{ backgroundColor: isDarkLogo ? DARK_LOGO_GLOW[skill.name] : skill.color }}
+                        />
+                      )}
+                      <motion.div
+                        whileHover={touchDevice ? undefined : { rotate: 12, scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 15 }}
                         className={`relative flex h-14 w-14 items-center justify-center rounded-2xl ${
                           isDarkLogo ? 'tag-glass-dark' : 'tag-glass'
                         }`}
                       >
                         <Icon size={30} style={{ color: skill.color }} />
-                      </div>
+                      </motion.div>
                     </div>
 
                     <h3 className="text-light-800 font-accent font-semibold text-sm">{skill.name}</h3>
                     {skill.level && (
-                      <span
-                        className={`mt-2 inline-block rounded-full border px-2.5 py-0.5 text-[0.65rem] font-medium ${
-                          levelStyles[skill.level] || levelStyles.Intermediate
-                        }`}
-                      >
-                        {skill.level}
-                      </span>
+                      <>
+                        <span
+                          className={`mt-1.5 inline-block rounded-full border px-2.5 py-0.5 text-[0.65rem] font-medium ${
+                            levelStyles[skill.level] || levelStyles.Intermediate
+                          }`}
+                        >
+                          {skill.level}
+                        </span>
+                        <ProgressBar level={skill.level} />
+                      </>
                     )}
                   </motion.div>
                 )
