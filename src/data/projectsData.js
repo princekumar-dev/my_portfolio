@@ -5,7 +5,8 @@ export const projectsData = [
     description: 'Comprehensive academic management system for tracking courses, grades, and student progress with real-time updates and analytics.',
     technologies: ['React', 'Node.js', 'MongoDB', 'Express', 'Tailwind CSS'],
     github: 'https://github.com/princekumar-dev/Academics--2',
-    image: '/images/academics.png',
+    image: '/academics.png',
+    color: '#3b82f6',
     featured: true,
     status: 'Completed'
   },
@@ -15,7 +16,8 @@ export const projectsData = [
     description: 'Social networking platform enabling users to connect, share posts, collaborate on projects, and build communities.',
     technologies: ['React', 'Firebase', 'Tailwind CSS', 'JavaScript', 'Firestore'],
     github: 'https://github.com/princekumar-dev/Connect',
-    image: '/images/connect.png',
+    image: '/connect.png',
+    color: '#06b6d4',
     featured: true,
     status: 'Completed'
   },
@@ -25,9 +27,10 @@ export const projectsData = [
     description: 'Intelligent chatbot for task automation, scheduling, and productivity enhancement using NLP and machine learning.',
     technologies: ['Python', 'Node.js', 'NLP', 'MongoDB', 'Express'],
     github: 'https://github.com/princekumar-dev/Busy_Bot',
-    image: '/images/busybot.png',
+    image: '/busybot.png',
+    color: '#10b981',
     featured: true,
-    status: 'In Progress'
+    status: 'Completed'
   },
   {
     id: 4,
@@ -35,7 +38,8 @@ export const projectsData = [
     description: 'Productivity tool helping developers maintain focus with Pomodoro timer, session tracking, and analytics dashboard.',
     technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Local Storage', 'Chart.js'],
     github: 'https://github.com/princekumar-dev/FocusForge',
-    image: '/images/focusforge.png',
+    image: '/focusforge.png',
+    color: '#f59e0b',
     featured: true,
     status: 'Completed'
   },
@@ -45,7 +49,8 @@ export const projectsData = [
     description: 'Logistics management system for tracking shipments, optimizing delivery routes, and managing inventory in real-time.',
     technologies: ['React', 'Node.js', 'PostgreSQL', 'Google Maps API', 'Express'],
     github: 'https://github.com/princekumar-dev/Logipilot',
-    image: '/images/logipilot.png',
+    image: '/logipilot.png',
+    color: '#ef4444',
     featured: true,
     status: 'Completed'
   }

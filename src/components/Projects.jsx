@@ -38,13 +38,17 @@ const Projects = () => {
     <motion.div variants={itemVariants}>
       <TiltCard className="group glass-card glass-edge h-full rounded-2xl overflow-hidden">
         <div className="relative h-48 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden">
-          {/* Real screenshot with graceful gradient fallback (hidden if it fails to load) */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 rounded-none blur-xl opacity-20 group-hover:opacity-50 transition-opacity duration-300"
+            style={{ backgroundColor: project.color }}
+          />
           {project.image && (
             <img
               src={project.image}
               alt={`${project.title} preview`}
               loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="absolute inset-0 h-full w-full object-contain p-10 transition-transform duration-500 group-hover:scale-105"
               onError={(e) => {
                 e.currentTarget.style.display = 'none'
               }}
