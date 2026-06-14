@@ -93,7 +93,7 @@ function App() {
         <ScrollProgressBar />
         <Navigation />
         <Hero />
-        <Suspense fallback={<div className="min-h-[400px]" />}>
+        <Suspense fallback={<div className="min-h-[300px] w-full" />}>
           <WaveDivider />
           <SectionReveal>
             <About />

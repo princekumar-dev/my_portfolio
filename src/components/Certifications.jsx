@@ -28,7 +28,7 @@ const Certifications = () => {
   const CertCard = ({ cert }) => (
     <motion.div variants={itemVariants}>
       <TiltCard className="group glass-card glass-edge h-full rounded-2xl overflow-hidden">
-        <div className="relative h-40 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden flex items-center justify-center">
+        <div className="relative h-32 sm:h-40 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden flex items-center justify-center">
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-cyan opacity-0 group-hover:opacity-15 transition-opacity duration-300"
           />
@@ -37,7 +37,7 @@ const Certifications = () => {
             <p className="text-sm text-light-600 font-semibold">{cert.date}</p>
           </div>
         </div>
-        <div className="p-5">
+        <div className="p-4 sm:p-5">
           <h3 className="text-lg font-bold text-accent-blue mb-2">{cert.title}</h3>
           <p className="text-light-500 text-sm">{cert.issuer}</p>
         </div>
@@ -46,7 +46,7 @@ const Certifications = () => {
   )
 
   return (
-    <section ref={ref} id="certifications" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <section ref={ref} id="certifications" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"
@@ -60,7 +60,7 @@ const Certifications = () => {
           className="text-center mb-16"
         >
           <span className="eyebrow text-accent-blue">Recognitions</span>
-          <h2 className="mt-3 text-4xl md:text-5xl font-bold">
+          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
             <span className="animated-gradient-text">
               Certifications
             </span>
@@ -72,7 +72,7 @@ const Certifications = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
         >
           {certificationsData.map((cert) => (
             <CertCard key={cert.id} cert={cert} />

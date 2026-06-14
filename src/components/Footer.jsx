@@ -5,18 +5,19 @@ const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer aria-label="Site footer" className="relative glass border-t border-white/40 py-12 px-4">
+    <footer aria-label="Site footer" className="relative glass border-t border-white/40 py-8 sm:py-12 px-4" style={{ contain: 'layout style' }}>
       <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-8 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            className="sm:flex-1"
           >
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent mb-4">
-              PR
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent mb-3">
+              Prince.dev
             </h3>
-            <p className="text-light-500 text-sm">
+            <p className="text-light-500 text-sm leading-relaxed max-w-xs">
               AI & Data Science engineer passionate about building intelligent, data-driven experiences.
             </p>
           </motion.div>
@@ -26,9 +27,10 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
+            className="sm:flex-1"
           >
-            <h4 className="text-accent-blue font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-light-500 text-sm">
+            <h4 className="text-accent-blue font-semibold mb-3">Quick Links</h4>
+            <ul className="space-y-2.5 text-light-500 text-sm">
               <li><a href="#home" className="hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Home</a></li>
               <li><a href="#projects" className="hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Projects</a></li>
               <li><a href="#contact" className="hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Contact</a></li>
@@ -40,9 +42,10 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
+            className="sm:flex-1"
           >
-            <h4 className="text-accent-blue font-semibold mb-4">Connect</h4>
-            <ul className="space-y-3 text-light-500 text-sm">
+            <h4 className="text-accent-blue font-semibold mb-3">Connect</h4>
+            <ul className="space-y-2.5 text-light-500 text-sm">
               <li>
                 <a href="https://github.com/princekumar-dev" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in new tab)" className="flex items-center gap-2 hover:text-accent-blue transition-colors duration-200 group">
                   <FiGithub size={16} className="group-hover:rotate-12 transition-transform duration-200" />
@@ -69,9 +72,9 @@ const Footer = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="border-t border-light-200 pt-8 text-center text-light-500 text-sm"
+          className="border-t border-light-200 pt-6 text-center text-light-500 text-sm"
         >
-          <p>&copy; {currentYear} Prince R. All rights reserved. Built with React & Framer Motion.</p>
+          <p>&copy; {currentYear} Prince R. All rights reserved.</p>
         </motion.div>
       </div>
     </footer>

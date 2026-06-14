@@ -74,7 +74,7 @@ const Contact = () => {
   }
 
   return (
-    <motion.section ref={ref} id="contact" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="contact" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
@@ -89,7 +89,7 @@ const Contact = () => {
         >
           <motion.div variants={itemVariants} className="text-center">
             <span className="eyebrow text-accent-blue">Let's talk</span>
-            <h2 className="mt-3 text-4xl md:text-5xl font-bold mb-8">
+            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8">
               <span className="animated-gradient-text">
                 Get In Touch
               </span>
@@ -98,16 +98,16 @@ const Contact = () => {
 
           <motion.p
             variants={itemVariants}
-            className="text-light-600 text-lg text-center mb-16 max-w-2xl mx-auto"
+            className="text-light-600 text-base sm:text-lg text-center mb-10 sm:mb-16 max-w-2xl mx-auto"
           >
             I'm always interested in hearing about new projects and opportunities.
             Feel free to reach out through any of the channels below!
           </motion.p>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             <motion.div
               variants={containerVariants}
-              className="grid grid-cols-2 gap-4"
+              className="grid grid-cols-2 gap-3 sm:gap-4"
             >
               {contactLinks.map((link) => {
                 const Icon = link.icon
@@ -140,7 +140,7 @@ const Contact = () => {
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <form onSubmit={handleSubmit} className="glass-card glass-edge rounded-2xl p-8 space-y-5">
+              <form onSubmit={handleSubmit} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4 sm:space-y-5">
                 <div className="floating-label-group">
                   <input
                     id="contact-name"

@@ -5,8 +5,14 @@ import { FiArrowDown } from 'react-icons/fi'
 const FULL_NAME = 'Prince R'
 const TYPING_SPEED = 80
 const START_DELAY = 600
-const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*'
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 const ROLE_TEXTS = ['AI Engineer', 'Data Scientist', 'Full Stack Developer', 'ML Researcher']
+const HOLD_MS = 2800
+const DECODE_MS = 500
+const ENCODE_MS = 250
+const STAGGER_MS = 35
+const ENCODE_STAGGER_MS = 20
+const GAP_MS = 80
 
 function SplitText({ text, className, delay = 0 }) {
   return (
@@ -31,43 +37,110 @@ function SplitText({ text, className, delay = 0 }) {
 }
 
 function TextScramble({ texts, className }) {
-  const [displayed, setDisplayed] = useState('')
-  const [textIndex, setTextIndex] = useState(0)
-  const [isScrambling, setIsScrambling] = useState(true)
+  const containerRef = useRef(null)
+  const rafRef = useRef(0)
+  const stateRef = useRef({ phase: 'in', textIdx: 0, startTime: 0 })
+  const maxLen = useMemo(() => Math.max(...texts.map(t => t.length)), [texts])
 
   useEffect(() => {
-    const target = texts[textIndex]
-    let frame = 0
-    const totalFrames = target.length * 3
-    const interval = setInterval(() => {
-      frame++
-      const progress = frame / totalFrames
-      const revealed = Math.floor(progress * target.length)
-      const scrambled = target
-        .slice(revealed)
-        .split('')
-        .map(() => SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)])
-        .join('')
-      setDisplayed(target.slice(0, revealed) + scrambled)
-      if (frame >= totalFrames) {
-        clearInterval(interval)
-        setDisplayed(target)
-        setIsScrambling(false)
-        setTimeout(() => {
-          setIsScrambling(true)
-          setTextIndex((prev) => (prev + 1) % texts.length)
-        }, 3000)
+    const container = containerRef.current
+    if (!container) return
+
+    container.innerHTML = ''
+    const spans = []
+    for (let i = 0; i < maxLen; i++) {
+      const s = document.createElement('span')
+      s.className = 'scramble-char'
+      container.appendChild(s)
+      spans.push(s)
+    }
+
+    const state = stateRef.current
+    state.phase = 'in'
+    state.textIdx = 0
+    state.startTime = performance.now()
+
+    const rnd = () => SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
+
+    const tick = (now) => {
+      const elapsed = now - state.startTime
+      const text = texts[state.textIdx]
+
+      if (state.phase === 'in') {
+        let allSettled = true
+        for (let i = 0; i < maxLen; i++) {
+          if (i >= text.length) {
+            spans[i].textContent = ''
+            spans[i].className = 'scramble-char'
+            continue
+          }
+          const delay = i * STAGGER_MS
+          const charTime = elapsed - delay
+          if (charTime < 0) {
+            spans[i].textContent = rnd()
+            spans[i].className = 'scramble-char scrambling'
+            allSettled = false
+          } else if (charTime < DECODE_MS * 0.5) {
+            spans[i].textContent = rnd()
+            spans[i].className = 'scramble-char scrambling'
+            allSettled = false
+          } else {
+            spans[i].textContent = text[i]
+            spans[i].className = 'scramble-char settled'
+          }
+        }
+        if (allSettled) {
+          for (let i = 0; i < text.length; i++) {
+            spans[i].textContent = text[i]
+            spans[i].className = 'scramble-char settled'
+          }
+          state.phase = 'hold'
+          state.startTime = now
+        }
+      } else if (state.phase === 'hold') {
+        if (elapsed >= HOLD_MS) {
+          state.phase = 'out'
+          state.startTime = now
+        }
+      } else if (state.phase === 'out') {
+        let allCleared = true
+        for (let i = 0; i < maxLen; i++) {
+          if (i >= text.length) continue
+          const delay = (text.length - 1 - i) * ENCODE_STAGGER_MS
+          const charTime = elapsed - delay
+          if (charTime < 0) {
+            spans[i].textContent = text[i]
+            spans[i].className = 'scramble-char settled'
+            allCleared = false
+          } else if (charTime < ENCODE_MS * 0.5) {
+            spans[i].textContent = rnd()
+            spans[i].className = 'scramble-char scrambling'
+            allCleared = false
+          } else {
+            spans[i].textContent = ''
+            spans[i].className = 'scramble-char'
+          }
+        }
+        if (allCleared) {
+          state.textIdx = (state.textIdx + 1) % texts.length
+          state.phase = 'in'
+          state.startTime = now + GAP_MS
+        }
       }
-    }, 40)
-    return () => clearInterval(interval)
-  }, [textIndex, texts])
+
+      rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+    return () => {
+      cancelAnimationFrame(rafRef.current)
+      container.innerHTML = ''
+    }
+  }, [texts, maxLen])
 
   return (
-    <span className={`scramble-text ${className || ''}`}>
-      {displayed}
-      {isScrambling && (
-        <span className="inline-block w-[2px] h-[1em] ml-0.5 align-middle bg-accent-blue animate-pulse" />
-      )}
+    <span className={`scramble-container ${className || ''}`}>
+      <span ref={containerRef} className="scramble-text" />
     </span>
   )
 }
@@ -76,8 +149,8 @@ function MagneticButton({ children, className, href, target, rel, ...rest }) {
   const ref = useRef(null)
   const x = useMotionValue(0)
   const y = useMotionValue(0)
-  const springX = useSpring(x, { stiffness: 300, damping: 20 })
-  const springY = useSpring(y, { stiffness: 300, damping: 20 })
+  const springX = useSpring(x, { stiffness: 500, damping: 20 })
+  const springY = useSpring(y, { stiffness: 500, damping: 20 })
 
   const handleMouseMove = useCallback((e) => {
     const el = ref.current
@@ -129,7 +202,7 @@ const ParticleCanvas = ({ isMobile }) => {
     let w = (canvas.width = window.innerWidth)
     let h = (canvas.height = window.innerHeight)
 
-    const PARTICLE_COUNT = 60
+    const PARTICLE_COUNT = w < 1024 ? 35 : w < 1440 ? 50 : 60
     const CONNECTION_DIST = 120
     const MOUSE_RADIUS = 150
 
@@ -247,7 +320,7 @@ const Hero = () => {
   const [badgeVisible, setBadgeVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const mouseX = useMotionValue(0)
-  const arrowX = useSpring(mouseX, { stiffness: 150, damping: 20 })
+  const arrowX = useSpring(mouseX, { stiffness: 350, damping: 20 })
 
   useEffect(() => {
     let interval
@@ -327,7 +400,8 @@ const Hero = () => {
     <section
       ref={sectionRef}
       id="home"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-16 sm:pt-20"
+      style={{ contain: 'layout style' }}
     >
       <motion.div style={{ y: gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]">
         <div
@@ -401,7 +475,7 @@ const Hero = () => {
           <span className="eyebrow text-accent-blue">Welcome to my portfolio</span>
         </motion.div>
 
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-light-900 h-[1.2em]">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-light-900">
           <span className="hero-shimmer bg-gradient-to-r from-accent-blue via-accent-purple to-accent-cyan bg-clip-text text-transparent">
             {typingDone ? (
               <SplitText text={FULL_NAME} className="inline-block" delay={0} />
@@ -418,14 +492,14 @@ const Hero = () => {
 
         <motion.p
           variants={itemVariants}
-          className="text-xl md:text-2xl text-light-700 mb-8 font-light"
+          className="text-lg sm:text-xl md:text-2xl text-light-700 mb-6 sm:mb-8 font-light"
         >
           <TextScramble texts={ROLE_TEXTS} className="text-accent-blue font-semibold" />
         </motion.p>
 
         <motion.p
           variants={itemVariants}
-          className="text-light-600 text-lg mb-12 max-w-2xl mx-auto"
+          className="text-light-600 text-base sm:text-lg mb-8 sm:mb-12 max-w-2xl mx-auto px-2"
         >
           Building intelligent systems that transform data into meaningful experiences.
           Passionate about creating seamless user experiences and scalable solutions.

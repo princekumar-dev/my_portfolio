@@ -50,7 +50,7 @@ const Projects = () => {
   const ProjectCard = ({ project }) => (
     <motion.div variants={itemVariants}>
       <TiltCard className="group glass-card glass-edge animated-border h-full rounded-2xl overflow-hidden">
-        <div className="relative h-48 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden">
+        <div className="relative h-40 sm:h-48 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden">
           <span
             aria-hidden="true"
             className="absolute inset-0 rounded-none blur-xl opacity-20 group-hover:opacity-50 transition-opacity duration-300"
@@ -86,7 +86,7 @@ const Projects = () => {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-5 sm:p-6">
           <p className="text-light-600 text-sm mb-4 line-clamp-2">{project.description}</p>
 
           <div className="card-reveal-content">
@@ -121,7 +121,7 @@ const Projects = () => {
   )
 
   return (
-    <motion.section ref={ref} id="projects" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="projects" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"
@@ -139,7 +139,7 @@ const Projects = () => {
           className="text-center mb-16"
         >
           <span className="eyebrow text-accent-blue">Selected work</span>
-          <h2 className="mt-3 text-4xl md:text-5xl font-bold">
+          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
             <span className="animated-gradient-text">
               Featured Projects
             </span>
@@ -151,7 +151,7 @@ const Projects = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-auto"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-auto"
         >
           {projectsData.map((project) => (
             <ProjectCard key={project.id} project={project} />

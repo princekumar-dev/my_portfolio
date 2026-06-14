@@ -36,8 +36,8 @@ const ScrollToTop = () => {
           onClick={scrollToTop}
           aria-label="Scroll to top"
           title="Scroll to top"
-          className="fixed z-40 p-3 rounded-full bg-gradient-to-r from-accent-blue to-accent-cyan text-white shadow-lg shadow-accent-blue/30 hover:shadow-xl hover:shadow-accent-blue/50 transition-[background,box-shadow,transform] duration-300"
-          style={{ bottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))', right: 'max(2rem, env(safe-area-inset-right, 2rem))' }}
+          className="fixed z-40 p-3 rounded-full bg-gradient-to-r from-accent-blue to-accent-cyan text-white shadow-lg shadow-accent-blue/30 hover:shadow-xl hover:shadow-accent-blue/50 transition-[transform] duration-300"
+          style={{ bottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))', right: 'max(2rem, env(safe-area-inset-right, 2rem))', contain: 'layout style' }}
         >
           <FiArrowUp size={24} />
         </motion.button>

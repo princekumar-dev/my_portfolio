@@ -66,7 +66,7 @@ const Experience = () => {
         initial={{ scale: 0 }}
         whileInView={{ scale: 1 }}
         viewport={{ once: true }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20, delay: index * 0.1 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 22, delay: index * 0.1 }}
         className="absolute left-0 top-0 w-4 h-4 rounded-full bg-accent-blue border-4 border-white shadow-md glow-pulse"
       />
       <TimelineConnector isLast={index === experienceData.length - 1} />
@@ -74,7 +74,7 @@ const Experience = () => {
       <motion.div
         whileHover={{ x: 10, boxShadow: '0 8px 30px -8px rgba(59,130,246,0.15)' }}
         transition={{ duration: 0.2 }}
-        className="glass-card glass-edge rounded-xl p-6 cursor-default"
+        className="glass-card glass-edge rounded-xl p-4 sm:p-6 cursor-default"
       >
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-xl font-bold text-accent-blue">{exp.position}</h3>
@@ -102,18 +102,18 @@ const Experience = () => {
   )
 
   return (
-    <motion.section ref={ref} id="experience" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
       ></motion.div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="max-w-4xl mx-auto relative z-10 px-2 sm:px-0">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-bold mb-16 text-center"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold mb-12 sm:mb-16 text-center"
         >
           <span className="eyebrow text-accent-blue block mb-3">Where I've worked</span>
           <span className="animated-gradient-text">

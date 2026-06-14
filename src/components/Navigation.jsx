@@ -126,6 +126,7 @@ const Navigation = () => {
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className="fixed w-full z-50 transition-[border-color] duration-500"
       style={{
+        contain: 'layout style',
         backdropFilter: scrollDepth > 0.05 ? `blur(${blurAmount}px) saturate(180%)` : 'none',
         WebkitBackdropFilter: scrollDepth > 0.05 ? `blur(${blurAmount}px) saturate(180%)` : 'none',
         background: scrollDepth > 0.05

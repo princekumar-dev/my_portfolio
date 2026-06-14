@@ -167,11 +167,9 @@ h1 {
     inset 0 -1px 0 rgba(255, 255, 255, 0.4),
     inset 1px 0 0 rgba(255, 255, 255, 0.3),
     inset -1px 0 0 rgba(255, 255, 255, 0.3);
-  transition:
-    box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 /* Inner shimmer highlight */
@@ -304,7 +302,17 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .float-slow, .float-medium, .float-fast, .tilt-float { animation: none; }
+
+  .glass-card:hover { transform: none; }
+  .btn-glass:hover { transform: none; }
 }
 
 /* ── Shimmer Loading Effect ───────────────────────── */
@@ -351,19 +359,20 @@ h1 {
 
 .skip-to-content {
   position: absolute;
-  top: -100%;
+  top: 0;
   left: 16px;
+  transform: translateY(-110%);
   z-index: 10000;
   padding: 12px 24px;
   background: #3B82F6;
   color: #fff;
   font-weight: 600;
   border-radius: 0 0 8px 8px;
-  transition: top 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .skip-to-content:focus {
-  top: 0;
+  transform: translateY(0);
 }
 
 /* ── Premium Button Glass ─────────────────────────── */
@@ -378,10 +387,9 @@ h1 {
     0 4px 16px -4px rgba(31, 41, 55, 0.1),
     0 1px 4px -1px rgba(31, 41, 55, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 .btn-glass:hover {
@@ -404,7 +412,7 @@ h1 {
   box-shadow:
     0 2px 8px -2px rgba(31, 41, 55, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .tag-glass:hover {
@@ -424,7 +432,7 @@ h1 {
   box-shadow:
     0 2px 8px -2px rgba(0, 0, 0, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .tag-glass-dark:hover {
@@ -669,10 +677,51 @@ h1 {
   opacity: 1;
 }
 
-/* Text scramble font */
-.scramble-text {
-  font-family: 'Sora', monospace;
+/* Text scramble — premium decode effect */
+.scramble-container {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.scramble-text {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.scramble-char {
+  display: inline-block;
+  opacity: 0;
+}
+
+.scramble-char.scrambling {
+  opacity: 0.45;
+  color: rgba(59, 130, 246, 0.5);
+}
+
+.scramble-char.settled {
+  opacity: 1;
+  color: transparent;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6, #06B6D4);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: charLand 0.35s ease-out forwards, charGradientShift 4s ease infinite;
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.25));
+}
+
+@keyframes charLand {
+  0% { opacity: 0.7; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes charGradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 /* Clip-path section reveal */
@@ -696,7 +745,13 @@ h1 {
 .wave-divider svg {
   display: block;
   width: 100%;
-  height: 60px;
+  height: 40px;
+}
+
+@media (min-width: 640px) {
+  .wave-divider svg {
+    height: 60px;
+  }
 }
 
 /* Social link hover fill */
@@ -757,7 +812,9 @@ h1 {
   font-size: 1rem;
   color: #9ca3af;
   pointer-events: none;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              font-size 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: left center;
 }
 
@@ -795,6 +852,7 @@ h1 {
 /* Nav auto-hide */
 .nav-hidden {
   transform: translateY(-100%);
+  will-change: transform;
 }
 
 /* Active nav pill */
@@ -834,18 +892,18 @@ h1 {
   50% { background-position: 100% 50%; }
 }
 
-/* Aurora mesh gradient */
+/* Aurora mesh gradient — GPU-composited only */
 @keyframes auroraMorph1 {
-  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(0, 0) rotate(0deg); }
-  25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: translate(5%, -5%) rotate(5deg); }
-  50% { border-radius: 50% 60% 30% 60% / 30% 40% 70% 60%; transform: translate(-3%, 3%) rotate(-3deg); }
-  75% { border-radius: 40% 60% 50% 40% / 60% 50% 40% 60%; transform: translate(3%, 5%) rotate(3deg); }
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  25% { transform: translate(5%, -5%) rotate(5deg) scale(1.1); }
+  50% { transform: translate(-3%, 3%) rotate(-3deg) scale(0.95); }
+  75% { transform: translate(3%, 5%) rotate(3deg) scale(1.05); }
 }
 
 @keyframes auroraMorph2 {
-  0%, 100% { border-radius: 40% 60% 60% 40% / 40% 50% 50% 60%; transform: translate(0, 0) rotate(0deg); }
-  33% { border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%; transform: translate(-4%, 4%) rotate(-4deg); }
-  66% { border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%; transform: translate(4%, -3%) rotate(4deg); }
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  33% { transform: translate(-4%, 4%) rotate(-4deg) scale(1.08); }
+  66% { transform: translate(4%, -3%) rotate(4deg) scale(0.92); }
 }
 
 .aurora-blob {
@@ -999,5 +1057,13 @@ h1 {
 
   nav, .pointer-events-none[aria-hidden="true"] {
     display: none !important;
+  }
+}
+
+/* ── Mobile Scramble Overrides ────────────────────── */
+
+@media (pointer: coarse) {
+  .scramble-char.settled {
+    filter: none;
   }
 }

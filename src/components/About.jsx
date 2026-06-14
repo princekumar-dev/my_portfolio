@@ -79,7 +79,7 @@ const About = () => {
   }
 
   return (
-    <motion.section ref={ref} id="about" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="about" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"
@@ -98,15 +98,15 @@ const About = () => {
         >
           <motion.div variants={itemVariants} className="text-center mb-12">
             <span className="eyebrow text-accent-blue">Who I am</span>
-            <h2 className="mt-3 text-4xl md:text-5xl font-bold">
+            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
               <span className="animated-gradient-text">
                 About Me
               </span>
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div variants={itemVariants} className="glass-card glass-edge rounded-2xl p-8 space-y-4">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <motion.div variants={itemVariants} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4">
               <LineReveal delay={0}>
                 <p className="text-light-600 text-lg leading-relaxed">
                   I'm an AI & Data Science engineer with a strong foundation in modern web and machine learning
@@ -131,7 +131,7 @@ const About = () => {
 
             <motion.div
               variants={itemVariants}
-              className="grid grid-cols-2 gap-4"
+              className="grid grid-cols-2 gap-3 sm:gap-4"
             >
               {stats.map((stat, i) => (
                 <motion.div

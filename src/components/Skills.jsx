@@ -84,7 +84,7 @@ const Skills = () => {
   } : itemVariants
 
   return (
-    <motion.section ref={ref} id="skills" className="relative py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="skills" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
       <motion.div
         style={{ y: fast }}
         className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
@@ -102,7 +102,7 @@ const Skills = () => {
           className="text-center mb-16"
         >
           <span className="eyebrow text-accent-blue">What I work with</span>
-          <h2 className="mt-3 text-4xl md:text-5xl font-bold">
+          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
             <span className="animated-gradient-text">
               Skills &amp; Technologies
             </span>
@@ -110,7 +110,7 @@ const Skills = () => {
         </motion.div>
 
         {allSkills.map(({ category, skills }) => (
-          <div key={category} className="mb-14">
+            <div key={category} className="mb-8 md:mb-14">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -129,7 +129,7 @@ const Skills = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: '-80px' }}
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
             >
               {skills.map((skill) => {
                 const Icon = skill.icon
@@ -152,7 +152,7 @@ const Skills = () => {
                       <motion.div
                         whileHover={touchDevice ? undefined : { rotate: 12, scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 18 }}
                         className={`relative flex h-14 w-14 items-center justify-center rounded-2xl ${
                           isDarkLogo ? 'tag-glass-dark' : 'tag-glass'
                         }`}
