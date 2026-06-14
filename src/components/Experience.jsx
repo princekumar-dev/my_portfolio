@@ -115,7 +115,7 @@ const Experience = () => {
           viewport={{ once: true }}
           className="text-4xl md:text-5xl font-bold mb-16 text-center"
         >
-          <span className="bg-gradient-to-r from-accent-blue to-accent-purple bg-clip-text text-transparent">
+          <span className="animated-gradient-text">
             Experience
           </span>
         </motion.h2>

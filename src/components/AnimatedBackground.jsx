@@ -85,6 +85,43 @@ const AnimatedBackground = () => {
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       style={{ contain: 'layout style paint' }}
     >
+      <svg className="absolute w-0 h-0">
+        <defs>
+          <filter id="noise-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
+        </defs>
+      </svg>
+
+      <div
+        className="absolute inset-0"
+        style={{
+          filter: 'url(#noise-filter)',
+          opacity: 0.03,
+          mixBlendMode: 'overlay',
+        }}
+      />
+
+      {!isMobile && (
+        <div className="absolute inset-0 overflow-hidden">
+          <div
+            className="aurora-blob absolute -top-1/4 -left-1/4 w-[60vw] h-[60vh] opacity-[0.07]"
+            style={{
+              background: 'radial-gradient(ellipse at center, rgba(59,130,246,0.4), rgba(139,92,246,0.2), transparent 70%)',
+              filter: 'blur(80px)',
+            }}
+          />
+          <div
+            className="aurora-blob-alt absolute -bottom-1/4 -right-1/4 w-[50vw] h-[50vh] opacity-[0.05]"
+            style={{
+              background: 'radial-gradient(ellipse at center, rgba(6,182,212,0.3), rgba(236,72,153,0.15), transparent 70%)',
+              filter: 'blur(80px)',
+            }}
+          />
+        </div>
+      )}
+
       <motion.div
         style={{ y: gridY }}
         className="absolute inset-0 opacity-[0.35]"

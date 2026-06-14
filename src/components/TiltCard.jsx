@@ -81,9 +81,11 @@ const TiltCard = ({
 
     const unsubX = px.onChange((v) => {
       el.style.setProperty('--mx', `${(v + 0.5) * 100}%`)
+      el.style.setProperty('--card-mx', `${(v + 0.5) * 100}%`)
     })
     const unsubY = py.onChange((v) => {
       el.style.setProperty('--my', `${(v + 0.5) * 100}%`)
+      el.style.setProperty('--card-my', `${(v + 0.5) * 100}%`)
     })
     return () => { unsubX(); unsubY() }
   }, [reduceMotion, isInView, px, py])
@@ -119,6 +121,8 @@ const TiltCard = ({
       {...rest}
     >
       {children}
+
+      <div className="card-spotlight" aria-hidden="true" />
 
       {glare && !touchDevice && (
         <motion.div

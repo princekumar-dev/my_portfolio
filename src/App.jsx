@@ -1,4 +1,5 @@
-import { Component, Suspense, lazy } from 'react'
+import { Component, Suspense, lazy, useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
 import Navigation from './components/Navigation'
 import AnimatedBackground from './components/AnimatedBackground'
 import ScrollProgressBar from './components/ScrollProgressBar'
@@ -45,11 +46,38 @@ class ErrorBoundary extends Component {
   }
 }
 
-function SectionDivider() {
+function WaveDivider({ flip = false, color = 'rgba(59,130,246,0.06)' }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-20px' })
+
   return (
-    <div className="relative h-px max-w-4xl mx-auto" aria-hidden="true">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent-blue/20 to-transparent" />
+    <div ref={ref} className="wave-divider relative" aria-hidden="true" style={{ transform: flip ? 'scaleY(-1)' : 'none' }}>
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
+        <motion.path
+          d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,60 L0,60 Z"
+          fill={color}
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+        />
+      </svg>
     </div>
+  )
+}
+
+function SectionReveal({ children }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ clipPath: 'inset(8% 0 8% 0)' }}
+      animate={isInView ? { clipPath: 'inset(0% 0 0% 0)' } : { clipPath: 'inset(8% 0 8% 0)' }}
+      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
   )
 }
 
@@ -66,18 +94,30 @@ function App() {
         <Navigation />
         <Hero />
         <Suspense fallback={null}>
-          <SectionDivider />
-          <About />
-          <SectionDivider />
-          <Skills />
-          <SectionDivider />
-          <Projects />
-          <SectionDivider />
-          <Experience />
-          <SectionDivider />
-          <Certifications />
-          <SectionDivider />
-          <Contact />
+          <WaveDivider />
+          <SectionReveal>
+            <About />
+          </SectionReveal>
+          <WaveDivider flip color="rgba(6,182,212,0.05)" />
+          <SectionReveal>
+            <Skills />
+          </SectionReveal>
+          <WaveDivider color="rgba(139,92,246,0.05)" />
+          <SectionReveal>
+            <Projects />
+          </SectionReveal>
+          <WaveDivider flip color="rgba(59,130,246,0.04)" />
+          <SectionReveal>
+            <Experience />
+          </SectionReveal>
+          <WaveDivider color="rgba(6,182,212,0.04)" />
+          <SectionReveal>
+            <Certifications />
+          </SectionReveal>
+          <WaveDivider flip color="rgba(139,92,246,0.04)" />
+          <SectionReveal>
+            <Contact />
+          </SectionReveal>
         </Suspense>
         <Footer />
         <ScrollToTop />

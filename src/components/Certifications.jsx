@@ -61,7 +61,7 @@ const Certifications = () => {
         >
           <span className="eyebrow text-accent-blue">Recognitions</span>
           <h2 className="mt-3 text-4xl md:text-5xl font-bold">
-            <span className="bg-gradient-to-r from-accent-blue to-accent-purple bg-clip-text text-transparent">
+            <span className="animated-gradient-text">
               Certifications
             </span>
           </h2>

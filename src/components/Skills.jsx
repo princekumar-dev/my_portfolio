@@ -103,7 +103,7 @@ const Skills = () => {
         >
           <span className="eyebrow text-accent-blue">What I work with</span>
           <h2 className="mt-3 text-4xl md:text-5xl font-bold">
-            <span className="bg-gradient-to-r from-accent-blue to-accent-purple bg-clip-text text-transparent">
+            <span className="animated-gradient-text">
               Skills &amp; Technologies
             </span>
           </h2>
@@ -139,7 +139,7 @@ const Skills = () => {
                   <motion.div
                     key={skill.name}
                     variants={mobileItemVariants}
-                    className="glass-card glass-edge group rounded-2xl p-6 cursor-default"
+                    className="glass-card glass-edge animated-border group rounded-2xl p-6 cursor-default"
                   >
                     <div className="relative mb-4 inline-block">
                       {!touchDevice && (

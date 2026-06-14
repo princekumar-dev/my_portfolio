@@ -1,10 +1,244 @@
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { FiArrowDown } from 'react-icons/fi'
 
 const FULL_NAME = 'Prince R'
 const TYPING_SPEED = 80
 const START_DELAY = 600
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*'
+const ROLE_TEXTS = ['AI Engineer', 'Data Scientist', 'Full Stack Developer', 'ML Researcher']
+
+function SplitText({ text, className, delay = 0 }) {
+  return (
+    <span className={className} aria-label={text}>
+      {text.split('').map((char, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 40, rotateX: -80 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{
+            duration: 0.6,
+            delay: delay + i * 0.04,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </span>
+  )
+}
+
+function TextScramble({ texts, className }) {
+  const [displayed, setDisplayed] = useState('')
+  const [textIndex, setTextIndex] = useState(0)
+  const [isScrambling, setIsScrambling] = useState(true)
+
+  useEffect(() => {
+    const target = texts[textIndex]
+    let frame = 0
+    const totalFrames = target.length * 3
+    const interval = setInterval(() => {
+      frame++
+      const progress = frame / totalFrames
+      const revealed = Math.floor(progress * target.length)
+      const scrambled = target
+        .slice(revealed)
+        .split('')
+        .map(() => SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)])
+        .join('')
+      setDisplayed(target.slice(0, revealed) + scrambled)
+      if (frame >= totalFrames) {
+        clearInterval(interval)
+        setDisplayed(target)
+        setIsScrambling(false)
+        setTimeout(() => {
+          setIsScrambling(true)
+          setTextIndex((prev) => (prev + 1) % texts.length)
+        }, 3000)
+      }
+    }, 40)
+    return () => clearInterval(interval)
+  }, [textIndex, texts])
+
+  return (
+    <span className={`scramble-text ${className || ''}`}>
+      {displayed}
+      {isScrambling && (
+        <span className="inline-block w-[2px] h-[1em] ml-0.5 align-middle bg-accent-blue animate-pulse" />
+      )}
+    </span>
+  )
+}
+
+function MagneticButton({ children, className, href, target, rel, ...rest }) {
+  const ref = useRef(null)
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const springX = useSpring(x, { stiffness: 300, damping: 20 })
+  const springY = useSpring(y, { stiffness: 300, damping: 20 })
+
+  const handleMouseMove = useCallback((e) => {
+    const el = ref.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+    x.set((e.clientX - cx) * 0.3)
+    y.set((e.clientY - cy) * 0.3)
+  }, [x, y])
+
+  const handleMouseLeave = useCallback(() => {
+    x.set(0)
+    y.set(0)
+  }, [x, y])
+
+  const Tag = href ? motion.a : motion.button
+
+  return (
+    <Tag
+      ref={ref}
+      href={href}
+      target={target}
+      rel={rel}
+      style={{ x: springX, y: springY }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className={className}
+      {...rest}
+    >
+      {children}
+    </Tag>
+  )
+}
+
+const ParticleCanvas = ({ isMobile }) => {
+  const canvasRef = useRef(null)
+  const mouseRef = useRef({ x: 0, y: 0 })
+  const particlesRef = useRef([])
+  const rafRef = useRef(0)
+
+  useEffect(() => {
+    if (isMobile) return
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    let w = (canvas.width = window.innerWidth)
+    let h = (canvas.height = window.innerHeight)
+
+    const PARTICLE_COUNT = 60
+    const CONNECTION_DIST = 120
+    const MOUSE_RADIUS = 150
+
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      size: 1 + Math.random() * 1.5,
+      opacity: 0.2 + Math.random() * 0.3,
+    }))
+    particlesRef.current = particles
+
+    const handleResize = () => {
+      w = canvas.width = window.innerWidth
+      h = canvas.height = window.innerHeight
+    }
+    const handleMouse = (e) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY }
+    }
+
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('pointermove', handleMouse, { passive: true })
+
+    const animate = () => {
+      ctx.clearRect(0, 0, w, h)
+      const mx = mouseRef.current.x
+      const my = mouseRef.current.y
+
+      particles.forEach((p) => {
+        const dx = mx - p.x
+        const dy = my - p.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist < MOUSE_RADIUS && dist > 0) {
+          const force = (MOUSE_RADIUS - dist) / MOUSE_RADIUS * 0.02
+          p.vx -= (dx / dist) * force
+          p.vy -= (dy / dist) * force
+        }
+
+        p.x += p.vx
+        p.y += p.vy
+        p.vx *= 0.99
+        p.vy *= 0.99
+
+        if (p.x < 0 || p.x > w) p.vx *= -1
+        if (p.y < 0 || p.y > h) p.vy *= -1
+        p.x = Math.max(0, Math.min(w, p.x))
+        p.y = Math.max(0, Math.min(h, p.y))
+
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(59, 130, 246, ${p.opacity})`
+        ctx.fill()
+      })
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x
+          const dy = particles[i].y - particles[j].y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < CONNECTION_DIST) {
+            ctx.beginPath()
+            ctx.moveTo(particles[i].x, particles[i].y)
+            ctx.lineTo(particles[j].x, particles[j].y)
+            ctx.strokeStyle = `rgba(59, 130, 246, ${0.08 * (1 - dist / CONNECTION_DIST)})`
+            ctx.lineWidth = 0.5
+            ctx.stroke()
+          }
+        }
+      }
+
+      if (mx > 0 && my > 0) {
+        for (let i = 0; i < particles.length; i++) {
+          const dx = mx - particles[i].x
+          const dy = my - particles[i].y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < MOUSE_RADIUS) {
+            ctx.beginPath()
+            ctx.moveTo(mx, my)
+            ctx.lineTo(particles[i].x, particles[i].y)
+            ctx.strokeStyle = `rgba(59, 130, 246, ${0.15 * (1 - dist / MOUSE_RADIUS)})`
+            ctx.lineWidth = 0.5
+            ctx.stroke()
+          }
+        }
+      }
+
+      rafRef.current = requestAnimationFrame(animate)
+    }
+
+    animate()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('pointermove', handleMouse)
+      cancelAnimationFrame(rafRef.current)
+    }
+  }, [isMobile])
+
+  if (isMobile) return null
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 z-0 pointer-events-none"
+      style={{ opacity: 0.6 }}
+    />
+  )
+}
 
 const Hero = () => {
   const sectionRef = useRef(null)
@@ -67,6 +301,7 @@ const Hero = () => {
   const contentY = useTransform(smooth, [0, 1], [0, -40])
   const contentOpacity = useTransform(smooth, [0, 0.8], [1, 0])
   const microOpacity = useTransform(smooth, [0, 0.6, 1], [0, 0.6, 0])
+  const heroRotateX = useTransform(smooth, [0, 1], [0, -5])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -105,6 +340,8 @@ const Hero = () => {
         />
       </motion.div>
 
+      <ParticleCanvas isMobile={isMobile} />
+
       <motion.div style={{ y: blobsY }} className="absolute inset-0 z-0">
         <div className={`absolute top-16 left-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-blue/20 rounded-full ${isMobile ? 'blur-xl' : 'blur-2xl'}`} />
         <div className={`absolute bottom-24 right-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-cyan/20 rounded-full ${isMobile ? 'blur-xl' : 'blur-2xl'}`} />
@@ -116,7 +353,6 @@ const Hero = () => {
         )}
       </motion.div>
 
-      {/* Micro depth layer - ultra-slow floating particles */}
       <motion.div style={{ y: microY, opacity: microOpacity }} className="absolute inset-0 z-0 pointer-events-none">
         {[...Array(isMobile ? 6 : 12)].map((_, i) => (
           <div
@@ -139,7 +375,7 @@ const Hero = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        style={{ y: contentY, opacity: contentOpacity }}
+        style={{ y: contentY, opacity: contentOpacity, perspective: 1000 }}
         className="relative z-10 text-center px-4 max-w-4xl"
       >
         <motion.div variants={itemVariants} className="mb-6 flex justify-center">
@@ -167,20 +403,24 @@ const Hero = () => {
 
         <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-light-900 h-[1.2em]">
           <span className="hero-shimmer bg-gradient-to-r from-accent-blue via-accent-purple to-accent-cyan bg-clip-text text-transparent">
-            {displayed}
+            {typingDone ? (
+              <SplitText text={FULL_NAME} className="inline-block" delay={0} />
+            ) : (
+              displayed
+            )}
           </span>
-          <span
-            className={`inline-block w-[3px] h-[0.85em] ml-1 align-middle bg-accent-blue transition-opacity duration-300 ${
-              typingDone ? 'opacity-0' : 'opacity-100 animate-pulse'
-            }`}
-          />
+          {!typingDone && (
+            <span
+              className="inline-block w-[3px] h-[0.85em] ml-1 align-middle bg-accent-blue animate-pulse"
+            />
+          )}
         </h1>
 
         <motion.p
           variants={itemVariants}
           className="text-xl md:text-2xl text-light-700 mb-8 font-light"
         >
-          AI & Data Science Engineer
+          <TextScramble texts={ROLE_TEXTS} className="text-accent-blue font-semibold" />
         </motion.p>
 
         <motion.p
@@ -195,24 +435,20 @@ const Hero = () => {
           variants={itemVariants}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <motion.a
+          <MagneticButton
             href="#projects"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 bg-gradient-to-r from-accent-blue to-accent-cyan text-white rounded-full font-semibold shadow-lg shadow-accent-blue/20 hover:shadow-xl hover:shadow-accent-blue/40 transition-all"
+            className="px-8 py-3 bg-gradient-to-r from-accent-blue to-accent-cyan text-white rounded-full font-semibold shadow-lg shadow-accent-blue/20 hover:shadow-xl hover:shadow-accent-blue/40 transition-shadow"
           >
             View My Work
-          </motion.a>
-          <motion.a
+          </MagneticButton>
+          <MagneticButton
             href="https://drive.google.com/file/d/15iuECh0MvqrQLKrAnKAN0q7IWkSN_PnL/view?usp=sharing"
             target="_blank"
             rel="noopener noreferrer"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 btn-glass rounded-full font-semibold text-accent-blue transition-all"
+            className="px-8 py-3 btn-glass rounded-full font-semibold text-accent-blue"
           >
             Download Resume
-          </motion.a>
+          </MagneticButton>
         </motion.div>
       </motion.div>
 

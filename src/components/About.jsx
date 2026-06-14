@@ -1,34 +1,58 @@
-import { motion, useMotionValue, useTransform, useInView } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 import { useRef, useEffect, useState } from 'react'
 
-const AnimatedCounter = ({ target, duration = 2 }) => {
+const AnimatedCounter = ({ target, suffix = '+', duration = 2 }) => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true })
   const [count, setCount] = useState(0)
 
   useEffect(() => {
     if (!isInView) return
-    let start = 0
     const end = parseInt(target)
-    const incrementTime = (duration * 1000) / end
     const step = Math.max(1, Math.floor(end / 60))
+    const incrementTime = (duration * 1000) / (end / step)
 
     const timer = setInterval(() => {
-      start += step
-      if (start >= end) {
-        setCount(end)
-        clearInterval(timer)
-      } else {
-        setCount(start)
-      }
-    }, incrementTime * step)
+      setCount((prev) => {
+        const next = prev + step
+        if (next >= end) {
+          clearInterval(timer)
+          return end
+        }
+        return next
+      })
+    }, incrementTime)
 
     return () => clearInterval(timer)
   }, [isInView, target, duration])
 
-  return <span ref={ref}>{count}+</span>
+  return <span ref={ref} className="counter-value">{count}{suffix}</span>
 }
+
+const LineReveal = ({ children, delay = 0 }) => {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-50px' })
+
+  return (
+    <div ref={ref} className="overflow-hidden">
+      <motion.div
+        initial={{ y: '100%', opacity: 0 }}
+        animate={isInView ? { y: 0, opacity: 1 } : { y: '100%', opacity: 0 }}
+        transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  )
+}
+
+const stats = [
+  { target: 5, suffix: '+', label: 'Projects Completed', color: 'from-accent-blue to-accent-cyan' },
+  { target: 15, suffix: '+', label: 'Technologies', color: 'from-accent-cyan to-accent-purple' },
+  { target: 3, suffix: '+', label: 'Years Experience', color: 'from-accent-purple to-accent-pink' },
+  { target: 5, suffix: '+', label: 'Certifications', color: 'from-accent-pink to-accent-blue' },
+]
 
 const About = () => {
   const { ref, slow, fast, opacity } = useSectionParallax({ slowDistance: 60, fastDistance: 100, preset: 'soft', opacityFade: true })
@@ -75,46 +99,55 @@ const About = () => {
           <motion.div variants={itemVariants} className="text-center mb-12">
             <span className="eyebrow text-accent-blue">Who I am</span>
             <h2 className="mt-3 text-4xl md:text-5xl font-bold">
-              <span className="bg-gradient-to-r from-accent-blue to-accent-purple bg-clip-text text-transparent">
+              <span className="animated-gradient-text">
                 About Me
               </span>
             </h2>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div variants={itemVariants} className="glass-card glass-edge rounded-2xl p-8 space-y-6">
-              <p className="text-light-600 text-lg leading-relaxed">
-                I'm an AI & Data Science engineer with a strong foundation in modern web and machine learning
-                technologies. With experience in building scalable applications and solving complex problems,
-                I'm dedicated to creating solutions that make a real impact.
-              </p>
-              <p className="text-light-600 text-lg leading-relaxed">
-                My journey in tech has been driven by curiosity and a desire to continuously learn and grow.
-                I thrive in collaborative environments and love turning ideas into reality through clean,
-                efficient code.
-              </p>
-              <p className="text-light-600 text-lg leading-relaxed">
-                When I'm not coding, you can find me exploring new technologies, contributing to open-source
-                projects, or sharing knowledge with the developer community.
-              </p>
+            <motion.div variants={itemVariants} className="glass-card glass-edge rounded-2xl p-8 space-y-4">
+              <LineReveal delay={0}>
+                <p className="text-light-600 text-lg leading-relaxed">
+                  I'm an AI & Data Science engineer with a strong foundation in modern web and machine learning
+                  technologies. With experience in building scalable applications and solving complex problems,
+                  I'm dedicated to creating solutions that make a real impact.
+                </p>
+              </LineReveal>
+              <LineReveal delay={0.1}>
+                <p className="text-light-600 text-lg leading-relaxed">
+                  My journey in tech has been driven by curiosity and a desire to continuously learn and grow.
+                  I thrive in collaborative environments and love turning ideas into reality through clean,
+                  efficient code.
+                </p>
+              </LineReveal>
+              <LineReveal delay={0.2}>
+                <p className="text-light-600 text-lg leading-relaxed">
+                  When I'm not coding, you can find me exploring new technologies, contributing to open-source
+                  projects, or sharing knowledge with the developer community.
+                </p>
+              </LineReveal>
             </motion.div>
 
             <motion.div
               variants={itemVariants}
-              style={{ y: slow }}
-              className="relative"
+              className="grid grid-cols-2 gap-4"
             >
-              <div className="relative w-full aspect-square rounded-3xl overflow-hidden glass-card glass-edge group">
-                <div className="absolute inset-0 bg-gradient-to-br from-accent-blue to-accent-cyan opacity-10"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center float-slow">
-                    <div className="text-7xl font-bold bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent mb-3">
-                      <AnimatedCounter target={5} />
-                    </div>
-                    <p className="text-light-600 text-lg">Projects Completed</p>
+              {stats.map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 * i, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="glass-card glass-edge animated-border rounded-2xl p-6 text-center group"
+                >
+                  <div className={`text-4xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
+                    <AnimatedCounter target={stat.target} suffix={stat.suffix} />
                   </div>
-                </div>
-              </div>
+                  <p className="text-light-600 text-sm">{stat.label}</p>
+                </motion.div>
+              ))}
             </motion.div>
           </div>
         </motion.div>
