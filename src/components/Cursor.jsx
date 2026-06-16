@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion'
+import { m, useMotionValue, useSpring, useReducedMotion } from 'framer-motion'
 import { usePointer } from '../context/PointerContext'
 
 const SECTION_COLORS = {
@@ -25,31 +25,18 @@ const Cursor = () => {
   const coreRef = useRef(null)
   const shellRef = useRef(null)
   const dotRef = useRef(null)
-  const shadowRef = useRef(null)
 
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
-  const prevX = useRef(-100)
-  const prevY = useRef(-100)
-  const velocity = useMotionValue(0)
 
   const x = useSpring(cursorX, { stiffness: 600, damping: 30, mass: 0.3 })
   const y = useSpring(cursorY, { stiffness: 600, damping: 30, mass: 0.3 })
-
-  const trail1X = useSpring(cursorX, { stiffness: 250, damping: 24, mass: 0.5 })
-  const trail1Y = useSpring(cursorY, { stiffness: 250, damping: 24, mass: 0.5 })
-
   const scale = useSpring(1, { stiffness: 400, damping: 22 })
-  const glowIntensity = useSpring(0, { stiffness: 400, damping: 18 })
-
-  const stretchX = useTransform(velocity, (v) => 1 + v * 0.4)
-  const stretchY = useTransform(velocity, (v) => 1 - v * 0.15)
 
   const applyHoverStyles = (isHovering, rgb) => {
     const core = coreRef.current
     const shell = shellRef.current
     const dot = dotRef.current
-    const shadow = shadowRef.current
 
     if (core) {
       core.style.background = isHovering
@@ -72,10 +59,6 @@ const Cursor = () => {
         ? `0 0 10px rgba(${rgb},0.5), 0 0 20px rgba(${rgb},0.2)`
         : '0 0 8px rgba(255,255,255,0.35)'
     }
-    if (shadow) {
-      shadow.style.transform = isHovering ? 'scale(0.5) translateY(4px)' : 'scale(1)'
-      shadow.style.opacity = isHovering ? '0.3' : '0.6'
-    }
   }
 
   useEffect(() => {
@@ -89,27 +72,18 @@ const Cursor = () => {
       coreRef.current = root.querySelector('.cursor-core')
       shellRef.current = root.querySelector('.cursor-shell')
       dotRef.current = root.querySelector('.cursor-dot')
-      shadowRef.current = root.querySelector('.cursor-shadow')
     }
 
     let throttleRaf
     const onMove = () => {
       cancelAnimationFrame(throttleRaf)
       throttleRaf = requestAnimationFrame(() => {
-        const cx = clientX.get()
-        const cy = clientY.get()
-        const dx = cx - prevX.current
-        const dy = cy - prevY.current
-        const d2 = dx * dx + dy * dy
-        velocity.set(Math.min((d2 < 1 ? 0 : Math.sqrt(d2)) / 20, 1))
-        prevX.current = cx
-        prevY.current = cy
-        cursorX.set(cx)
-        cursorY.set(cy)
+        cursorX.set(clientX.get())
+        cursorY.set(clientY.get())
       })
     }
-    const unsubX = clientX.onChange(onMove)
-    const unsubY = clientY.onChange(onMove)
+    const unsubX = clientX.on("change", onMove)
+    const unsubY = clientY.on("change", onMove)
 
     const down = () => scale.set(0.6)
     const up = () => scale.set(1)
@@ -119,7 +93,6 @@ const Cursor = () => {
       if (t) {
         hoveringRef.current = true
         scale.set(1.25)
-        glowIntensity.set(1)
 
         const section = t.closest('section[id]')
         const rgb = section && SECTION_COLORS[section.id]
@@ -135,7 +108,6 @@ const Cursor = () => {
       if (t) {
         hoveringRef.current = false
         scale.set(1)
-        glowIntensity.set(0)
         applyHoverStyles(false, sectionRGBRef.current)
       }
     }
@@ -162,39 +134,11 @@ const Cursor = () => {
       className="pointer-events-none fixed inset-0 z-[9999]"
       aria-hidden="true"
     >
-      {/* Trail */}
-      <motion.div
-        style={{ x: trail1X, y: trail1Y, translateX: '-50%', translateY: '-50%', scaleX: stretchX, scaleY: stretchY }}
-        className="absolute top-0 left-0 w-6 h-6 rounded-full"
-      >
-        <div className="w-full h-full rounded-full border border-white/10" />
-      </motion.div>
-
-      {/* Ripple ring */}
-      <motion.div
-        style={{ x, y, translateX: '-50%', translateY: '-50%', opacity: glowIntensity }}
-        className="absolute top-0 left-0 w-12 h-12 rounded-full"
-      >
-        <div className="cursor-ring-inner" />
-      </motion.div>
-
       {/* Main cursor */}
-      <motion.div
+      <m.div
         style={{ x, y, translateX: '-50%', translateY: '-50%', scale }}
         className="absolute top-0 left-0 w-10 h-10 rounded-full"
       >
-        <div
-          className="cursor-shadow absolute rounded-full"
-          style={{
-            bottom: '-8px', left: '15%', width: '70%', height: '20%',
-            background: 'radial-gradient(ellipse, rgba(31,41,55,0.08) 0%, transparent 70%)',
-            filter: 'blur(2px)',
-            transform: 'scale(1)',
-            transition: 'transform 0.3s ease, opacity 0.3s ease',
-            opacity: 0.6,
-          }}
-        />
-
         <div
           className="cursor-shell absolute inset-[-3px] rounded-full"
           style={{
@@ -219,14 +163,6 @@ const Cursor = () => {
               background: 'rgba(255,255,255,0.3)', borderRadius: '50%',
             }}
           />
-          <div
-            className="absolute"
-            style={{
-              bottom: '10%', left: '18%', width: '64%', height: '14%',
-              background: 'linear-gradient(0deg, rgba(255,255,255,0.12) 0%, transparent 100%)',
-              borderRadius: '50%',
-            }}
-          />
         </div>
 
         <div
@@ -239,7 +175,7 @@ const Cursor = () => {
             transition: 'background 0.3s ease, box-shadow 0.3s ease',
           }}
         />
-      </motion.div>
+      </m.div>
     </div>
   )
 }

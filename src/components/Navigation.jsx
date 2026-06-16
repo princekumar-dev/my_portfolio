@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { m, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { FiSun, FiMoon } from 'react-icons/fi'
 import { useActiveSection } from '../hooks/useActiveSection'
 import { useTheme } from '../context/ThemeContext'
+import { useSmoothScroll } from '../context/SmoothScrollContext'
 
 const navItems = [
   { name: 'Home', href: '#home', id: 'home' },
@@ -25,17 +26,17 @@ function MorphingHamburger({ isOpen }) {
       aria-expanded={isOpen}
       aria-controls="mobile-menu"
     >
-      <motion.span
+      <m.span
         className="block w-full h-0.5 bg-accent-blue rounded-full origin-left"
         animate={isOpen ? { rotate: 45, y: -1 } : { rotate: 0, y: 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       />
-      <motion.span
+      <m.span
         className="block w-full h-0.5 bg-accent-blue rounded-full"
         animate={isOpen ? { opacity: 0, x: -10 } : { opacity: 1, x: 0 }}
         transition={{ duration: 0.2 }}
       />
-      <motion.span
+      <m.span
         className="block w-full h-0.5 bg-accent-blue rounded-full origin-left"
         animate={isOpen ? { rotate: -45, y: 1 } : { rotate: 0, y: 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -50,6 +51,7 @@ const Navigation = () => {
   const [scrollDepth, setScrollDepth] = useState(0)
   const active = useActiveSection(sectionIds)
   const { isDark, toggleTheme } = useTheme()
+  const lenisRef = useSmoothScroll()
   const lastScrollY = useRef(0)
   const menuRef = useRef(null)
   const menuButtonRef = useRef(null)
@@ -128,7 +130,7 @@ const Navigation = () => {
   const bgOpacity = isScrolled ? (0.4 + scrollDepth * 0.35) : 0
 
   return (
-    <motion.nav
+    <m.nav
       aria-label="Main navigation"
       initial={{ y: -100 }}
       animate={{
@@ -155,13 +157,14 @@ const Navigation = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <motion.a
+          <m.a
             href="#home"
             whileHover={{ scale: 1.05 }}
             className="text-2xl font-bold bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent"
+            onClick={(e) => { e.preventDefault(); lenisRef?.current?.scrollTo('#home') }}
           >
             Prince.dev
-          </motion.a>
+          </m.a>
 
           <div className="hidden md:flex gap-1">
             {navItems.map((item) => {
@@ -172,9 +175,10 @@ const Navigation = () => {
                   href={item.href}
                   aria-current={isActive ? 'page' : undefined}
                   className="relative px-3 py-1.5 text-sm font-medium transition-colors duration-300 rounded-full"
+                  onClick={(e) => { e.preventDefault(); lenisRef?.current?.scrollTo(item.href) }}
                 >
                   {isActive && (
-                    <motion.span
+                    <m.span
                       layoutId="nav-pill"
                       className="absolute inset-0 bg-accent-blue/10 border border-accent-blue/20 rounded-full"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
@@ -189,14 +193,14 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <motion.button
+            <m.button
               whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
               className="p-2 rounded-full text-light-600 hover:text-accent-blue hover:bg-accent-blue/10 transition-colors duration-200"
             >
-              <motion.span
+              <m.span
                 key={isDark ? 'sun' : 'moon'}
                 initial={{ rotate: -90, scale: 0 }}
                 animate={{ rotate: 0, scale: 1 }}
@@ -205,8 +209,8 @@ const Navigation = () => {
                 className="block"
               >
                 {isDark ? <FiSun size={18} /> : <FiMoon size={18} />}
-              </motion.span>
-            </motion.button>
+              </m.span>
+            </m.button>
 
             <MorphingHamburger isOpen={isOpen} />
           </div>
@@ -214,7 +218,7 @@ const Navigation = () => {
 
         <AnimatePresence>
           {isOpen && (
-            <motion.div
+            <m.div
               ref={menuRef}
               id="mobile-menu"
               initial={{ opacity: 0, y: -10 }}
@@ -231,7 +235,7 @@ const Navigation = () => {
             >
                 <div className="py-2 space-y-1">
                 {navItems.map((item, i) => (
-                  <motion.a
+                  <m.a
                     key={item.name}
                     href={item.href}
                     initial={{ opacity: 0, x: -20 }}
@@ -242,24 +246,24 @@ const Navigation = () => {
                         ? 'text-accent-blue font-semibold'
                         : 'text-light-600 hover:text-accent-blue hover:bg-accent-blue/5'
                     }`}
-                    onClick={() => setIsOpen(false)}
+                    onClick={(e) => { e.preventDefault(); setIsOpen(false); lenisRef?.current?.scrollTo(item.href) }}
                   >
                     {active === item.id && (
-                      <motion.span
+                      <m.span
                         layoutId="nav-pill-mobile"
                         className="absolute inset-0 bg-accent-blue/5 border border-accent-blue/20 rounded-lg"
                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                       />
                     )}
                     <span className="relative z-10">{item.name}</span>
-                  </motion.a>
+                  </m.a>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
-    </motion.nav>
+    </m.nav>
   )
 }
 

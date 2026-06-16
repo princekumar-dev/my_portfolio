@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { FiArrowUp } from 'react-icons/fi'
+import { useSmoothScroll } from '../context/SmoothScrollContext'
 
 const ScrollToTop = () => {
   const [isVisible, setIsVisible] = useState(false)
+  const lenisRef = useSmoothScroll()
 
   useEffect(() => {
     let ticking = false
@@ -21,13 +23,13 @@ const ScrollToTop = () => {
   }, [])
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    lenisRef?.current?.scrollTo(0)
   }
 
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.button
+        <m.button
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0 }}
@@ -40,7 +42,7 @@ const ScrollToTop = () => {
           style={{ bottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))', right: 'max(2rem, env(safe-area-inset-right, 2rem))', contain: 'layout style' }}
         >
           <FiArrowUp size={24} />
-        </motion.button>
+        </m.button>
       )}
     </AnimatePresence>
   )

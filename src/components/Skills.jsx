@@ -1,5 +1,5 @@
-import { motion, useInView } from 'framer-motion'
-import { useRef, useState, useEffect } from 'react'
+import { m, useInView } from 'framer-motion'
+import { useRef, useState, useEffect, useMemo, memo } from 'react'
 import { skillsData } from '../data/skillsData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 
@@ -26,13 +26,61 @@ const levelBarColors = {
   Beginner: 'from-accent-purple to-accent-pink',
 }
 
+const SkillCard = memo(({ skill, touchDevice, itemVariants }) => {
+  const Icon = skill.icon
+  const isDarkLogo = DARK_LOGO.has(skill.name)
+
+  return (
+    <m.div
+      variants={itemVariants}
+      className="glass-card glass-edge animated-border group rounded-2xl p-6 cursor-default"
+    >
+      <div className="relative mb-4 inline-block">
+        {!touchDevice && (
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 rounded-2xl blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-300"
+            style={{ backgroundColor: isDarkLogo ? DARK_LOGO_GLOW[skill.name] : skill.color }}
+          />
+        )}
+        <m.div
+          whileHover={touchDevice ? undefined : { rotate: 12, scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+          className={`relative flex h-14 w-14 items-center justify-center rounded-2xl ${
+            isDarkLogo ? 'tag-glass-dark' : 'tag-glass'
+          }`}
+        >
+          <Icon size={30} style={{ color: skill.color }} />
+        </m.div>
+      </div>
+
+      <h3 className="text-light-800 font-accent font-semibold text-sm">{skill.name}</h3>
+      {skill.level && (
+        <>
+          <span
+            className={`mt-1.5 inline-block rounded-full border px-2.5 py-0.5 text-[0.65rem] font-medium ${
+              levelStyles[skill.level] || levelStyles.Intermediate
+            }`}
+          >
+            {skill.level}
+          </span>
+          <ProgressBar level={skill.level} percent={getPercent(skill)} />
+        </>
+      )}
+    </m.div>
+  )
+})
+
+SkillCard.displayName = 'SkillCard'
+
 const ProgressBar = ({ level, percent }) => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true })
 
   return (
     <div ref={ref} className="mt-2 w-full h-1.5 bg-light-200/50 rounded-full overflow-hidden">
-      <motion.div
+      <m.div
         initial={{ scaleX: 0 }}
         animate={isInView ? { scaleX: percent / 100 } : { scaleX: 0 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
@@ -69,10 +117,10 @@ const Skills = () => {
     setTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
   }, [])
 
-  const allSkills = Object.entries(skillsData).map(([category, skills]) => ({
+  const allSkills = useMemo(() => Object.entries(skillsData).map(([category, skills]) => ({
     category,
     skills,
-  }))
+  })), [])
 
   const mobileItemVariants = touchDevice ? {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
@@ -85,18 +133,18 @@ const Skills = () => {
   } : itemVariants
 
   return (
-    <motion.section ref={ref} id="skills" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
-      <motion.div
+    <m.section ref={ref} id="skills" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
+      <m.div
         style={{ y: fast }}
         className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
       />
-      <motion.div
+      <m.div
         style={{ y: slow }}
         className="absolute top-10 right-0 w-64 h-64 bg-accent-blue/10 rounded-full blur-lg"
       />
 
       <div className="max-w-6xl mx-auto relative z-10">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -108,11 +156,11 @@ const Skills = () => {
               Skills &amp; Technologies
             </span>
           </h2>
-        </motion.div>
+        </m.div>
 
         {allSkills.map(({ category, skills }) => (
             <div key={category} className="mb-8 md:mb-14">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -123,66 +171,28 @@ const Skills = () => {
                 {category.replace(/([A-Z])/g, ' $1').trim()}
               </h3>
               <span className="h-px flex-1 bg-gradient-to-r from-accent-blue/40 to-transparent" />
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               variants={containerVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: '-80px' }}
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
             >
-              {skills.map((skill) => {
-                const Icon = skill.icon
-                const isDarkLogo = DARK_LOGO.has(skill.name)
-
-                return (
-                  <motion.div
-                    key={skill.name}
-                    variants={mobileItemVariants}
-                    className="glass-card glass-edge animated-border group rounded-2xl p-6 cursor-default"
-                  >
-                    <div className="relative mb-4 inline-block">
-                      {!touchDevice && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute inset-0 rounded-2xl blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-300"
-                          style={{ backgroundColor: isDarkLogo ? DARK_LOGO_GLOW[skill.name] : skill.color }}
-                        />
-                      )}
-                      <motion.div
-                        whileHover={touchDevice ? undefined : { rotate: 12, scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-                        className={`relative flex h-14 w-14 items-center justify-center rounded-2xl ${
-                          isDarkLogo ? 'tag-glass-dark' : 'tag-glass'
-                        }`}
-                      >
-                        <Icon size={30} style={{ color: skill.color }} />
-                      </motion.div>
-                    </div>
-
-                    <h3 className="text-light-800 font-accent font-semibold text-sm">{skill.name}</h3>
-                    {skill.level && (
-                      <>
-                        <span
-                          className={`mt-1.5 inline-block rounded-full border px-2.5 py-0.5 text-[0.65rem] font-medium ${
-                            levelStyles[skill.level] || levelStyles.Intermediate
-                          }`}
-                        >
-                          {skill.level}
-                        </span>
-                        <ProgressBar level={skill.level} percent={getPercent(skill)} />
-                      </>
-                    )}
-                  </motion.div>
-                )
-              })}
-            </motion.div>
+              {skills.map((skill) => (
+                <SkillCard
+                  key={skill.name}
+                  skill={skill}
+                  touchDevice={touchDevice}
+                  itemVariants={mobileItemVariants}
+                />
+              ))}
+            </m.div>
           </div>
         ))}
       </div>
-    </motion.section>
+    </m.section>
   )
 }
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useMotionValue } from 'framer-motion'
 
 const PointerContext = createContext(null)
@@ -9,8 +9,18 @@ export const PointerProvider = ({ children }) => {
   const nx = useMotionValue(0)
   const ny = useMotionValue(0)
   const frameRef = useRef(0)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  useEffect(() => {
+    if (isMobile) return
+
     const handlePointer = (e) => {
       cancelAnimationFrame(frameRef.current)
       frameRef.current = requestAnimationFrame(() => {
@@ -25,7 +35,7 @@ export const PointerProvider = ({ children }) => {
       window.removeEventListener('pointermove', handlePointer)
       cancelAnimationFrame(frameRef.current)
     }
-  }, [clientX, clientY, nx, ny])
+  }, [isMobile, clientX, clientY, nx, ny])
 
   return (
     <PointerContext.Provider value={{ clientX, clientY, nx, ny }}>

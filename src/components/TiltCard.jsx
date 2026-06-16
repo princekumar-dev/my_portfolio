@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect, useState } from 'react'
-import { motion, useMotionValue, useSpring, useTransform, useReducedMotion, useInView } from 'framer-motion'
+import { m, useMotionValue, useSpring, useTransform, useReducedMotion, useInView } from 'framer-motion'
 
 const isTouchDevice = () =>
   typeof window !== 'undefined' &&
@@ -60,12 +60,12 @@ const TiltCard = ({
     let unsubX, unsubY
 
     const subscribe = () => {
-      unsubX = px.onChange((v) => {
+      unsubX = px.on("change", (v) => {
         el.style.setProperty('--mx', `${(v + 0.5) * 100}%`)
         el.style.setProperty('--card-mx', `${(v + 0.5) * 100}%`)
         el.style.setProperty('--mx-raw', v)
       })
-      unsubY = py.onChange((v) => {
+      unsubY = py.on("change", (v) => {
         el.style.setProperty('--my', `${(v + 0.5) * 100}%`)
         el.style.setProperty('--card-my', `${(v + 0.5) * 100}%`)
         el.style.setProperty('--my-raw', v)
@@ -100,7 +100,7 @@ const TiltCard = ({
   }
 
   const tiltContent = (
-    <motion.div
+    <m.div
       ref={cardRef}
       onPointerEnter={() => { hoverRef.current = true }}
       onPointerMove={handleMove}
@@ -127,7 +127,7 @@ const TiltCard = ({
       <div className="card-spotlight" aria-hidden="true" />
 
       {glare && !touchDevice && (
-        <motion.div
+        <m.div
           aria-hidden="true"
           className="card-glare pointer-events-none"
           style={{ opacity: glareOpacity }}
@@ -135,7 +135,7 @@ const TiltCard = ({
       )}
 
       {borderGlow && !touchDevice && (
-        <motion.div
+        <m.div
           aria-hidden="true"
           className="card-glow pointer-events-none"
           style={{ opacity: glowOpacity }}
@@ -145,7 +145,7 @@ const TiltCard = ({
       {!touchDevice && (
         <div className="card-shadow pointer-events-none" />
       )}
-    </motion.div>
+    </m.div>
   )
 
   if (!float) return tiltContent

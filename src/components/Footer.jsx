@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { FiGithub, FiLinkedin, FiMail } from 'react-icons/fi'
 
 const Footer = () => {
@@ -8,7 +8,7 @@ const Footer = () => {
     <footer aria-label="Site footer" className="relative glass border-t border-white/40 py-8 sm:py-12 px-4" style={{ contain: 'layout style' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-8 mb-8">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -20,9 +20,9 @@ const Footer = () => {
             <p className="text-light-500 text-sm leading-relaxed max-w-xs">
               AI & Data Science engineer passionate about building intelligent, data-driven experiences.
             </p>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -35,9 +35,9 @@ const Footer = () => {
               <li><a href="#projects" className="hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Projects</a></li>
               <li><a href="#contact" className="hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Contact</a></li>
             </ul>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -65,17 +65,17 @@ const Footer = () => {
                 </a>
               </li>
             </ul>
-          </motion.div>
+          </m.div>
         </div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           className="border-t border-light-200 pt-6 text-center text-light-500 text-sm"
         >
           <p>&copy; {currentYear} Prince R. All rights reserved.</p>
-        </motion.div>
+        </m.div>
       </div>
     </footer>
   )

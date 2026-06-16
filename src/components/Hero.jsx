@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
+import { m, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { FiArrowDown } from 'react-icons/fi'
 import { usePointer } from '../context/PointerContext'
@@ -19,7 +19,7 @@ function SplitText({ text, className, delay = 0 }) {
   return (
     <span className={className} aria-label={text}>
       {text.split('').map((char, i) => (
-        <motion.span
+        <m.span
           key={i}
           initial={{ opacity: 0, y: 40, rotateX: -80 }}
           animate={{ opacity: 1, y: 0, rotateX: 0 }}
@@ -31,7 +31,7 @@ function SplitText({ text, className, delay = 0 }) {
           style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
         >
           {char}
-        </motion.span>
+        </m.span>
       ))}
     </span>
   )
@@ -171,7 +171,7 @@ function MagneticButton({ children, className, href, target, rel, ...rest }) {
     y.set(0)
   }, [x, y])
 
-  const Tag = href ? motion.a : motion.button
+  const Tag = href ? m.a : m.button
 
   return (
     <Tag
@@ -208,11 +208,11 @@ const ParticleCanvas = ({ isMobile }) => {
     let h = (canvas.height = window.innerHeight)
 
     const cpuCores = navigator.hardwareConcurrency || 4
-    const maxParticles = cpuCores <= 4 ? 10 : cpuCores <= 8 ? 15 : 20
-    const PARTICLE_COUNT = Math.min(w < 1024 ? 10 : w < 1440 ? 15 : 20, maxParticles)
-    const CONNECTION_DIST = 120
+    const maxParticles = cpuCores <= 4 ? 6 : cpuCores <= 8 ? 8 : 10
+    const PARTICLE_COUNT = Math.min(w < 1024 ? 6 : w < 1440 ? 8 : 10, maxParticles)
+    const CONNECTION_DIST = 100
     const CONNECTION_DIST_SQ = CONNECTION_DIST * CONNECTION_DIST
-    const MOUSE_RADIUS = 150
+    const MOUSE_RADIUS = 120
     const MOUSE_RADIUS_SQ = MOUSE_RADIUS * MOUSE_RADIUS
 
     const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
@@ -424,7 +424,7 @@ const Hero = () => {
       className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-16 sm:pt-20"
       style={{ contain: 'layout style', contentVisibility: 'auto' }}
     >
-      <motion.div style={{ y: gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]">
+      <m.div style={{ y: gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]">
         <div
           className="absolute inset-0"
           style={{
@@ -433,11 +433,11 @@ const Hero = () => {
             backgroundSize: '48px 48px',
           }}
         />
-      </motion.div>
+      </m.div>
 
       <ParticleCanvas isMobile={isMobile} />
 
-      <motion.div style={{ y: blobsY }} className="absolute inset-0 z-0">
+      <m.div style={{ y: blobsY }} className="absolute inset-0 z-0">
         <div className={`absolute top-16 left-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-blue/20 rounded-full blur-lg`} />
         <div className={`absolute bottom-24 right-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-cyan/20 rounded-full blur-lg`} />
         {!isMobile && (
@@ -446,18 +446,18 @@ const Hero = () => {
             <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-lg" />
           </>
         )}
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         style={{ y: contentY, opacity: contentOpacity, perspective: 1000 }}
         className="relative z-10 text-center px-4 max-w-4xl"
       >
-        <motion.div variants={itemVariants} className="mb-6 flex justify-center">
+        <m.div variants={itemVariants} className="mb-6 flex justify-center">
           {badgeVisible && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.8, filter: 'blur(8px)' }}
               animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -470,13 +470,13 @@ const Hero = () => {
               <span className="text-sm font-semibold text-green-600 tracking-wide" style={{ fontFamily: 'Sora, sans-serif' }}>
                 Open to Opportunities
               </span>
-            </motion.div>
+            </m.div>
           )}
-        </motion.div>
+        </m.div>
 
-        <motion.div variants={itemVariants} className="mb-6">
+        <m.div variants={itemVariants} className="mb-6">
           <span className="eyebrow text-accent-blue">Welcome to my portfolio</span>
-        </motion.div>
+        </m.div>
 
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-light-900">
           <span className="hero-shimmer bg-gradient-to-r from-accent-blue via-accent-purple to-accent-cyan bg-clip-text text-transparent">
@@ -493,22 +493,22 @@ const Hero = () => {
           )}
         </h1>
 
-        <motion.p
+        <m.p
           variants={itemVariants}
           className="text-lg sm:text-xl md:text-2xl text-light-700 mb-6 sm:mb-8 font-light"
         >
           <TextScramble texts={ROLE_TEXTS} className="text-accent-blue font-semibold" />
-        </motion.p>
+        </m.p>
 
-        <motion.p
+        <m.p
           variants={itemVariants}
           className="text-light-600 text-base sm:text-lg mb-8 sm:mb-12 max-w-2xl mx-auto px-2"
         >
           Building intelligent systems that transform data into meaningful experiences.
           Passionate about creating seamless user experiences and scalable solutions.
-        </motion.p>
+        </m.p>
 
-        <motion.div
+        <m.div
           variants={itemVariants}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
@@ -526,10 +526,10 @@ const Hero = () => {
           >
             Download Resume
           </MagneticButton>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 0.5 }}
@@ -537,7 +537,7 @@ const Hero = () => {
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10"
       >
         <FiArrowDown className="text-accent-blue text-2xl" />
-      </motion.div>
+      </m.div>
     </section>
   )
 }

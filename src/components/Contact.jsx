@@ -1,11 +1,51 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { FiMail, FiLinkedin, FiGithub, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi'
 import { SiInstagram } from 'react-icons/si'
-import { useState, useRef } from 'react'
+import { useState, useRef, memo } from 'react'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const linkItemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8 },
+  },
+}
+
+const ContactLink = memo(({ link }) => {
+  const Icon = link.icon
+  return (
+    <m.div variants={linkItemVariants}>
+      <TiltCard maxTilt={8} className="group glass-card glass-edge animated-border h-full rounded-2xl">
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${link.label} (opens in new tab)`}
+          className="flex flex-col items-center p-6"
+        >
+          <div className="relative mb-3 social-link-hover rounded-2xl p-3">
+            <m.div
+              whileHover={{ rotate: 360 }}
+              transition={{ duration: 0.8, ease: 'easeInOut' }}
+              className={`relative flex h-12 w-12 items-center justify-center rounded-xl tag-glass ${link.color}`}
+            >
+              <Icon size={24} />
+            </m.div>
+          </div>
+          <h3 className="text-sm font-bold text-accent-blue mb-1">{link.label}</h3>
+          <p className="text-light-600 text-center text-xs break-all">{link.value}</p>
+        </a>
+      </TiltCard>
+    </m.div>
+  )
+})
+
+ContactLink.displayName = 'ContactLink'
 
 const Contact = () => {
   const { ref, fast, opacity } = useSectionParallax({ fastDistance: 100, preset: 'soft', opacityFade: true })
@@ -108,72 +148,47 @@ const Contact = () => {
   }
 
   return (
-    <motion.section ref={ref} id="contact" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
-      <motion.div
+    <m.section ref={ref} id="contact" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
+      <m.div
         style={{ y: fast }}
         className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
-      ></motion.div>
+      ></m.div>
 
       <div className="max-w-5xl mx-auto relative z-10">
-        <motion.div
+        <m.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <motion.div variants={itemVariants} className="text-center">
+          <m.div variants={itemVariants} className="text-center">
             <span className="eyebrow text-accent-blue">Let's talk</span>
             <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8">
               <span className="animated-gradient-text">
                 Get In Touch
               </span>
             </h2>
-          </motion.div>
+          </m.div>
 
-          <motion.p
+          <m.p
             variants={itemVariants}
             className="text-light-600 text-base sm:text-lg text-center mb-10 sm:mb-16 max-w-2xl mx-auto"
           >
             I'm always interested in hearing about new projects and opportunities.
             Feel free to reach out through any of the channels below!
-          </motion.p>
+          </m.p>
 
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            <motion.div
+            <m.div
               variants={containerVariants}
               className="grid grid-cols-2 gap-3 sm:gap-4"
             >
-              {contactLinks.map((link) => {
-                const Icon = link.icon
-                return (
-                  <motion.div key={link.label} variants={itemVariants}>
-                    <TiltCard maxTilt={8} className="group glass-card glass-edge animated-border h-full rounded-2xl">
-                      <a
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${link.label} (opens in new tab)`}
-                        className="flex flex-col items-center p-6"
-                      >
-                        <div className="relative mb-3 social-link-hover rounded-2xl p-3">
-                          <motion.div
-                            whileHover={{ rotate: 360 }}
-                            transition={{ duration: 0.8, ease: 'easeInOut' }}
-                            className={`relative flex h-12 w-12 items-center justify-center rounded-xl tag-glass ${link.color}`}
-                          >
-                            <Icon size={24} />
-                          </motion.div>
-                        </div>
-                        <h3 className="text-sm font-bold text-accent-blue mb-1">{link.label}</h3>
-                        <p className="text-light-600 text-center text-xs break-all">{link.value}</p>
-                      </a>
-                    </TiltCard>
-                  </motion.div>
-                )
-              })}
-            </motion.div>
+              {contactLinks.map((link) => (
+                <ContactLink key={link.label} link={link} />
+              ))}
+            </m.div>
 
-            <motion.div variants={itemVariants}>
+            <m.div variants={itemVariants}>
               <form ref={formRef} onSubmit={handleSubmit} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4 sm:space-y-5" noValidate>
                 <div className="floating-label-group">
                   <input
@@ -235,7 +250,7 @@ const Contact = () => {
                   </div>
                 </div>
 
-                <motion.button
+                <m.button
                   type="submit"
                   disabled={formState !== 'idle'}
                   whileHover={formState === 'idle' ? { scale: 1.02 } : {}}
@@ -266,13 +281,13 @@ const Contact = () => {
                       Sent!
                     </>
                   )}
-                </motion.button>
+                </m.button>
               </form>
-            </motion.div>
+            </m.div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
-    </motion.section>
+    </m.section>
   )
 }
 

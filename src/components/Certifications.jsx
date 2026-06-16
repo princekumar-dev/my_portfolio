@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
+import { memo } from 'react'
 import { certificationsData } from '../data/certificationsData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
@@ -25,11 +26,11 @@ const Certifications = () => {
     },
   }
 
-  const CertCard = ({ cert }) => (
-    <motion.div variants={itemVariants}>
+  const CertCard = memo(({ cert }) => (
+    <m.div variants={itemVariants}>
       <TiltCard className="group glass-card glass-edge h-full rounded-2xl overflow-hidden">
         <div className="relative h-32 sm:h-40 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden flex items-center justify-center">
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-cyan opacity-0 group-hover:opacity-15 transition-opacity duration-300"
           />
           <div className="text-center relative z-10">
@@ -42,18 +43,20 @@ const Certifications = () => {
           <p className="text-light-500 text-sm">{cert.issuer}</p>
         </div>
       </TiltCard>
-    </motion.div>
-  )
+    </m.div>
+  ))
+
+  CertCard.displayName = 'CertCard'
 
   return (
     <section ref={ref} id="certifications" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
-      <motion.div
+      <m.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
-      ></motion.div>
+      ></m.div>
 
       <div className="max-w-6xl mx-auto relative z-10">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -65,18 +68,18 @@ const Certifications = () => {
               Certifications
             </span>
           </h2>
-        </motion.div>
+        </m.div>
 
         {certificationsData.length === 0 ? (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center py-16"
           >
             <p className="text-light-500 text-lg">Certifications coming soon!</p>
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div
+          <m.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -86,7 +89,7 @@ const Certifications = () => {
             {certificationsData.map((cert) => (
               <CertCard key={cert.id} cert={cert} />
             ))}
-          </motion.div>
+          </m.div>
         )}
       </div>
     </section>

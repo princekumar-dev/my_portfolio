@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  motion,
+  m,
   useReducedMotion,
   useSpring,
   useTransform,
@@ -33,22 +33,15 @@ const AnimatedBackground = () => {
   const mouseScale = reduceMotion ? 0 : 1
   const scrollScale = reduceMotion ? 0 : 1
 
-  const blob1X = useTransform(mx, (m) => m * 60 * mouseScale)
-  const blob1Y = useTransform([my, scroll], ([m, s]) => m * 50 * mouseScale + s * 200 * scrollScale)
+  const blob1X = useTransform(mx, (m) => m * 50 * mouseScale)
+  const blob1Y = useTransform([my, scroll], ([m, s]) => m * 40 * mouseScale + s * 150 * scrollScale)
 
-  const blob2X = useTransform(my, (m) => m * -40 * mouseScale)
-  const blob2Y = useTransform([mx, scroll], ([m, s]) => m * -35 * mouseScale + s * -160 * scrollScale)
+  const blob2X = useTransform(my, (m) => m * -35 * mouseScale)
+  const blob2Y = useTransform([mx, scroll], ([m, s]) => m * -30 * mouseScale + s * -120 * scrollScale)
 
-  const blob3X = useTransform(mx, (m) => m * 25 * mouseScale)
-  const blob3Y = useTransform(scroll, (s) => s * -220 * scrollScale)
-
-  const gridY = useTransform(scroll, [0, 1], reduceMotion ? [0, 0] : [0, -100])
+  const gridY = useTransform(scroll, [0, 1], reduceMotion ? [0, 0] : [0, -80])
 
   if (isMobile) return null
-
-  const blobSize1 = isMobile ? 'h-[18rem] w-[18rem]' : 'h-[28rem] w-[28rem]'
-  const blobSize2 = isMobile ? 'h-[15rem] w-[15rem]' : 'h-[24rem] w-[24rem]'
-  const blobSize3 = isMobile ? 'h-[13rem] w-[13rem]' : 'h-[22rem] w-[22rem]'
 
   return (
     <div
@@ -56,9 +49,7 @@ const AnimatedBackground = () => {
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       style={{ contain: 'layout style paint' }}
     >
-
-
-      <motion.div
+      <m.div
         style={{ y: gridY }}
         className="absolute inset-0 opacity-[0.35]"
       >
@@ -74,30 +65,21 @@ const AnimatedBackground = () => {
               'radial-gradient(circle at 50% 30%, black, transparent 75%)',
           }}
         />
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         style={{ x: blob1X, y: blob1Y, willChange: 'transform' }}
-        className={`absolute -top-32 -left-24 ${blobSize1}`}
+        className="absolute -top-32 -left-24 h-[22rem] w-[22rem]"
       >
         <div className="h-full w-full rounded-full bg-accent-blue/20" />
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         style={{ x: blob2X, y: blob2Y, willChange: 'transform' }}
-        className={`absolute top-1/3 -right-24 ${blobSize2}`}
+        className="absolute top-1/3 -right-24 h-[18rem] w-[18rem]"
       >
         <div className="h-full w-full rounded-full bg-accent-cyan/20" />
-      </motion.div>
-
-      {!isMobile && (
-        <motion.div
-          style={{ x: blob3X, y: blob3Y, willChange: 'transform' }}
-          className={`absolute bottom-0 left-1/3 ${blobSize3}`}
-        >
-          <div className="h-full w-full rounded-full bg-accent-purple/15" />
-        </motion.div>
-      )}
+      </m.div>
     </div>
   )
 }

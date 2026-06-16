@@ -1,5 +1,5 @@
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { m, useScroll, useTransform, useInView } from 'framer-motion'
+import { useRef, useState, memo } from 'react'
 import { FiChevronRight } from 'react-icons/fi'
 import { experienceData } from '../data/experienceData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
@@ -14,20 +14,20 @@ const MetroidBeam = ({ scrollYProgress }) => {
     <div ref={beamRef} className="absolute left-[7px] top-0 w-[3px] h-full z-0 pointer-events-none" style={{ contain: 'layout style' }}>
       <div className="absolute inset-0 w-full rounded-full bg-gradient-to-b from-accent-blue/10 via-accent-cyan/10 to-accent-purple/10" />
 
-      <motion.div
+      <m.div
         style={{ scaleY: beamScaleY, transformOrigin: 'top', willChange: 'transform' }}
         className="absolute top-0 w-full h-full rounded-full bg-gradient-to-b from-accent-blue via-accent-cyan to-accent-purple opacity-70 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
       />
-      <motion.div
+      <m.div
         style={{ scaleY: beamScaleY, transformOrigin: 'top', willChange: 'transform' }}
         className="absolute top-0 left-[0.5px] w-[2px] h-full rounded-full bg-white/40 blur-sm"
       />
 
-      <motion.div
+      <m.div
         style={{ top: tipY, willChange: 'transform' }}
         className="absolute -left-[4px] w-[11px] h-[11px]"
       >
-        <motion.div
+        <m.div
           className="w-full h-full rounded-full bg-white"
           animate={beamInView ? {
             scale: [1, 1.45, 1],
@@ -40,14 +40,14 @@ const MetroidBeam = ({ scrollYProgress }) => {
           } : {}}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
         />
-      </motion.div>
+      </m.div>
     </div>
   )
 }
 
 const getInitials = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 
-const ExperienceCard = ({ exp, index, scrollYProgress, total, touchDevice }) => {
+const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }) => {
   const slotSize = 1 / total
   const slotStart = index * slotSize
   const slotEnd = (index + 1) * slotSize
@@ -65,14 +65,14 @@ const ExperienceCard = ({ exp, index, scrollYProgress, total, touchDevice }) => 
   const accent = exp.accentColor || '#3B82F6'
 
   return (
-    <motion.div
+    <m.div
       className="relative pb-12"
       initial={{ opacity: 0, x: touchDevice ? 0 : -30 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.div
+      <m.div
         className="absolute left-[1px] top-[2px] w-[15px] h-[15px] rounded-full border-[3px] z-10"
         style={{
           scale: dotScale,
@@ -85,7 +85,7 @@ const ExperienceCard = ({ exp, index, scrollYProgress, total, touchDevice }) => 
       />
 
       <div className="ml-8">
-        <motion.div
+        <m.div
           whileHover={{ y: -4 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
           className="group glass-card glass-edge animated-border rounded-2xl cursor-default"
@@ -145,11 +145,13 @@ const ExperienceCard = ({ exp, index, scrollYProgress, total, touchDevice }) => 
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
-    </motion.div>
+    </m.div>
   )
-}
+})
+
+ExperienceCard.displayName = 'ExperienceCard'
 
 const Experience = () => {
   const { ref, fast, opacity } = useSectionParallax({ fastDistance: 100, preset: 'default', opacityFade: true })
@@ -160,23 +162,23 @@ const Experience = () => {
   })
 
   return (
-    <motion.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
-      <motion.div
+    <m.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
+      <m.div
         style={{ y: fast }}
         className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
       />
 
       <div className="max-w-4xl mx-auto relative z-10 px-2 sm:px-0">
         <div className="text-center mb-12 sm:mb-16">
-          <motion.span
+          <m.span
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="eyebrow text-accent-blue block"
           >
             Where I've worked
-          </motion.span>
-          <motion.h2
+          </m.span>
+          <m.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -185,17 +187,17 @@ const Experience = () => {
             <span className="animated-gradient-text">
               Experience
             </span>
-          </motion.h2>
+          </m.h2>
         </div>
 
         {experienceData.length === 0 ? (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center py-16"
           >
             <p className="text-light-500 text-lg">Experience details coming soon!</p>
-          </motion.div>
+          </m.div>
         ) : (
           <div className="relative">
             <MetroidBeam scrollYProgress={scrollYProgress} />
@@ -212,7 +214,7 @@ const Experience = () => {
           </div>
         )}
       </div>
-    </motion.section>
+    </m.section>
   )
 }
 

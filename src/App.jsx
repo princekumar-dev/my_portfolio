@@ -1,13 +1,13 @@
 import { Component, Suspense, lazy, useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import Navigation from './components/Navigation'
 import AnimatedBackground from './components/AnimatedBackground'
 import ScrollProgressBar from './components/ScrollProgressBar'
 import { PointerProvider } from './context/PointerContext'
 import { ScrollProvider } from './context/ScrollContext'
+import { SmoothScrollProvider } from './context/SmoothScrollContext'
 import Cursor from './components/Cursor'
 import Hero from './components/Hero'
-import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 
 const About = lazy(() => import('./components/About'))
@@ -16,6 +16,7 @@ const Projects = lazy(() => import('./components/Projects'))
 const Experience = lazy(() => import('./components/Experience'))
 const Certifications = lazy(() => import('./components/Certifications'))
 const Contact = lazy(() => import('./components/Contact'))
+const Footer = lazy(() => import('./components/Footer'))
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -54,7 +55,7 @@ function WaveDivider({ flip = false, color = 'rgba(59,130,246,0.06)' }) {
 
   return (
     <div ref={ref} className="wave-divider relative" aria-hidden="true" style={{ transform: flip ? 'scaleY(-1)' : 'none' }}>
-      <motion.svg
+      <m.svg
         viewBox="0 0 1440 60"
         preserveAspectRatio="none"
         initial={{ opacity: 0 }}
@@ -65,7 +66,7 @@ function WaveDivider({ flip = false, color = 'rgba(59,130,246,0.06)' }) {
           d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,60 L0,60 Z"
           fill={color}
         />
-      </motion.svg>
+      </m.svg>
     </div>
   )
 }
@@ -75,25 +76,27 @@ function SectionReveal({ children }) {
   const isInView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
 function App() {
   return (
     <ErrorBoundary>
+      <LazyMotion features={domAnimation} strict>
       <a href="#main-content" className="skip-to-content">
         Skip to main content
       </a>
       <main id="main-content" className="relative bg-gradient-light min-h-screen text-light-800">
         <PointerProvider>
+        <SmoothScrollProvider>
         <ScrollProvider>
         <Cursor />
         <AnimatedBackground />
@@ -129,8 +132,10 @@ function App() {
         <Footer />
         <ScrollToTop />
         </ScrollProvider>
+        </SmoothScrollProvider>
         </PointerProvider>
       </main>
+      </LazyMotion>
     </ErrorBoundary>
   )
 }

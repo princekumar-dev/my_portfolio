@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { FiGithub, FiExternalLink } from 'react-icons/fi'
-import { useState } from 'react'
+import { useState, useMemo, memo } from 'react'
 import { projectsData } from '../data/projectsData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
@@ -12,21 +12,30 @@ const statusStyles = {
 
 const ShimmerImage = ({ src, alt, className, style }) => {
   const [loaded, setLoaded] = useState(false)
+  const webpSrc = src ? src.replace(/\.png$/, '.webp') : null
 
   return (
     <div className="absolute inset-0">
       <div
         className={`absolute inset-0 bg-gradient-to-br from-accent-blue/10 to-accent-cyan/10 ${loaded ? 'opacity-0' : 'opacity-100 shimmer'} transition-opacity duration-500`}
       />
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        onLoad={() => setLoaded(true)}
-        onError={(e) => { e.currentTarget.style.display = 'none'; setLoaded(true) }}
-        className={className}
-        style={{ ...style, opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease' }}
-      />
+      {src && (
+        <picture>
+          {webpSrc && <source srcSet={webpSrc} type="image/webp" />}
+          <img
+            src={src}
+            alt={alt}
+            loading="lazy"
+            decoding="async"
+            width={400}
+            height={300}
+            onLoad={() => setLoaded(true)}
+            onError={(e) => { e.currentTarget.style.display = 'none'; setLoaded(true) }}
+            className={className}
+            style={{ ...style, opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease' }}
+          />
+        </picture>
+      )}
     </div>
   )
 }
@@ -64,8 +73,8 @@ const Projects = () => {
     },
   }
 
-  const ProjectCard = ({ project }) => (
-    <motion.div variants={itemVariants}>
+  const ProjectCard = memo(({ project }) => (
+    <m.div variants={itemVariants}>
       <TiltCard className="group glass-card glass-edge animated-border h-full rounded-2xl">
         <div className="relative h-48 sm:h-56 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden">
           <span
@@ -82,7 +91,7 @@ const Projects = () => {
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/10 to-transparent" />
-          <motion.div className="absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-cyan opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+          <m.div className="absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-cyan opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
 
           {project.status && (
             <span
@@ -116,7 +125,7 @@ const Projects = () => {
             </div>
 
             <div className="flex gap-4">
-              <motion.a
+              <m.a
                 href={project.github}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -126,9 +135,9 @@ const Projects = () => {
               >
                 <FiGithub size={18} />
                 <span className="text-sm font-semibold">Code</span>
-              </motion.a>
+              </m.a>
               {project.liveUrl && (
-                <motion.a
+                <m.a
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -138,29 +147,31 @@ const Projects = () => {
                 >
                   <FiExternalLink size={18} />
                   <span className="text-sm font-semibold">Live Demo</span>
-                </motion.a>
+                </m.a>
               )}
             </div>
           </div>
           </div>
         </div>
       </TiltCard>
-    </motion.div>
-  )
+    </m.div>
+  ))
+
+  ProjectCard.displayName = 'ProjectCard'
 
   return (
-    <motion.section ref={ref} id="projects" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
-      <motion.div
+    <m.section ref={ref} id="projects" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
+      <m.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
-      ></motion.div>
-      <motion.div
+      ></m.div>
+      <m.div
         style={{ y: slow }}
         className="absolute bottom-0 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-lg"
-      ></motion.div>
+      ></m.div>
 
       <div className="max-w-6xl mx-auto relative z-10">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -172,18 +183,18 @@ const Projects = () => {
               Featured Projects
             </span>
           </h2>
-        </motion.div>
+        </m.div>
 
         {projectsData.length === 0 ? (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center py-16"
           >
             <p className="text-light-500 text-lg">No projects to show yet. Check back soon!</p>
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div
+          <m.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -193,10 +204,10 @@ const Projects = () => {
             {projectsData.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
-          </motion.div>
+          </m.div>
         )}
       </div>
-    </motion.section>
+    </m.section>
   )
 }
 
