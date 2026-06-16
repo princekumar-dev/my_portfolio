@@ -31,33 +31,11 @@ const TiltCard = ({
   const rotateX = useSpring(useTransform(py, v => -v * maxTilt * 2), springCfg)
   const rotateY = useSpring(useTransform(px, v => v * maxTilt * 2), springCfg)
 
-  const glareX = useTransform(px, v => `${(v + 0.5) * 100}%`)
-  const glareY = useTransform(py, v => `${(v + 0.5) * 100}%`)
   const glareOpacity = useTransform(px, [-0.5, 0, 0.5], [0.3, 0, 0.3])
-
-  const glowX = useTransform(px, v => `${(v + 0.5) * 60 + 20}%`)
-  const glowY = useTransform(py, v => `${(v + 0.5) * 60 + 20}%`)
   const glowOpacity = useTransform([px, py], ([x, y]) => {
     const d2 = x * x + y * y
     return Math.min((d2 < 0.0001 ? 0 : Math.sqrt(d2)) * 2.5, 0.55)
   })
-
-  const shadowX = useTransform(px, v => v * 20)
-  const shadowY = useTransform(py, v => v * 20)
-  const shadowBlur = useTransform([px, py], ([x, y]) => {
-    const d2 = x * x + y * y
-    return 15 + (d2 < 0.0001 ? 0 : Math.sqrt(d2)) * 50
-  })
-
-  const glareBg = useTransform([glareX, glareY], ([gx, gy]) =>
-    `radial-gradient(circle at ${gx} ${gy}, rgba(255,255,255,0.45), transparent 55%)`
-  )
-  const glowBg = useTransform([glowX, glowY], ([gx, gy]) =>
-    `radial-gradient(circle at ${gx} ${gy}, rgba(99,102,241,0.4), rgba(168,85,247,0.15), transparent 60%)`
-  )
-  const shadowVal = useTransform([shadowX, shadowY, shadowBlur], ([sx, sy, sb]) =>
-    `${sx}px ${sy}px ${sb}px rgba(0,0,0,0.2), ${sx * 0.4}px ${sy * 0.4}px ${sb * 0.4}px rgba(99,102,241,0.08)`
-  )
 
   const setPointer = useCallback((ex, ey) => {
     cancelAnimationFrame(rafRef.current)
@@ -79,15 +57,38 @@ const TiltCard = ({
     const el = cardRef.current
     if (!el) return
 
-    const unsubX = px.onChange((v) => {
-      el.style.setProperty('--mx', `${(v + 0.5) * 100}%`)
-      el.style.setProperty('--card-mx', `${(v + 0.5) * 100}%`)
-    })
-    const unsubY = py.onChange((v) => {
-      el.style.setProperty('--my', `${(v + 0.5) * 100}%`)
-      el.style.setProperty('--card-my', `${(v + 0.5) * 100}%`)
-    })
-    return () => { unsubX(); unsubY() }
+    let unsubX, unsubY
+
+    const subscribe = () => {
+      unsubX = px.onChange((v) => {
+        el.style.setProperty('--mx', `${(v + 0.5) * 100}%`)
+        el.style.setProperty('--card-mx', `${(v + 0.5) * 100}%`)
+        el.style.setProperty('--mx-raw', v)
+      })
+      unsubY = py.onChange((v) => {
+        el.style.setProperty('--my', `${(v + 0.5) * 100}%`)
+        el.style.setProperty('--card-my', `${(v + 0.5) * 100}%`)
+        el.style.setProperty('--my-raw', v)
+      })
+    }
+
+    const unsubscribe = () => {
+      if (unsubX) { unsubX(); unsubX = null }
+      if (unsubY) { unsubY(); unsubY = null }
+    }
+
+    const onEnter = () => subscribe()
+    const onLeave = () => unsubscribe()
+
+    const card = cardRef.current
+    card.addEventListener('pointerenter', onEnter)
+    card.addEventListener('pointerleave', onLeave)
+
+    return () => {
+      unsubscribe()
+      card.removeEventListener('pointerenter', onEnter)
+      card.removeEventListener('pointerleave', onLeave)
+    }
   }, [reduceMotion, isInView, px, py])
 
   if (reduceMotion) {
@@ -105,14 +106,15 @@ const TiltCard = ({
       onPointerMove={handleMove}
       onPointerLeave={() => {
         hoverRef.current = false
-        px.set(0)
-        py.set(0)
+        px.jump(0)
+        py.jump(0)
       }}
       style={touchDevice ? {} : {
         rotateX,
         rotateY,
         transformStyle: 'preserve-3d',
         transformPerspective: 800,
+        willChange: isInView ? 'transform' : 'auto',
       }}
       whileHover={touchDevice ? undefined : { scale: 1.025 }}
       whileTap={{ scale: 0.98 }}
@@ -127,42 +129,21 @@ const TiltCard = ({
       {glare && !touchDevice && (
         <motion.div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-[inherit]"
-          style={{
-            contain: 'layout style paint',
-            willChange: 'opacity',
-            background: glareBg,
-            opacity: glareOpacity,
-          }}
+          className="card-glare pointer-events-none"
+          style={{ opacity: glareOpacity }}
         />
       )}
 
       {borderGlow && !touchDevice && (
         <motion.div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-[inherit]"
-          style={{
-            contain: 'layout style paint',
-            willChange: 'opacity',
-            background: glowBg,
-            opacity: glowOpacity,
-            mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-            maskComposite: 'exclude',
-            WebkitMaskComposite: 'xor',
-            padding: '1.5px',
-          }}
+          className="card-glow pointer-events-none"
+          style={{ opacity: glowOpacity }}
         />
       )}
 
       {!touchDevice && (
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-[inherit]"
-          style={{
-            contain: 'layout style paint',
-            boxShadow: shadowVal,
-          }}
-        />
+        <div className="card-shadow pointer-events-none" />
       )}
     </motion.div>
   )

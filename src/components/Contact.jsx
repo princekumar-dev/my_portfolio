@@ -1,14 +1,18 @@
 import { motion } from 'framer-motion'
-import { FiMail, FiLinkedin, FiGithub, FiSend, FiCheck } from 'react-icons/fi'
+import { FiMail, FiLinkedin, FiGithub, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi'
 import { SiInstagram } from 'react-icons/si'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const Contact = () => {
   const { ref, fast, opacity } = useSectionParallax({ fastDistance: 100, preset: 'soft', opacityFade: true })
   const [formState, setFormState] = useState('idle')
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [errors, setErrors] = useState({})
+  const formRef = useRef(null)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -64,20 +68,50 @@ const Contact = () => {
     }
   ]
 
+  const validate = () => {
+    const newErrors = {}
+    if (!formData.name.trim()) newErrors.name = 'Please enter your name'
+    if (!formData.email.trim()) {
+      newErrors.email = 'Please enter your email'
+    } else if (!EMAIL_REGEX.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address'
+    }
+    if (!formData.message.trim()) {
+      newErrors.message = 'Please enter your message'
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters'
+    }
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (!validate()) return
     setFormState('sending')
+
+    const submission = { ...formData, timestamp: new Date().toISOString() }
+
     setTimeout(() => {
+      try {
+        const existing = JSON.parse(localStorage.getItem('contact_messages') || '[]')
+        existing.push(submission)
+        localStorage.setItem('contact_messages', JSON.stringify(existing))
+      } catch { /* localStorage unavailable */ }
+      console.log('Message received:', submission)
+
       setFormState('sent')
+      setFormData({ name: '', email: '', message: '' })
+      setErrors({})
       setTimeout(() => setFormState('idle'), 3000)
-    }, 1500)
+    }, 1200)
   }
 
   return (
-    <motion.section ref={ref} id="contact" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="contact" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
       <motion.div
         style={{ y: fast }}
-        className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
+        className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
       ></motion.div>
 
       <div className="max-w-5xl mx-auto relative z-10">
@@ -140,17 +174,23 @@ const Contact = () => {
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <form onSubmit={handleSubmit} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4 sm:space-y-5">
+              <form ref={formRef} onSubmit={handleSubmit} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4 sm:space-y-5" noValidate>
                 <div className="floating-label-group">
                   <input
                     id="contact-name"
                     type="text"
                     placeholder=" "
+                    autoComplete="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
+                    onChange={(e) => { setFormData({ ...formData, name: e.target.value }); if (errors.name) setErrors((prev) => ({ ...prev, name: '' })) }}
+                    className={errors.name ? 'border-red-400/50' : ''}
                   />
                   <label htmlFor="contact-name">Your Name</label>
+                  {errors.name && (
+                    <span className="text-red-500 text-xs mt-1 flex items-center gap-1" role="alert">
+                      <FiAlertCircle size={12} /> {errors.name}
+                    </span>
+                  )}
                 </div>
 
                 <div className="floating-label-group">
@@ -158,11 +198,17 @@ const Contact = () => {
                     id="contact-email"
                     type="email"
                     placeholder=" "
+                    autoComplete="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
+                    onChange={(e) => { setFormData({ ...formData, email: e.target.value }); if (errors.email) setErrors((prev) => ({ ...prev, email: '' })) }}
+                    className={errors.email ? 'border-red-400/50' : ''}
                   />
                   <label htmlFor="contact-email">Email Address</label>
+                  {errors.email && (
+                    <span className="text-red-500 text-xs mt-1 flex items-center gap-1" role="alert">
+                      <FiAlertCircle size={12} /> {errors.email}
+                    </span>
+                  )}
                 </div>
 
                 <div className="floating-label-group">
@@ -170,24 +216,40 @@ const Contact = () => {
                     id="contact-message"
                     placeholder=" "
                     rows={4}
+                    maxLength={1000}
+                    autoComplete="off"
                     value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    required
-                    className="resize-none"
+                    onChange={(e) => { setFormData({ ...formData, message: e.target.value }); if (errors.message) setErrors((prev) => ({ ...prev, message: '' })) }}
+                    className={`resize-none ${errors.message ? 'border-red-400/50' : ''}`}
                   />
                   <label htmlFor="contact-message">Your Message</label>
+                  <div className="flex justify-between mt-1">
+                    {errors.message && (
+                      <span className="text-red-500 text-xs flex items-center gap-1" role="alert">
+                        <FiAlertCircle size={12} /> {errors.message}
+                      </span>
+                    )}
+                    <span className={`text-xs ml-auto ${formData.message.length > 900 ? 'text-amber-500' : 'text-light-500'}`}>
+                      {formData.message.length}/1000
+                    </span>
+                  </div>
                 </div>
 
                 <motion.button
                   type="submit"
                   disabled={formState !== 'idle'}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={formState === 'idle' ? { scale: 1.02 } : {}}
+                  whileTap={formState === 'idle' ? { scale: 0.98 } : {}}
                   className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
                     formState === 'sent'
                       ? 'bg-green-500 text-white'
-                      : 'bg-gradient-to-r from-accent-blue to-accent-cyan text-white shadow-lg shadow-accent-blue/20 hover:shadow-xl hover:shadow-accent-blue/40'
+                      : formState === 'error'
+                        ? 'bg-red-500 text-white'
+                        : formState !== 'idle'
+                          ? 'bg-accent-blue/50 text-white cursor-not-allowed'
+                          : 'bg-gradient-to-r from-accent-blue to-accent-cyan text-white shadow-lg shadow-accent-blue/20 hover:shadow-xl hover:shadow-accent-blue/40'
                   }`}
+                  aria-live="polite"
                 >
                   {formState === 'idle' && (
                     <>

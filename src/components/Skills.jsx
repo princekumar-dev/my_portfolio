@@ -18,24 +18,26 @@ const levelPercent = {
   Beginner: 35,
 }
 
+const getPercent = (skill) => skill.percent || levelPercent[skill.level] || 50
+
 const levelBarColors = {
   Expert: 'from-accent-blue to-accent-cyan',
   Intermediate: 'from-accent-cyan to-accent-purple',
   Beginner: 'from-accent-purple to-accent-pink',
 }
 
-const ProgressBar = ({ level }) => {
+const ProgressBar = ({ level, percent }) => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true })
-  const percent = levelPercent[level] || 50
 
   return (
     <div ref={ref} className="mt-2 w-full h-1.5 bg-light-200/50 rounded-full overflow-hidden">
       <motion.div
-        initial={{ width: 0 }}
-        animate={isInView ? { width: `${percent}%` } : { width: 0 }}
+        initial={{ scaleX: 0 }}
+        animate={isInView ? { scaleX: percent / 100 } : { scaleX: 0 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        className={`h-full rounded-full bg-gradient-to-r ${levelBarColors[level] || levelBarColors.Intermediate}`}
+        className={`h-full w-full rounded-full bg-gradient-to-r ${levelBarColors[level] || levelBarColors.Intermediate}`}
+        style={{ transformOrigin: 'left' }}
       />
     </div>
   )
@@ -43,20 +45,19 @@ const ProgressBar = ({ level }) => {
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
-  },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.03, delayChildren: 0.1 },
+    },
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95, rotateX: 8 },
+  hidden: { opacity: 0, y: 24, scale: 0.97 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    rotateX: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
 }
 
@@ -84,14 +85,14 @@ const Skills = () => {
   } : itemVariants
 
   return (
-    <motion.section ref={ref} id="skills" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="skills" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
       <motion.div
         style={{ y: fast }}
-        className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
+        className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
       />
       <motion.div
         style={{ y: slow }}
-        className="absolute top-10 right-0 w-64 h-64 bg-accent-blue/10 rounded-full blur-2xl"
+        className="absolute top-10 right-0 w-64 h-64 bg-accent-blue/10 rounded-full blur-lg"
       />
 
       <div className="max-w-6xl mx-auto relative z-10">
@@ -171,7 +172,7 @@ const Skills = () => {
                         >
                           {skill.level}
                         </span>
-                        <ProgressBar level={skill.level} />
+                        <ProgressBar level={skill.level} percent={getPercent(skill)} />
                       </>
                     )}
                   </motion.div>

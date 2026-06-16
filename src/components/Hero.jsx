@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { FiArrowDown } from 'react-icons/fi'
+import { usePointer } from '../context/PointerContext'
 
 const FULL_NAME = 'Prince R'
 const TYPING_SPEED = 80
@@ -59,6 +60,7 @@ function TextScramble({ texts, className }) {
     state.phase = 'in'
     state.textIdx = 0
     state.startTime = performance.now()
+    let completedCycles = 0
 
     const rnd = () => SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
 
@@ -122,6 +124,8 @@ function TextScramble({ texts, className }) {
           }
         }
         if (allCleared) {
+          completedCycles++
+          if (completedCycles >= texts.length) return
           state.textIdx = (state.textIdx + 1) % texts.length
           state.phase = 'in'
           state.startTime = now + GAP_MS
@@ -193,6 +197,7 @@ const ParticleCanvas = ({ isMobile }) => {
   const mouseRef = useRef({ x: 0, y: 0 })
   const particlesRef = useRef([])
   const rafRef = useRef(0)
+  const visibleRef = useRef(true)
 
   useEffect(() => {
     if (isMobile) return
@@ -202,9 +207,13 @@ const ParticleCanvas = ({ isMobile }) => {
     let w = (canvas.width = window.innerWidth)
     let h = (canvas.height = window.innerHeight)
 
-    const PARTICLE_COUNT = w < 1024 ? 35 : w < 1440 ? 50 : 60
+    const cpuCores = navigator.hardwareConcurrency || 4
+    const maxParticles = cpuCores <= 4 ? 10 : cpuCores <= 8 ? 15 : 20
+    const PARTICLE_COUNT = Math.min(w < 1024 ? 10 : w < 1440 ? 15 : 20, maxParticles)
     const CONNECTION_DIST = 120
+    const CONNECTION_DIST_SQ = CONNECTION_DIST * CONNECTION_DIST
     const MOUSE_RADIUS = 150
+    const MOUSE_RADIUS_SQ = MOUSE_RADIUS * MOUSE_RADIUS
 
     const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
       x: Math.random() * w,
@@ -216,30 +225,51 @@ const ParticleCanvas = ({ isMobile }) => {
     }))
     particlesRef.current = particles
 
+    let resizeTimeout
     const handleResize = () => {
-      w = canvas.width = window.innerWidth
-      h = canvas.height = window.innerHeight
+      clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(() => {
+        w = canvas.width = window.innerWidth
+        h = canvas.height = window.innerHeight
+      }, 150)
     }
     const handleMouse = (e) => {
       mouseRef.current = { x: e.clientX, y: e.clientY }
     }
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visibleRef.current = entry.isIntersecting
+        if (!entry.isIntersecting) {
+          cancelAnimationFrame(rafRef.current)
+        } else {
+          rafRef.current = requestAnimationFrame(animate)
+        }
+      },
+      { threshold: 0 }
+    )
+    observer.observe(canvas)
+
     window.addEventListener('resize', handleResize)
     window.addEventListener('pointermove', handleMouse, { passive: true })
 
     const animate = () => {
+      if (!visibleRef.current) return
+
       ctx.clearRect(0, 0, w, h)
       const mx = mouseRef.current.x
       const my = mouseRef.current.y
 
-      particles.forEach((p) => {
-        const dx = mx - p.x
-        const dy = my - p.y
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < MOUSE_RADIUS && dist > 0) {
-          const force = (MOUSE_RADIUS - dist) / MOUSE_RADIUS * 0.02
-          p.vx -= (dx / dist) * force
-          p.vy -= (dy / dist) * force
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i]
+        const pdx = mx - p.x
+        const pdy = my - p.y
+        const pdistSq = pdx * pdx + pdy * pdy
+        if (pdistSq < MOUSE_RADIUS_SQ && pdistSq > 0) {
+          const pdist = Math.sqrt(pdistSq)
+          const force = (MOUSE_RADIUS - pdist) / MOUSE_RADIUS * 0.02
+          p.vx -= (pdx / pdist) * force
+          p.vy -= (pdy / pdist) * force
         }
 
         p.x += p.vx
@@ -256,38 +286,39 @@ const ParticleCanvas = ({ isMobile }) => {
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
         ctx.fillStyle = `rgba(59, 130, 246, ${p.opacity})`
         ctx.fill()
-      })
+      }
 
+      ctx.beginPath()
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x
           const dy = particles[i].y - particles[j].y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < CONNECTION_DIST) {
-            ctx.beginPath()
+          const distSq = dx * dx + dy * dy
+          if (distSq < CONNECTION_DIST_SQ) {
+            const dist = Math.sqrt(distSq)
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(particles[j].x, particles[j].y)
-            ctx.strokeStyle = `rgba(59, 130, 246, ${0.08 * (1 - dist / CONNECTION_DIST)})`
-            ctx.lineWidth = 0.5
-            ctx.stroke()
           }
         }
       }
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.06)'
+      ctx.lineWidth = 0.5
+      ctx.stroke()
 
       if (mx > 0 && my > 0) {
+        ctx.beginPath()
         for (let i = 0; i < particles.length; i++) {
           const dx = mx - particles[i].x
           const dy = my - particles[i].y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < MOUSE_RADIUS) {
-            ctx.beginPath()
+          const distSq = dx * dx + dy * dy
+          if (distSq < MOUSE_RADIUS_SQ) {
             ctx.moveTo(mx, my)
             ctx.lineTo(particles[i].x, particles[i].y)
-            ctx.strokeStyle = `rgba(59, 130, 246, ${0.15 * (1 - dist / MOUSE_RADIUS)})`
-            ctx.lineWidth = 0.5
-            ctx.stroke()
           }
         }
+        ctx.strokeStyle = 'rgba(59, 130, 246, 0.10)'
+        ctx.lineWidth = 0.5
+        ctx.stroke()
       }
 
       rafRef.current = requestAnimationFrame(animate)
@@ -296,6 +327,8 @@ const ParticleCanvas = ({ isMobile }) => {
     animate()
 
     return () => {
+      observer.disconnect()
+      clearTimeout(resizeTimeout)
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('pointermove', handleMouse)
       cancelAnimationFrame(rafRef.current)
@@ -319,8 +352,8 @@ const Hero = () => {
   const [typingDone, setTypingDone] = useState(false)
   const [badgeVisible, setBadgeVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const mouseX = useMotionValue(0)
-  const arrowX = useSpring(mouseX, { stiffness: 350, damping: 20 })
+  const { nx } = usePointer()
+  const arrowX = useSpring(useTransform(nx, (v) => v * 10), { stiffness: 350, damping: 20 })
 
   useEffect(() => {
     let interval
@@ -353,15 +386,6 @@ const Hero = () => {
     return () => window.removeEventListener('resize', check)
   }, [])
 
-  useEffect(() => {
-    const handlePointer = (e) => {
-      const nx = (e.clientX / window.innerWidth - 0.5) * 20
-      mouseX.set(nx)
-    }
-    window.addEventListener('pointermove', handlePointer, { passive: true })
-    return () => window.removeEventListener('pointermove', handlePointer)
-  }, [mouseX])
-
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
@@ -370,11 +394,8 @@ const Hero = () => {
 
   const blobsY = useTransform(smooth, [0, 1], [0, 200])
   const gridY = useTransform(smooth, [0, 1], [0, 60])
-  const microY = useTransform(smooth, [0, 1], [0, 35])
   const contentY = useTransform(smooth, [0, 1], [0, -40])
   const contentOpacity = useTransform(smooth, [0, 0.8], [1, 0])
-  const microOpacity = useTransform(smooth, [0, 0.6, 1], [0, 0.6, 0])
-  const heroRotateX = useTransform(smooth, [0, 1], [0, -5])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -401,7 +422,7 @@ const Hero = () => {
       ref={sectionRef}
       id="home"
       className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-16 sm:pt-20"
-      style={{ contain: 'layout style' }}
+      style={{ contain: 'layout style', contentVisibility: 'auto' }}
     >
       <motion.div style={{ y: gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]">
         <div
@@ -417,32 +438,14 @@ const Hero = () => {
       <ParticleCanvas isMobile={isMobile} />
 
       <motion.div style={{ y: blobsY }} className="absolute inset-0 z-0">
-        <div className={`absolute top-16 left-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-blue/20 rounded-full ${isMobile ? 'blur-xl' : 'blur-2xl'}`} />
-        <div className={`absolute bottom-24 right-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-cyan/20 rounded-full ${isMobile ? 'blur-xl' : 'blur-2xl'}`} />
+        <div className={`absolute top-16 left-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-blue/20 rounded-full blur-lg`} />
+        <div className={`absolute bottom-24 right-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-cyan/20 rounded-full blur-lg`} />
         {!isMobile && (
           <>
-            <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-purple/15 rounded-full blur-2xl" />
-            <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-2xl" />
+            <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-purple/15 rounded-full blur-lg" />
+            <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-lg" />
           </>
         )}
-      </motion.div>
-
-      <motion.div style={{ y: microY, opacity: microOpacity }} className="absolute inset-0 z-0 pointer-events-none">
-        {[...Array(isMobile ? 6 : 12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: `${2 + (i % 3)}px`,
-              height: `${2 + (i % 3)}px`,
-              background: i % 3 === 0 ? 'rgba(59,130,246,0.3)' : i % 3 === 1 ? 'rgba(139,92,246,0.25)' : 'rgba(6,182,212,0.25)',
-              top: `${10 + (i * 7.3) % 80}%`,
-              left: `${5 + (i * 8.1) % 90}%`,
-              animation: `particleFloat ${3 + (i % 4) * 0.8}s ease-in-out infinite`,
-              animationDelay: `${i * 0.5}s`,
-            }}
-          />
-        ))}
       </motion.div>
 
       <motion.div
@@ -461,7 +464,7 @@ const Hero = () => {
               className="badge-shimmer inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-green-500/25 bg-green-500/[0.06] backdrop-blur-sm"
             >
               <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-60" style={{ animation: 'pulseRing 2s ease-out infinite' }} />
+                <span className="absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-60" style={{ animation: 'pulseRing 8s ease-out infinite' }} />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
               </span>
               <span className="text-sm font-semibold text-green-600 tracking-wide" style={{ fontFamily: 'Sora, sans-serif' }}>
@@ -527,8 +530,9 @@ const Hero = () => {
       </motion.div>
 
       <motion.div
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2, duration: 0.5 }}
         style={{ x: arrowX }}
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10"
       >

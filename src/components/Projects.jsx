@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { FiGithub, FiExternalLink } from 'react-icons/fi'
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { projectsData } from '../data/projectsData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
@@ -10,13 +10,30 @@ const statusStyles = {
   'In Progress': 'bg-amber-500/15 text-amber-600 border-amber-500/30',
 }
 
+const ShimmerImage = ({ src, alt, className, style }) => {
+  const [loaded, setLoaded] = useState(false)
+
+  return (
+    <div className="absolute inset-0">
+      <div
+        className={`absolute inset-0 bg-gradient-to-br from-accent-blue/10 to-accent-cyan/10 ${loaded ? 'opacity-0' : 'opacity-100 shimmer'} transition-opacity duration-500`}
+      />
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        onError={(e) => { e.currentTarget.style.display = 'none'; setLoaded(true) }}
+        className={className}
+        style={{ ...style, opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease' }}
+      />
+    </div>
+  )
+}
+
 const Projects = () => {
   const { ref, slow, fast, opacity } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy', opacityFade: true })
-  const [touchDevice, setTouchDevice] = useState(false)
-
-  useEffect(() => {
-    setTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  }, [])
+  const [touchDevice] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -49,23 +66,19 @@ const Projects = () => {
 
   const ProjectCard = ({ project }) => (
     <motion.div variants={itemVariants}>
-      <TiltCard className="group glass-card glass-edge animated-border h-full rounded-2xl overflow-hidden">
-        <div className="relative h-40 sm:h-48 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden">
+      <TiltCard className="group glass-card glass-edge animated-border h-full rounded-2xl">
+        <div className="relative h-48 sm:h-56 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden">
           <span
             aria-hidden="true"
             className="absolute inset-0 rounded-none blur-xl opacity-20 group-hover:opacity-50 transition-opacity duration-300"
             style={{ backgroundColor: project.color }}
           />
           {project.image && (
-            <img
+            <ShimmerImage
               src={project.image}
               alt={`${project.title} preview`}
-              loading="lazy"
               className="absolute inset-0 h-full w-full object-contain p-10 transition-transform duration-700 ease-out group-hover:scale-105"
               style={{ transform: 'translateZ(0)' }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none'
-              }}
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/10 to-transparent" />
@@ -89,7 +102,8 @@ const Projects = () => {
         <div className="p-5 sm:p-6">
           <p className="text-light-600 text-sm mb-4 line-clamp-2">{project.description}</p>
 
-          <div className="card-reveal-content">
+          <div className="card-reveal-wrap">
+          <div className="card-reveal-content pb-3">
             <div className="flex flex-wrap gap-2 mb-4">
               {project.technologies.map((tech) => (
                 <span
@@ -106,14 +120,28 @@ const Projects = () => {
                 href={project.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue ml-1.5"
               >
                 <FiGithub size={18} />
                 <span className="text-sm font-semibold">Code</span>
               </motion.a>
+              {project.liveUrl && (
+                <motion.a
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue"
+                >
+                  <FiExternalLink size={18} />
+                  <span className="text-sm font-semibold">Live Demo</span>
+                </motion.a>
+              )}
             </div>
+          </div>
           </div>
         </div>
       </TiltCard>
@@ -121,14 +149,14 @@ const Projects = () => {
   )
 
   return (
-    <motion.section ref={ref} id="projects" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="projects" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
       <motion.div
         style={{ y: fast }}
-        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"
+        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
       ></motion.div>
       <motion.div
         style={{ y: slow }}
-        className="absolute bottom-0 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-2xl"
+        className="absolute bottom-0 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-lg"
       ></motion.div>
 
       <div className="max-w-6xl mx-auto relative z-10">
@@ -146,17 +174,27 @@ const Projects = () => {
           </h2>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-auto"
-        >
-          {projectsData.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </motion.div>
+        {projectsData.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16"
+          >
+            <p className="text-light-500 text-lg">No projects to show yet. Check back soon!</p>
+          </motion.div>
+        ) : (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-auto"
+          >
+            {projectsData.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </motion.div>
+        )}
       </div>
     </motion.section>
   )

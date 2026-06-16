@@ -72,7 +72,9 @@ const Navigation = () => {
         requestAnimationFrame(() => {
           const currentY = window.scrollY
           setScrollDir(currentY > lastScrollY.current && currentY > 80 ? 'down' : 'up')
-          setScrollDepth(Math.min(currentY / 400, 1))
+          const rawDepth = Math.min(currentY / 400, 1)
+          const quantized = Math.round(rawDepth * 4) / 4
+          setScrollDepth((prev) => (prev === quantized ? prev : quantized))
           lastScrollY.current = currentY
           ticking = false
         })
@@ -90,6 +92,15 @@ const Navigation = () => {
       document.body.style.overflow = ''
     }
     return () => { document.body.style.overflow = '' }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setIsOpen(false)
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
   }, [isOpen])
 
   useEffect(() => {
@@ -113,8 +124,8 @@ const Navigation = () => {
     return () => menu.removeEventListener('keydown', handleKeyDown)
   }, [isOpen])
 
-  const blurAmount = 8 + scrollDepth * 16
-  const bgOpacity = 0.4 + scrollDepth * 0.35
+  const isScrolled = scrollDepth > 0.05
+  const bgOpacity = isScrolled ? (0.4 + scrollDepth * 0.35) : 0
 
   return (
     <motion.nav
@@ -127,14 +138,14 @@ const Navigation = () => {
       className="fixed w-full z-50 transition-[border-color] duration-500"
       style={{
         contain: 'layout style',
-        backdropFilter: scrollDepth > 0.05 ? `blur(${blurAmount}px) saturate(180%)` : 'none',
-        WebkitBackdropFilter: scrollDepth > 0.05 ? `blur(${blurAmount}px) saturate(180%)` : 'none',
-        background: scrollDepth > 0.05
+        backdropFilter: isScrolled ? 'blur(16px) saturate(180%)' : 'none',
+        WebkitBackdropFilter: isScrolled ? 'blur(16px) saturate(180%)' : 'none',
+        background: isScrolled
           ? isDark
             ? `rgba(15, 23, 42, ${bgOpacity})`
             : `rgba(255, 255, 255, ${bgOpacity})`
           : 'transparent',
-        borderBottom: scrollDepth > 0.05
+        borderBottom: isScrolled
           ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`
           : '1px solid transparent',
         boxShadow: scrollDepth > 0.1
@@ -218,7 +229,7 @@ const Navigation = () => {
                 boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
               }}
             >
-              <div className="py-2 space-y-1">
+                <div className="py-2 space-y-1">
                 {navItems.map((item, i) => (
                   <motion.a
                     key={item.name}
@@ -226,14 +237,21 @@ const Navigation = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className={`block px-4 py-2.5 transition-colors duration-200 ${
+                    className={`relative block px-4 py-2.5 transition-colors duration-200 ${
                       active === item.id
-                        ? 'text-accent-blue font-semibold bg-accent-blue/5'
+                        ? 'text-accent-blue font-semibold'
                         : 'text-light-600 hover:text-accent-blue hover:bg-accent-blue/5'
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
-                    {item.name}
+                    {active === item.id && (
+                      <motion.span
+                        layoutId="nav-pill-mobile"
+                        className="absolute inset-0 bg-accent-blue/5 border border-accent-blue/20 rounded-lg"
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{item.name}</span>
                   </motion.a>
                 ))}
               </div>

@@ -3,6 +3,8 @@ import { motion, useInView } from 'framer-motion'
 import Navigation from './components/Navigation'
 import AnimatedBackground from './components/AnimatedBackground'
 import ScrollProgressBar from './components/ScrollProgressBar'
+import { PointerProvider } from './context/PointerContext'
+import { ScrollProvider } from './context/ScrollContext'
 import Cursor from './components/Cursor'
 import Hero from './components/Hero'
 import Footer from './components/Footer'
@@ -52,15 +54,18 @@ function WaveDivider({ flip = false, color = 'rgba(59,130,246,0.06)' }) {
 
   return (
     <div ref={ref} className="wave-divider relative" aria-hidden="true" style={{ transform: flip ? 'scaleY(-1)' : 'none' }}>
-      <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
-        <motion.path
+      <motion.svg
+        viewBox="0 0 1440 60"
+        preserveAspectRatio="none"
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+      >
+        <path
           d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,60 L0,60 Z"
           fill={color}
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
-          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
         />
-      </svg>
+      </motion.svg>
     </div>
   )
 }
@@ -72,9 +77,9 @@ function SectionReveal({ children }) {
   return (
     <motion.div
       ref={ref}
-      initial={{ clipPath: 'inset(8% 0 8% 0)' }}
-      animate={isInView ? { clipPath: 'inset(0% 0 0% 0)' } : { clipPath: 'inset(8% 0 8% 0)' }}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -88,6 +93,8 @@ function App() {
         Skip to main content
       </a>
       <main id="main-content" className="relative bg-gradient-light min-h-screen text-light-800">
+        <PointerProvider>
+        <ScrollProvider>
         <Cursor />
         <AnimatedBackground />
         <ScrollProgressBar />
@@ -121,6 +128,8 @@ function App() {
         </Suspense>
         <Footer />
         <ScrollToTop />
+        </ScrollProvider>
+        </PointerProvider>
       </main>
     </ErrorBoundary>
   )

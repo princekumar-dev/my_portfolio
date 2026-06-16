@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react'
 
 const ThemeContext = createContext()
 
@@ -14,18 +14,32 @@ export const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     const root = document.documentElement
-    if (isDark) {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
+    const raf = requestAnimationFrame(() => {
+      if (isDark) {
+        root.classList.add('dark')
+      } else {
+        root.classList.remove('dark')
+      }
+    })
     localStorage.setItem('theme', isDark ? 'dark' : 'light')
+    return () => cancelAnimationFrame(raf)
   }, [isDark])
 
-  const toggleTheme = () => setIsDark((prev) => !prev)
+  const toggleTheme = useCallback(() => setIsDark((prev) => !prev), [])
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const handler = (e) => {
+      if (!localStorage.getItem('theme')) setIsDark(e.matches)
+    }
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  const value = useMemo(() => ({ isDark, toggleTheme }), [isDark, toggleTheme])
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   )

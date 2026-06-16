@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 // Scroll-spy: returns the id of the section currently in view.
 // Uses IntersectionObserver and picks the most visible matching section.
 export function useActiveSection(sectionIds, { rootMargin = '-45% 0px -45% 0px' } = {}) {
   const [active, setActive] = useState(sectionIds[0] || '')
+  const timeoutRef = useRef(null)
 
   useEffect(() => {
     const elements = sectionIds
@@ -18,14 +19,20 @@ export function useActiveSection(sectionIds, { rootMargin = '-45% 0px -45% 0px' 
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
         if (visible[0]) {
-          setActive(visible[0].target.id)
+          clearTimeout(timeoutRef.current)
+          timeoutRef.current = setTimeout(() => {
+            setActive(visible[0].target.id)
+          }, 100)
         }
       },
-      { rootMargin, threshold: [0.1, 0.25, 0.5, 0.75] }
+      { rootMargin, threshold: [0.1, 0.5] }
     )
 
     elements.forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      clearTimeout(timeoutRef.current)
+    }
   }, [sectionIds, rootMargin])
 
   return active

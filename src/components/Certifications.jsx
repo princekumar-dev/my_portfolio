@@ -46,10 +46,10 @@ const Certifications = () => {
   )
 
   return (
-    <section ref={ref} id="certifications" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <section ref={ref} id="certifications" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
       <motion.div
         style={{ y: fast }}
-        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"
+        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
       ></motion.div>
 
       <div className="max-w-6xl mx-auto relative z-10">
@@ -67,17 +67,27 @@ const Certifications = () => {
           </h2>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
-        >
-          {certificationsData.map((cert) => (
-            <CertCard key={cert.id} cert={cert} />
-          ))}
-        </motion.div>
+        {certificationsData.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16"
+          >
+            <p className="text-light-500 text-lg">Certifications coming soon!</p>
+          </motion.div>
+        ) : (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+          >
+            {certificationsData.map((cert) => (
+              <CertCard key={cert.id} cert={cert} />
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   )

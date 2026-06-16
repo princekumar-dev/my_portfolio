@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion'
+import { usePointer } from '../context/PointerContext'
 
 const SECTION_COLORS = {
   home:     { r: 59,  g: 130, b: 246 },
@@ -11,10 +12,12 @@ const SECTION_COLORS = {
   contact:  { r: 139, g: 92,  b: 246 },
 }
 
-const SNAP_STRENGTH = 0.15
-
 const Cursor = () => {
   const [visible, setVisible] = useState(false)
+  const reduceMotion = useReducedMotion()
+  const { clientX, clientY } = usePointer()
+
+  if (reduceMotion) return null
 
   const hoveringRef = useRef(false)
   const sectionRGBRef = useRef('59, 130, 246')
@@ -23,8 +26,6 @@ const Cursor = () => {
   const shellRef = useRef(null)
   const dotRef = useRef(null)
   const shadowRef = useRef(null)
-  const caustic2Ref = useRef(null)
-  const causticOverlayRef = useRef(null)
 
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
@@ -37,13 +38,9 @@ const Cursor = () => {
 
   const trail1X = useSpring(cursorX, { stiffness: 250, damping: 24, mass: 0.5 })
   const trail1Y = useSpring(cursorY, { stiffness: 250, damping: 24, mass: 0.5 })
-  const trail2X = useSpring(cursorX, { stiffness: 300, damping: 20, mass: 0.6 })
-  const trail2Y = useSpring(cursorY, { stiffness: 300, damping: 20, mass: 0.6 })
 
   const scale = useSpring(1, { stiffness: 400, damping: 22 })
   const glowIntensity = useSpring(0, { stiffness: 400, damping: 18 })
-
-  const glowScale = useTransform(scale, (s) => s * 1.8)
 
   const stretchX = useTransform(velocity, (v) => 1 + v * 0.4)
   const stretchY = useTransform(velocity, (v) => 1 - v * 0.15)
@@ -53,8 +50,6 @@ const Cursor = () => {
     const shell = shellRef.current
     const dot = dotRef.current
     const shadow = shadowRef.current
-    const caustic2 = caustic2Ref.current
-    const overlay = causticOverlayRef.current
 
     if (core) {
       core.style.background = isHovering
@@ -81,14 +76,6 @@ const Cursor = () => {
       shadow.style.transform = isHovering ? 'scale(0.5) translateY(4px)' : 'scale(1)'
       shadow.style.opacity = isHovering ? '0.3' : '0.6'
     }
-    if (caustic2) {
-      caustic2.style.background = isHovering ? `rgba(${rgb},0.12)` : 'rgba(255,255,255,0.18)'
-    }
-    if (overlay) {
-      overlay.style.background = isHovering
-        ? `radial-gradient(circle at 40% 40%, rgba(${rgb},0.08) 0%, transparent 60%)`
-        : 'transparent'
-    }
   }
 
   useEffect(() => {
@@ -103,51 +90,29 @@ const Cursor = () => {
       shellRef.current = root.querySelector('.cursor-shell')
       dotRef.current = root.querySelector('.cursor-dot')
       shadowRef.current = root.querySelector('.cursor-shadow')
-      caustic2Ref.current = root.querySelector('.cursor-caustic2')
-      causticOverlayRef.current = root.querySelector('.cursor-caustic-overlay')
     }
 
-    let raf
-    let lastSnapTarget = null
-    let lastElementCheck = 0
-
-    const move = (e) => {
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(() => {
-        const dx = e.clientX - prevX.current
-        const dy = e.clientY - prevY.current
+    let throttleRaf
+    const onMove = () => {
+      cancelAnimationFrame(throttleRaf)
+      throttleRaf = requestAnimationFrame(() => {
+        const cx = clientX.get()
+        const cy = clientY.get()
+        const dx = cx - prevX.current
+        const dy = cy - prevY.current
         const d2 = dx * dx + dy * dy
         velocity.set(Math.min((d2 < 1 ? 0 : Math.sqrt(d2)) / 20, 1))
-        prevX.current = e.clientX
-        prevY.current = e.clientY
+        prevX.current = cx
+        prevY.current = cy
+        cursorX.set(cx)
+        cursorY.set(cy)
       })
-
-      const now = performance.now()
-      if (now - lastElementCheck > 100) {
-        lastElementCheck = now
-        const el = document.elementFromPoint(e.clientX, e.clientY)
-        lastSnapTarget = el?.closest('a, button, [role="button"], .glass-card, .group') || null
-      }
-
-      if (lastSnapTarget && hoveringRef.current) {
-        const rect = lastSnapTarget.getBoundingClientRect()
-        const cx = rect.left + rect.width / 2
-        const cy = rect.top + rect.height / 2
-        cursorX.set(e.clientX + (cx - e.clientX) * SNAP_STRENGTH)
-        cursorY.set(e.clientY + (cy - e.clientY) * SNAP_STRENGTH)
-      } else {
-        cursorX.set(e.clientX)
-        cursorY.set(e.clientY)
-      }
     }
+    const unsubX = clientX.onChange(onMove)
+    const unsubY = clientY.onChange(onMove)
 
-    const down = () => {
-      scale.set(0.6)
-    }
-
-    const up = () => {
-      scale.set(1)
-    }
+    const down = () => scale.set(0.6)
+    const up = () => scale.set(1)
 
     const over = (e) => {
       const t = e.target.closest('a, button, [role="button"], .glass-card, .group')
@@ -175,23 +140,21 @@ const Cursor = () => {
       }
     }
 
-    window.addEventListener('pointermove', move, { passive: true })
     window.addEventListener('mousedown', down, { passive: true })
     window.addEventListener('mouseup', up, { passive: true })
     document.addEventListener('mouseover', over, { passive: true })
     document.addEventListener('mouseout', out, { passive: true })
 
     return () => {
-      window.removeEventListener('pointermove', move)
       window.removeEventListener('mousedown', down)
       window.removeEventListener('mouseup', up)
       document.removeEventListener('mouseover', over)
       document.removeEventListener('mouseout', out)
-      cancelAnimationFrame(raf)
+      unsubX()
+      unsubY()
+      cancelAnimationFrame(throttleRaf)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const glowRGB = sectionRGBRef.current
 
   return (
     <div
@@ -199,20 +162,10 @@ const Cursor = () => {
       className="pointer-events-none fixed inset-0 z-[9999]"
       aria-hidden="true"
     >
-      {/* Trail 3 */}
-      <motion.div
-        style={{ x: trail2X, y: trail2Y, translateX: '-50%', translateY: '-50%', scaleX: stretchX, scaleY: stretchY }}
-        className="absolute top-0 left-0 w-4 h-4 rounded-full"
-        willChange="transform"
-      >
-        <div className="w-full h-full rounded-full border border-white/12" />
-      </motion.div>
-
-      {/* Trail 2 */}
+      {/* Trail */}
       <motion.div
         style={{ x: trail1X, y: trail1Y, translateX: '-50%', translateY: '-50%', scaleX: stretchX, scaleY: stretchY }}
         className="absolute top-0 left-0 w-6 h-6 rounded-full"
-        willChange="transform"
       >
         <div className="w-full h-full rounded-full border border-white/10" />
       </motion.div>
@@ -222,21 +175,7 @@ const Cursor = () => {
         style={{ x, y, translateX: '-50%', translateY: '-50%', opacity: glowIntensity }}
         className="absolute top-0 left-0 w-12 h-12 rounded-full"
       >
-        <div className="w-full h-full rounded-full border border-accent-blue/20 animate-ping" style={{ animationDuration: '1.5s' }} />
-      </motion.div>
-
-      {/* Outer glow halo */}
-      <motion.div
-        style={{ x, y, translateX: '-50%', translateY: '-50%', opacity: glowIntensity, scale: glowScale }}
-        className="absolute top-0 left-0 w-20 h-20 -ml-5 -mt-5 rounded-full"
-      >
-        <div
-          className="w-full h-full rounded-full"
-          style={{
-            background: `radial-gradient(circle, rgba(${glowRGB},0.12) 0%, rgba(${glowRGB},0.04) 40%, transparent 70%)`,
-            filter: 'blur(6px)',
-          }}
-        />
+        <div className="cursor-ring-inner" />
       </motion.div>
 
       {/* Main cursor */}
@@ -277,26 +216,7 @@ const Cursor = () => {
           <div
             style={{
               position: 'absolute', top: '8%', left: '12%', width: '55%', height: '35%',
-              background: 'rgba(255,255,255,0.3)', borderRadius: '50%', filter: 'blur(3px)',
-              animation: 'waterCaustic1 4.5s ease-in-out infinite',
-            }}
-          />
-          <div
-            className="cursor-caustic2"
-            style={{
-              position: 'absolute', bottom: '18%', right: '12%', width: '40%', height: '28%',
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '50%', filter: 'blur(2px)',
-              animation: 'waterCaustic2 3.8s ease-in-out infinite',
-              transition: 'background 0.35s ease',
-            }}
-          />
-          <div
-            className="absolute"
-            style={{
-              top: '6%', left: '22%', width: '56%', height: '22%',
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.55) 0%, transparent 100%)',
-              borderRadius: '50%', filter: 'blur(1.5px)',
+              background: 'rgba(255,255,255,0.3)', borderRadius: '50%',
             }}
           />
           <div
@@ -304,12 +224,8 @@ const Cursor = () => {
             style={{
               bottom: '10%', left: '18%', width: '64%', height: '14%',
               background: 'linear-gradient(0deg, rgba(255,255,255,0.12) 0%, transparent 100%)',
-              borderRadius: '50%', filter: 'blur(1.5px)',
+              borderRadius: '50%',
             }}
-          />
-          <div
-            className="cursor-caustic-overlay absolute inset-0 rounded-full"
-            style={{ background: 'transparent', transition: 'background 0.4s ease' }}
           />
         </div>
 

@@ -10,21 +10,17 @@ const AnimatedCounter = ({ target, suffix = '+', duration = 2 }) => {
   useEffect(() => {
     if (!isInView) return
     const end = parseInt(target)
-    const step = Math.max(1, Math.floor(end / 60))
-    const incrementTime = (duration * 1000) / (end / step)
+    const startTime = performance.now()
 
-    const timer = setInterval(() => {
-      setCount((prev) => {
-        const next = prev + step
-        if (next >= end) {
-          clearInterval(timer)
-          return end
-        }
-        return next
-      })
-    }, incrementTime)
+    const tick = (now) => {
+      const elapsed = (now - startTime) / (duration * 1000)
+      const progress = Math.min(elapsed, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.round(eased * end))
+      if (progress < 1) requestAnimationFrame(tick)
+    }
 
-    return () => clearInterval(timer)
+    requestAnimationFrame(tick)
   }, [isInView, target, duration])
 
   return <span ref={ref} className="counter-value">{count}{suffix}</span>
@@ -79,14 +75,14 @@ const About = () => {
   }
 
   return (
-    <motion.section ref={ref} id="about" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="about" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
       <motion.div
         style={{ y: fast }}
-        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-2xl"
+        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
       ></motion.div>
       <motion.div
         style={{ y: slow }}
-        className="absolute top-40 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-2xl"
+        className="absolute top-40 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-lg"
       ></motion.div>
 
       <div className="max-w-6xl mx-auto relative z-10">

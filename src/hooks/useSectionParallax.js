@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { useScroll, useSpring, useTransform, useReducedMotion } from 'framer-motion'
+import { useScroll, useSpring, useTransform, useReducedMotion, useInView } from 'framer-motion'
 
 const PRESETS = {
   snappy:  { stiffness: 200, damping: 35, restDelta: 0.001 },
@@ -15,6 +15,7 @@ export function useSectionParallax({
 } = {}) {
   const ref = useRef(null)
   const reduceMotion = useReducedMotion()
+  const isNear = useInView(ref, { margin: '-100px 0px' })
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -24,19 +25,21 @@ export function useSectionParallax({
   const springConfig = PRESETS[preset] || PRESETS.default
   const smooth = useSpring(scrollYProgress, springConfig)
 
+  const away = reduceMotion || !isNear
+
   const slow = useTransform(
     smooth,
     [0, 1],
-    reduceMotion ? [0, 0] : [slowDistance, -slowDistance]
+    away ? [0, 0] : [slowDistance, -slowDistance]
   )
   const fast = useTransform(
     smooth,
     [0, 1],
-    reduceMotion ? [0, 0] : [fastDistance, -fastDistance]
+    away ? [0, 0] : [fastDistance, -fastDistance]
   )
 
   const opacity = opacityFade
-    ? useTransform(smooth, [0, 0.2, 0.8, 1], reduceMotion ? [1, 1, 1, 1] : [0, 1, 1, 0])
+    ? useTransform(smooth, [0, 0.2, 0.8, 1], away ? [1, 1, 1, 1] : [0, 1, 1, 0])
     : null
 
   return { ref, smooth, slow, fast, opacity }

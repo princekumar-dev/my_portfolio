@@ -5,7 +5,6 @@ export const certificationsData = [
     issuer: 'Udemy',
     date: 'Mar 2024',
     description: 'Advanced React patterns, hooks, and performance optimization',
-    image: '/images/cert-react.png',
     credentialUrl: '#'
   },
   {
@@ -14,7 +13,6 @@ export const certificationsData = [
     issuer: 'Coursera',
     date: 'Dec 2023',
     description: 'Complete full-stack development with MERN stack',
-    image: '/images/cert-fullstack.png',
     credentialUrl: '#'
   },
   {
@@ -23,7 +21,6 @@ export const certificationsData = [
     issuer: 'Udemy',
     date: 'Sep 2023',
     description: 'Advanced JavaScript concepts and ES6+ features',
-    image: '/images/cert-js.png',
     credentialUrl: '#'
   },
   {
@@ -32,7 +29,6 @@ export const certificationsData = [
     issuer: 'LinkedIn Learning',
     date: 'Aug 2023',
     description: 'SQL, database design, and optimization techniques',
-    image: '/images/cert-database.png',
     credentialUrl: '#'
   },
   {
@@ -41,7 +37,6 @@ export const certificationsData = [
     issuer: 'AWS',
     date: 'Feb 2024',
     description: 'AWS services, EC2, S3, and cloud architecture',
-    image: '/images/cert-aws.png',
     credentialUrl: '#'
   },
   {
@@ -50,7 +45,6 @@ export const certificationsData = [
     issuer: 'Udemy',
     date: 'Jul 2023',
     description: 'Version control, Git workflows, and collaboration',
-    image: '/images/cert-git.png',
     credentialUrl: '#'
   },
   {
@@ -59,7 +53,6 @@ export const certificationsData = [
     issuer: 'Udemy',
     date: 'Jan 2024',
     description: 'Backend development with Node.js and Express',
-    image: '/images/cert-nodejs.png',
     credentialUrl: '#'
   },
   {
@@ -68,7 +61,6 @@ export const certificationsData = [
     issuer: 'MongoDB University',
     date: 'Nov 2023',
     description: 'NoSQL database design and MongoDB operations',
-    image: '/images/cert-mongodb.png',
     credentialUrl: '#'
   }
 ]

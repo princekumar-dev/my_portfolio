@@ -1,136 +1,216 @@
-import { motion, useInView } from 'framer-motion'
-import { useRef, useState, useEffect } from 'react'
+import { motion, useScroll, useTransform, useInView } from 'framer-motion'
+import { useRef, useState } from 'react'
+import { FiChevronRight } from 'react-icons/fi'
 import { experienceData } from '../data/experienceData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 
-const TimelineConnector = ({ isLast }) => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-50px' })
-
-  if (isLast) return null
+const MetroidBeam = ({ scrollYProgress }) => {
+  const beamRef = useRef(null)
+  const beamInView = useInView(beamRef, { margin: '-50px' })
+  const beamScaleY = useTransform(scrollYProgress, [0, 1], [0, 1])
+  const tipY = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
 
   return (
-    <div ref={ref} className="absolute left-1.5 top-4 w-0.5 h-24 overflow-hidden" style={{ transformOrigin: 'top' }}>
+    <div ref={beamRef} className="absolute left-[7px] top-0 w-[3px] h-full z-0 pointer-events-none" style={{ contain: 'layout style' }}>
+      <div className="absolute inset-0 w-full rounded-full bg-gradient-to-b from-accent-blue/10 via-accent-cyan/10 to-accent-purple/10" />
+
       <motion.div
-        initial={{ scaleY: 0 }}
-        animate={isInView ? { scaleY: 1 } : { scaleY: 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-        className="w-full h-full bg-gradient-to-b from-accent-blue to-transparent"
+        style={{ scaleY: beamScaleY, transformOrigin: 'top', willChange: 'transform' }}
+        className="absolute top-0 w-full h-full rounded-full bg-gradient-to-b from-accent-blue via-accent-cyan to-accent-purple opacity-70 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
       />
+      <motion.div
+        style={{ scaleY: beamScaleY, transformOrigin: 'top', willChange: 'transform' }}
+        className="absolute top-0 left-[0.5px] w-[2px] h-full rounded-full bg-white/40 blur-sm"
+      />
+
+      <motion.div
+        style={{ top: tipY, willChange: 'transform' }}
+        className="absolute -left-[4px] w-[11px] h-[11px]"
+      >
+        <motion.div
+          className="w-full h-full rounded-full bg-white"
+          animate={beamInView ? {
+            scale: [1, 1.45, 1],
+            opacity: [0.6, 1, 0.6],
+            boxShadow: [
+              '0 0 10px rgba(59,130,246,0.5)',
+              '0 0 22px rgba(59,130,246,0.9)',
+              '0 0 10px rgba(59,130,246,0.5)',
+            ],
+          } : {}}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </motion.div>
     </div>
+  )
+}
+
+const getInitials = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+
+const ExperienceCard = ({ exp, index, scrollYProgress, total, touchDevice }) => {
+  const slotSize = 1 / total
+  const slotStart = index * slotSize
+  const slotEnd = (index + 1) * slotSize
+  const fade = 0.08
+
+  const fillProgress = useTransform(
+    scrollYProgress,
+    [slotStart, slotStart + fade, slotEnd - fade, slotEnd],
+    [0, 1, 1, 0]
+  )
+
+  const dotScale = useTransform(fillProgress, [0, 1], [1, 1.2])
+  const dotOpacity = useTransform(fillProgress, [0, 0.3, 1], [0.3, 1, 1])
+
+  const accent = exp.accentColor || '#3B82F6'
+
+  return (
+    <motion.div
+      className="relative pb-12"
+      initial={{ opacity: 0, x: touchDevice ? 0 : -30 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <motion.div
+        className="absolute left-[1px] top-[2px] w-[15px] h-[15px] rounded-full border-[3px] z-10"
+        style={{
+          scale: dotScale,
+          opacity: dotOpacity,
+          backgroundColor: accent,
+          borderColor: accent,
+          boxShadow: `0 0 12px ${accent}88`,
+          willChange: 'transform',
+        }}
+      />
+
+      <div className="ml-8">
+        <motion.div
+          whileHover={{ y: -4 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="group glass-card glass-edge animated-border rounded-2xl cursor-default"
+        >
+          <div className="p-5 sm:p-7">
+            <div className="flex items-start gap-4 mb-4">
+              <div
+                className="shrink-0 flex h-12 w-12 items-center justify-center rounded-xl font-bold text-sm text-white shadow-lg"
+                style={{ background: `linear-gradient(135deg, ${accent}, ${accent}cc)` }}
+              >
+                {getInitials(exp.company)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap justify-between items-start gap-2">
+                  <h3 className="text-lg sm:text-xl font-bold text-light-900">{exp.position}</h3>
+                  <span className="text-sm text-light-500 whitespace-nowrap">{exp.duration}</span>
+                </div>
+                <div className="flex items-center gap-3 mt-1">
+                  <p className="text-light-500 text-sm">{exp.company}</p>
+                  {exp.duration.includes('Present') && (
+                    <span className="badge-shimmer inline-flex rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-0.5 text-[0.65rem] font-semibold text-green-600">
+                      Current
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <p className="text-light-600 mb-4 text-sm leading-relaxed">{exp.description}</p>
+
+            <div className="card-reveal-wrap">
+              <div className="card-reveal-content">
+                <ul className="space-y-2 mb-4">
+                  {exp.achievements.map((achievement, idx) => (
+                    <li
+                      key={idx}
+                      className="text-light-600 text-sm flex items-start"
+                    >
+                      <FiChevronRight className="mr-3 mt-0.5 shrink-0" size={14} style={{ color: accent }} />
+                      {achievement}
+                    </li>
+                  ))}
+                </ul>
+
+                {exp.technologies && (
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {exp.technologies.map((tech) => (
+                      <span
+                        key={tech}
+                        className="tag-glass px-2.5 py-1 text-xs rounded-full text-accent-blue"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
   )
 }
 
 const Experience = () => {
   const { ref, fast, opacity } = useSectionParallax({ fastDistance: 100, preset: 'default', opacityFade: true })
-  const [touchDevice, setTouchDevice] = useState(false)
-
-  useEffect(() => {
-    setTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  }, [])
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: touchDevice ? 0.08 : 0.15,
-        delayChildren: 0.1,
-      },
-    },
-  }
-
-  const itemVariants = touchDevice ? {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-    },
-  } : {
-    hidden: { opacity: 0, x: -40, scale: 0.97 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      scale: 1,
-      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-    },
-  }
-
-  const ExperienceCard = ({ exp, index }) => (
-    <motion.div
-      variants={itemVariants}
-      className="relative pl-8 pb-12"
-    >
-      <motion.div
-        initial={{ scale: 0 }}
-        whileInView={{ scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ type: 'spring', stiffness: 500, damping: 22, delay: index * 0.1 }}
-        className="absolute left-0 top-0 w-4 h-4 rounded-full bg-accent-blue border-4 border-white shadow-md glow-pulse"
-      />
-      <TimelineConnector isLast={index === experienceData.length - 1} />
-
-      <motion.div
-        whileHover={{ x: 10, boxShadow: '0 8px 30px -8px rgba(59,130,246,0.15)' }}
-        transition={{ duration: 0.2 }}
-        className="glass-card glass-edge rounded-xl p-4 sm:p-6 cursor-default"
-      >
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-bold text-accent-blue">{exp.position}</h3>
-          <span className="text-sm text-light-500">{exp.duration}</span>
-        </div>
-        <p className="text-light-500 mb-4">{exp.company}</p>
-        <p className="text-light-600 mb-4">{exp.description}</p>
-        <ul className="space-y-2">
-          {exp.achievements.map((achievement, idx) => (
-            <motion.li
-              key={idx}
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 * idx }}
-              className="text-light-600 text-sm flex items-start"
-            >
-              <span className="text-accent-purple mr-3">▸</span>
-              {achievement}
-            </motion.li>
-          ))}
-        </ul>
-      </motion.div>
-    </motion.div>
-  )
+  const [touchDevice] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  })
 
   return (
-    <motion.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style' }}>
+    <motion.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
       <motion.div
         style={{ y: fast }}
-        className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-2xl"
-      ></motion.div>
+        className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
+      />
 
       <div className="max-w-4xl mx-auto relative z-10 px-2 sm:px-0">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-3xl sm:text-4xl md:text-5xl font-bold mb-12 sm:mb-16 text-center"
-        >
-          <span className="eyebrow text-accent-blue block mb-3">Where I've worked</span>
-          <span className="animated-gradient-text">
-            Experience
-          </span>
-        </motion.h2>
+        <div className="text-center mb-12 sm:mb-16">
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="eyebrow text-accent-blue block"
+          >
+            Where I've worked
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold"
+          >
+            <span className="animated-gradient-text">
+              Experience
+            </span>
+          </motion.h2>
+        </div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          {experienceData.map((exp, index) => (
-            <ExperienceCard key={exp.id} exp={exp} index={index} />
-          ))}
-        </motion.div>
+        {experienceData.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16"
+          >
+            <p className="text-light-500 text-lg">Experience details coming soon!</p>
+          </motion.div>
+        ) : (
+          <div className="relative">
+            <MetroidBeam scrollYProgress={scrollYProgress} />
+            {experienceData.map((exp, index) => (
+              <ExperienceCard
+                key={exp.id}
+                exp={exp}
+                index={index}
+                scrollYProgress={scrollYProgress}
+                total={experienceData.length}
+                touchDevice={touchDevice}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </motion.section>
   )
