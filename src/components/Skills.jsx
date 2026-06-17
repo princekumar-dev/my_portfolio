@@ -34,6 +34,7 @@ const SkillCard = memo(({ skill, touchDevice, itemVariants }) => {
     <m.div
       variants={itemVariants}
       className="glass-card glass-edge animated-border group rounded-2xl p-6 cursor-default"
+      data-cursor-target="card"
     >
       <div className="relative mb-4 inline-block">
         {!touchDevice && (
@@ -109,6 +110,16 @@ const itemVariants = {
   },
 }
 
+const mobileItemVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  },
+}
+
 const Skills = () => {
   const { ref, slow, fast } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy' })
   const [touchDevice, setTouchDevice] = useState(false)
@@ -122,26 +133,20 @@ const Skills = () => {
     skills,
   })), [])
 
-  const mobileItemVariants = touchDevice ? {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-    },
-  } : itemVariants
+  const activeItemVariants = touchDevice ? mobileItemVariants : itemVariants
 
   return (
-    <m.section ref={ref} id="skills" className="relative py-16 sm:py-24 px-4 overflow-hidden">
-      <m.div
-        style={{ y: fast }}
-        className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
-      />
-      <m.div
-        style={{ y: slow }}
-        className="absolute top-10 right-0 w-64 h-64 bg-accent-blue/10 rounded-full blur-lg"
-      />
+    <m.section ref={ref} id="skills" className="relative py-16 sm:py-24 px-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <m.div
+          style={{ y: fast }}
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
+        />
+        <m.div
+          style={{ y: slow }}
+          className="absolute top-10 right-0 w-64 h-64 bg-accent-blue/10 rounded-full blur-lg"
+        />
+      </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
         <m.div
@@ -177,7 +182,7 @@ const Skills = () => {
               variants={containerVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+              viewport={{ once: true }}
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
             >
               {skills.map((skill) => (
@@ -185,7 +190,7 @@ const Skills = () => {
                   key={skill.name}
                   skill={skill}
                   touchDevice={touchDevice}
-                  itemVariants={mobileItemVariants}
+                  itemVariants={activeItemVariants}
                 />
               ))}
             </m.div>

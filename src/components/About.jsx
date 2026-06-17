@@ -11,16 +11,18 @@ const AnimatedCounter = ({ target, suffix = '+', duration = 2 }) => {
     if (!isInView) return
     const end = parseInt(target)
     const startTime = performance.now()
+    let frameId
 
     const tick = (now) => {
       const elapsed = (now - startTime) / (duration * 1000)
       const progress = Math.min(elapsed, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
       setCount(Math.round(eased * end))
-      if (progress < 1) requestAnimationFrame(tick)
+      if (progress < 1) frameId = requestAnimationFrame(tick)
     }
 
-    requestAnimationFrame(tick)
+    frameId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frameId)
   }, [isInView, target, duration])
 
   return <span ref={ref} className="counter-value">{count}{suffix}</span>
@@ -33,6 +35,7 @@ const StatCard = memo(({ stat, index }) => (
     viewport={{ once: true }}
     transition={{ delay: 0.1 * index, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     className="glass-card glass-edge animated-border rounded-2xl p-6 text-center group"
+    data-cursor-target="card"
   >
     <div className={`text-4xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
       <AnimatedCounter target={stat.target} suffix={stat.suffix} />
@@ -92,22 +95,24 @@ const About = () => {
   }
 
   return (
-    <m.section ref={ref} id="about" className="relative py-16 sm:py-24 px-4 overflow-hidden">
-      <m.div
-        style={{ y: fast }}
-        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
-      ></m.div>
-      <m.div
-        style={{ y: slow }}
-        className="absolute top-40 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-lg"
-      ></m.div>
+    <m.section ref={ref} id="about" className="relative py-16 sm:py-24 px-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <m.div
+          style={{ y: fast }}
+          className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
+        ></m.div>
+        <m.div
+          style={{ y: slow }}
+          className="absolute top-40 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-lg"
+        ></m.div>
+      </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
         <m.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+          viewport={{ once: true }}
         >
           <m.div variants={itemVariants} className="text-center mb-12">
             <span className="eyebrow text-accent-blue">Who I am</span>
@@ -119,7 +124,7 @@ const About = () => {
           </m.div>
 
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-            <m.div variants={itemVariants} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4">
+            <m.div variants={itemVariants} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4" data-cursor-target="card">
               <LineReveal delay={0}>
                 <p className="text-light-600 text-lg leading-relaxed">
                   I'm an AI & Data Science engineer with a strong foundation in modern web and machine learning

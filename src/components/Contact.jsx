@@ -148,11 +148,13 @@ const Contact = () => {
   }
 
   return (
-    <m.section ref={ref} id="contact" className="relative py-16 sm:py-24 px-4 overflow-hidden">
-      <m.div
-        style={{ y: fast }}
-        className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
-      ></m.div>
+    <m.section ref={ref} id="contact" className="relative py-16 sm:py-24 px-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <m.div
+          style={{ y: fast }}
+          className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
+        ></m.div>
+      </div>
 
       <div className="max-w-5xl mx-auto relative z-10">
         <m.div
@@ -189,8 +191,8 @@ const Contact = () => {
             </m.div>
 
             <m.div variants={itemVariants}>
-              <form ref={formRef} onSubmit={handleSubmit} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4 sm:space-y-5" noValidate>
-                <div className="floating-label-group">
+              <form ref={formRef} onSubmit={handleSubmit} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4 sm:space-y-5" data-cursor-target="card" noValidate>
+                <div className="floating-label-group rounded-xl" data-cursor-target="card">
                   <input
                     id="contact-name"
                     type="text"
@@ -208,7 +210,7 @@ const Contact = () => {
                   )}
                 </div>
 
-                <div className="floating-label-group">
+                <div className="floating-label-group rounded-xl" data-cursor-target="card">
                   <input
                     id="contact-email"
                     type="email"
@@ -226,7 +228,7 @@ const Contact = () => {
                   )}
                 </div>
 
-                <div className="floating-label-group">
+                <div className="floating-label-group rounded-xl" data-cursor-target="card">
                   <textarea
                     id="contact-message"
                     placeholder=" "
@@ -255,6 +257,7 @@ const Contact = () => {
                   disabled={formState !== 'idle'}
                   whileHover={formState === 'idle' ? { scale: 1.02 } : {}}
                   whileTap={formState === 'idle' ? { scale: 0.98 } : {}}
+                  data-cursor-target="card"
                   className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
                     formState === 'sent'
                       ? 'bg-green-500 text-white'

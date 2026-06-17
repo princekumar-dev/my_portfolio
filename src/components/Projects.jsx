@@ -10,6 +10,37 @@ const statusStyles = {
   'In Progress': 'bg-amber-500/15 text-amber-600 border-amber-500/30',
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+    },
+  },
+}
+
+const desktopItemVariants = {
+  hidden: { opacity: 0, y: 50, scale: 0.96, rotateX: 6 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    rotateX: 0,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  },
+}
+
+const mobileItemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  },
+}
+
 const ShimmerImage = ({ src, alt, className, style }) => {
   const [loaded, setLoaded] = useState(false)
   const webpSrc = src ? src.replace(/\.png$/, '.webp') : null
@@ -40,135 +71,110 @@ const ShimmerImage = ({ src, alt, className, style }) => {
   )
 }
 
-const Projects = () => {
-  const { ref, slow, fast } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy' })
-  const [touchDevice] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: touchDevice ? 0.08 : 0.15,
-        delayChildren: 0.1,
-      },
-    },
-  }
-
-  const itemVariants = touchDevice ? {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-    },
-  } : {
-    hidden: { opacity: 0, y: 50, scale: 0.96, rotateX: 6 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      rotateX: 0,
-      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-    },
-  }
-
-  const ProjectCard = memo(({ project }) => (
-    <m.div variants={itemVariants}>
-      <TiltCard className="group glass-card glass-edge animated-border h-full rounded-2xl">
-        <div className="relative h-48 sm:h-56 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden">
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 rounded-none blur-xl opacity-20 group-hover:opacity-50 transition-opacity duration-300"
-            style={{ backgroundColor: project.color }}
+const ProjectCard = memo(({ project, itemVariants }) => (
+  <m.div variants={itemVariants}>
+    <TiltCard className="group glass-card glass-edge animated-border h-full rounded-2xl">
+      <div className="relative h-48 sm:h-56 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden">
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 rounded-none blur-xl opacity-20 group-hover:opacity-50 transition-opacity duration-300"
+          style={{ backgroundColor: project.color }}
+        />
+        {project.image && (
+          <ShimmerImage
+            src={project.image}
+            alt={`${project.title} preview`}
+            className="absolute inset-0 h-full w-full object-contain p-10 transition-transform duration-700 ease-out group-hover:scale-105"
+            style={{ transform: 'translateZ(0)' }}
           />
-          {project.image && (
-            <ShimmerImage
-              src={project.image}
-              alt={`${project.title} preview`}
-              className="absolute inset-0 h-full w-full object-contain p-10 transition-transform duration-700 ease-out group-hover:scale-105"
-              style={{ transform: 'translateZ(0)' }}
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/10 to-transparent" />
-          <m.div className="absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-cyan opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/10 to-transparent" />
+        <m.div className="absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-cyan opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
 
-          {project.status && (
-            <span
-              className={`absolute top-3 right-3 rounded-full border px-3 py-0.5 text-[0.7rem] font-medium backdrop-blur-sm ${
-                statusStyles[project.status] || statusStyles.Completed
-              }`}
-            >
-              {project.status}
-            </span>
-          )}
+        {project.status && (
+          <span
+            className={`absolute top-3 right-3 rounded-full border px-3 py-0.5 text-[0.7rem] font-medium backdrop-blur-sm ${
+              statusStyles[project.status] || statusStyles.Completed
+            }`}
+          >
+            {project.status}
+          </span>
+        )}
 
-          <div className="absolute inset-x-0 bottom-0 p-4">
-            <h3 className="text-2xl font-bold text-light-900 drop-shadow-sm">{project.title}</h3>
-          </div>
+        <div className="absolute inset-x-0 bottom-0 p-4">
+          <h3 className="text-2xl font-bold text-light-900 drop-shadow-sm">{project.title}</h3>
         </div>
+      </div>
 
-        <div className="p-5 sm:p-6">
-          <p className="text-light-600 text-sm mb-4 line-clamp-2">{project.description}</p>
+      <div className="p-5 sm:p-6">
+        <p className="text-light-600 text-sm mb-4 line-clamp-2">{project.description}</p>
 
-          <div className="card-reveal-wrap">
-          <div className="card-reveal-content pb-3">
-            <div className="flex flex-wrap gap-2 mb-4">
-              {project.technologies.map((tech) => (
-                <span
-                  key={tech}
-                  className="tag-glass px-3 py-1 text-xs rounded-full text-accent-blue"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
+        <div className="card-reveal-wrap">
+        <div className="card-reveal-content pb-3">
+          <div className="flex flex-wrap gap-2 mb-4">
+            {project.technologies.map((tech) => (
+              <span
+                key={tech}
+                className="tag-glass px-3 py-1 text-xs rounded-full text-accent-blue"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
 
-            <div className="flex gap-4">
+          <div className="flex gap-4">
+            <m.a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue ml-1.5"
+            >
+              <FiGithub size={18} />
+              <span className="text-sm font-semibold">Code</span>
+            </m.a>
+            {project.liveUrl && (
               <m.a
-                href={project.github}
+                href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue ml-1.5"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue"
               >
-                <FiGithub size={18} />
-                <span className="text-sm font-semibold">Code</span>
+                <FiExternalLink size={18} />
+                <span className="text-sm font-semibold">Live Demo</span>
               </m.a>
-              {project.liveUrl && (
-                <m.a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue"
-                >
-                  <FiExternalLink size={18} />
-                  <span className="text-sm font-semibold">Live Demo</span>
-                </m.a>
-              )}
-            </div>
-          </div>
+            )}
           </div>
         </div>
-      </TiltCard>
-    </m.div>
-  ))
+        </div>
+      </div>
+    </TiltCard>
+  </m.div>
+))
 
-  ProjectCard.displayName = 'ProjectCard'
+ProjectCard.displayName = 'ProjectCard'
+
+const Projects = () => {
+  const { ref, slow, fast } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy' })
+  const [touchDevice] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
+
+  const itemVariants = touchDevice ? mobileItemVariants : desktopItemVariants
 
   return (
-    <m.section ref={ref} id="projects" className="relative py-16 sm:py-24 px-4 overflow-hidden">
-      <m.div
-        style={{ y: fast }}
-        className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
-      ></m.div>
-      <m.div
-        style={{ y: slow }}
-        className="absolute bottom-0 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-lg"
-      ></m.div>
+    <m.section ref={ref} id="projects" className="relative py-16 sm:py-24 px-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <m.div
+          style={{ y: fast }}
+          className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
+        ></m.div>
+        <m.div
+          style={{ y: slow }}
+          className="absolute bottom-0 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-lg"
+        ></m.div>
+      </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
         <m.div
@@ -198,11 +204,11 @@ const Projects = () => {
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+            viewport={{ once: true }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-auto"
           >
             {projectsData.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectCard key={project.id} project={project} itemVariants={itemVariants} />
             ))}
           </m.div>
         )}

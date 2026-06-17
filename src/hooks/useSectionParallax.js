@@ -38,9 +38,8 @@ export function useSectionParallax({
     away ? [0, 0] : [fastDistance, -fastDistance]
   )
 
-  const opacity = opacityFade
-    ? useTransform(smooth, [0, 0.2, 0.8, 1], away ? [1, 1, 1, 1] : [0, 1, 1, 0])
-    : null
+  const opacityTransform = useTransform(smooth, [0, 0.2, 0.8, 1], away ? [1, 1, 1, 1] : [0, 1, 1, 0])
+  const opacity = opacityFade ? opacityTransform : null
 
   return { ref, smooth, slow, fast, opacity }
 }

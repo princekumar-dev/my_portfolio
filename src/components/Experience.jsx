@@ -69,7 +69,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
       className="relative pb-12"
       initial={{ opacity: 0, x: touchDevice ? 0 : -30 }}
       whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+      viewport={{ once: true }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
       <m.div
@@ -89,6 +89,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
           whileHover={{ y: -4 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
           className="group glass-card glass-edge animated-border rounded-2xl cursor-default"
+          data-cursor-target="card"
         >
           <div className="p-5 sm:p-7">
             <div className="flex items-start gap-4 mb-4">
@@ -162,11 +163,13 @@ const Experience = () => {
   })
 
   return (
-    <m.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4 overflow-hidden">
-      <m.div
-        style={{ y: fast }}
-        className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
-      />
+    <m.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <m.div
+          style={{ y: fast }}
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
+        />
+      </div>
 
       <div className="max-w-4xl mx-auto relative z-10 px-2 sm:px-0">
         <div className="text-center mb-12 sm:mb-16">

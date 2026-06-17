@@ -1,5 +1,6 @@
-import { useRef, useCallback, useEffect, useState } from 'react'
-import { m, useMotionValue, useSpring, useTransform, useReducedMotion, useInView } from 'framer-motion'
+import { useRef, useCallback, useEffect, useState, useContext } from 'react'
+import { m, useMotionValue, useSpring, useTransform, useReducedMotion, useInView, useMotionValueEvent } from 'framer-motion'
+import { useTiltContext } from '../context/TiltContext'
 
 const isTouchDevice = () =>
   typeof window !== 'undefined' &&
@@ -20,6 +21,7 @@ const TiltCard = ({
   const rafRef = useRef(0)
   const hoverRef = useRef(false)
   const isInView = useInView(cardRef, { margin: '-50px' })
+  const { setTilt, clearTilt } = useTiltContext()
 
   const px = useMotionValue(0)
   const py = useMotionValue(0)
@@ -30,6 +32,18 @@ const TiltCard = ({
 
   const rotateX = useSpring(useTransform(py, v => -v * maxTilt * 2), springCfg)
   const rotateY = useSpring(useTransform(px, v => v * maxTilt * 2), springCfg)
+
+  useMotionValueEvent(rotateX, "change", (v) => {
+    if (reduceMotion || touchDevice) return
+    const rect = cardRef.current?.getBoundingClientRect()
+    setTilt({ x: v, y: rotateY.get(), rect, active: hoverRef.current })
+  })
+
+  useMotionValueEvent(rotateY, "change", (v) => {
+    if (reduceMotion || touchDevice) return
+    const rect = cardRef.current?.getBoundingClientRect()
+    setTilt({ x: rotateX.get(), y: v, rect, active: hoverRef.current })
+  })
 
   const glareOpacity = useTransform(px, [-0.5, 0, 0.5], [0.3, 0, 0.3])
   const glowOpacity = useTransform([px, py], ([x, y]) => {
@@ -93,7 +107,7 @@ const TiltCard = ({
 
   if (reduceMotion) {
     return (
-      <div className={className} {...rest}>
+      <div className={className} data-cursor-target="tilt-card" {...rest}>
         {children}
       </div>
     )
@@ -102,12 +116,18 @@ const TiltCard = ({
   const tiltContent = (
     <m.div
       ref={cardRef}
-      onPointerEnter={() => { hoverRef.current = true }}
+      data-cursor-target="tilt-card"
+      onPointerEnter={() => {
+        hoverRef.current = true
+        const rect = cardRef.current?.getBoundingClientRect()
+        if (rect) setTilt({ x: rotateX.get(), y: rotateY.get(), rect, active: true })
+      }}
       onPointerMove={handleMove}
       onPointerLeave={() => {
         hoverRef.current = false
         px.jump(0)
         py.jump(0)
+        clearTilt()
       }}
       style={touchDevice ? {} : {
         rotateX,

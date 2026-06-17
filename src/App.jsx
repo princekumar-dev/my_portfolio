@@ -6,6 +6,7 @@ import ScrollProgressBar from './components/ScrollProgressBar'
 import { PointerProvider } from './context/PointerContext'
 import { ScrollProvider } from './context/ScrollContext'
 import { SmoothScrollProvider } from './context/SmoothScrollContext'
+import { TiltProvider } from './context/TiltContext'
 import Cursor from './components/Cursor'
 import Hero from './components/Hero'
 import ScrollToTop from './components/ScrollToTop'
@@ -73,7 +74,7 @@ function WaveDivider({ flip = false, color = 'rgba(59,130,246,0.06)' }) {
 
 function SectionReveal({ children }) {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-80px' })
+  const isInView = useInView(ref, { once: true, margin: '-20px' })
 
   return (
     <m.div
@@ -98,6 +99,7 @@ function App() {
         <PointerProvider>
         <SmoothScrollProvider>
         <ScrollProvider>
+        <TiltProvider>
         <Cursor />
         <AnimatedBackground />
         <ScrollProgressBar />
@@ -131,6 +133,7 @@ function App() {
         </Suspense>
         <Footer />
         <ScrollToTop />
+        </TiltProvider>
         </ScrollProvider>
         </SmoothScrollProvider>
         </PointerProvider>

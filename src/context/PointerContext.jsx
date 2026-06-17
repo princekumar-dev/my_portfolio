@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, useMemo } from 'react'
 import { useMotionValue } from 'framer-motion'
 
 const PointerContext = createContext(null)
@@ -37,8 +37,10 @@ export const PointerProvider = ({ children }) => {
     }
   }, [isMobile, clientX, clientY, nx, ny])
 
+  const value = useMemo(() => ({ clientX, clientY, nx, ny }), [clientX, clientY, nx, ny])
+
   return (
-    <PointerContext.Provider value={{ clientX, clientY, nx, ny }}>
+    <PointerContext.Provider value={value}>
       {children}
     </PointerContext.Provider>
   )

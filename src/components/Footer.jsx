@@ -31,9 +31,9 @@ const Footer = () => {
           >
             <h4 className="text-accent-blue font-semibold mb-3">Quick Links</h4>
             <ul className="space-y-2.5 text-light-500 text-sm">
-              <li><a href="#home" className="hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Home</a></li>
-              <li><a href="#projects" className="hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Projects</a></li>
-              <li><a href="#contact" className="hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Contact</a></li>
+              <li><a href="#home" data-cursor-target="link" className="inline-block rounded-lg px-2 py-0.5 hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Home</a></li>
+              <li><a href="#projects" data-cursor-target="link" className="inline-block rounded-lg px-2 py-0.5 hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Projects</a></li>
+              <li><a href="#contact" data-cursor-target="link" className="inline-block rounded-lg px-2 py-0.5 hover:text-accent-blue transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-px after:bg-accent-blue after:transition-all after:duration-300">Contact</a></li>
             </ul>
           </m.div>
 
@@ -47,19 +47,19 @@ const Footer = () => {
             <h4 className="text-accent-blue font-semibold mb-3">Connect</h4>
             <ul className="space-y-2.5 text-light-500 text-sm">
               <li>
-                <a href="https://github.com/princekumar-dev" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in new tab)" className="flex items-center gap-2 hover:text-accent-blue transition-colors duration-200 group">
+                <a href="https://github.com/princekumar-dev" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in new tab)" data-cursor-target="link" className="inline-flex items-center gap-2 rounded-lg px-2 py-0.5 hover:text-accent-blue transition-colors duration-200 group">
                   <FiGithub size={16} className="group-hover:rotate-12 transition-transform duration-200" />
                   GitHub
                 </a>
               </li>
               <li>
-                <a href="https://www.linkedin.com/in/prince-r-b9685130b" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in new tab)" className="flex items-center gap-2 hover:text-accent-blue transition-colors duration-200 group">
+                <a href="https://www.linkedin.com/in/prince-r-b9685130b" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in new tab)" data-cursor-target="link" className="inline-flex items-center gap-2 rounded-lg px-2 py-0.5 hover:text-accent-blue transition-colors duration-200 group">
                   <FiLinkedin size={16} className="group-hover:rotate-12 transition-transform duration-200" />
                   LinkedIn
                 </a>
               </li>
               <li>
-                <a href="mailto:prince55833kumar@gmail.com" className="flex items-center gap-2 hover:text-accent-blue transition-colors duration-200 group">
+                <a href="mailto:prince55833kumar@gmail.com" data-cursor-target="link" className="inline-flex items-center gap-2 rounded-lg px-2 py-0.5 hover:text-accent-blue transition-colors duration-200 group">
                   <FiMail size={16} className="group-hover:rotate-12 transition-transform duration-200" />
                   Email
                 </a>
