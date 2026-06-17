@@ -3,9 +3,9 @@ import { useSectionParallax } from '../hooks/useSectionParallax'
 import { useRef, useEffect, useState, useMemo, memo } from 'react'
 
 const AnimatedCounter = ({ target, suffix = '+', duration = 2 }) => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
-  const [count, setCount] = useState(0)
+  const viewRef = useRef(null)
+  const countRef = useRef(null)
+  const isInView = useInView(viewRef, { once: true })
 
   useEffect(() => {
     if (!isInView) return
@@ -17,15 +17,15 @@ const AnimatedCounter = ({ target, suffix = '+', duration = 2 }) => {
       const elapsed = (now - startTime) / (duration * 1000)
       const progress = Math.min(elapsed, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
-      setCount(Math.round(eased * end))
+      if (countRef.current) countRef.current.textContent = `${Math.round(eased * end)}${suffix}`
       if (progress < 1) frameId = requestAnimationFrame(tick)
     }
 
     frameId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frameId)
-  }, [isInView, target, duration])
+  }, [isInView, target, duration, suffix])
 
-  return <span ref={ref} className="counter-value">{count}{suffix}</span>
+  return <span ref={viewRef} className="counter-value"><span ref={countRef}>0{suffix}</span></span>
 }
 
 const StatCard = memo(({ stat, index }) => (
@@ -70,29 +70,29 @@ const stats = [
   { target: 5, suffix: '+', label: 'Certifications', color: 'from-accent-pink to-accent-blue' },
 ]
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -40, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  },
+}
+
 const About = () => {
   const { ref, slow, fast } = useSectionParallax({ slowDistance: 60, fastDistance: 100, preset: 'soft' })
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.1,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -40, scale: 0.97 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      scale: 1,
-      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-    },
-  }
 
   return (
     <m.section ref={ref} id="about" className="relative py-16 sm:py-24 px-4">

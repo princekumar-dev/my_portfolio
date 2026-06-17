@@ -12,10 +12,16 @@ export const PointerProvider = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0)
+    let timeout
+    const check = () => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0)
+      }, 200)
+    }
     check()
     window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
+    return () => { clearTimeout(timeout); window.removeEventListener('resize', check) }
   }, [])
 
   useEffect(() => {
