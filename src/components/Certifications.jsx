@@ -5,7 +5,7 @@ import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
 
 const Certifications = () => {
-  const { ref, fast, opacity } = useSectionParallax({ fastDistance: 100, opacityFade: true })
+  const { ref, fast } = useSectionParallax({ fastDistance: 100 })
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -49,7 +49,7 @@ const Certifications = () => {
   CertCard.displayName = 'CertCard'
 
   return (
-    <section ref={ref} id="certifications" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
+    <section ref={ref} id="certifications" className="relative py-16 sm:py-24 px-4 overflow-hidden">
       <m.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
@@ -83,7 +83,7 @@ const Certifications = () => {
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: '-100px' }}
+            viewport={{ once: true, margin: '0px 0px -10% 0px' }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
           >
             {certificationsData.map((cert) => (

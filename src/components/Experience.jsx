@@ -69,7 +69,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
       className="relative pb-12"
       initial={{ opacity: 0, x: touchDevice ? 0 : -30 }}
       whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
+      viewport={{ once: true, margin: '0px 0px -10% 0px' }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
       <m.div
@@ -154,7 +154,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
 ExperienceCard.displayName = 'ExperienceCard'
 
 const Experience = () => {
-  const { ref, fast, opacity } = useSectionParallax({ fastDistance: 100, preset: 'default', opacityFade: true })
+  const { ref, fast } = useSectionParallax({ fastDistance: 100, preset: 'default' })
   const [touchDevice] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -162,7 +162,7 @@ const Experience = () => {
   })
 
   return (
-    <m.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
+    <m.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4 overflow-hidden">
       <m.div
         style={{ y: fast }}
         className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"

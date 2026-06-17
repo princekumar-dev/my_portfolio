@@ -68,7 +68,7 @@ const stats = [
 ]
 
 const About = () => {
-  const { ref, slow, fast, opacity } = useSectionParallax({ slowDistance: 60, fastDistance: 100, preset: 'soft', opacityFade: true })
+  const { ref, slow, fast } = useSectionParallax({ slowDistance: 60, fastDistance: 100, preset: 'soft' })
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -92,7 +92,7 @@ const About = () => {
   }
 
   return (
-    <m.section ref={ref} id="about" className="relative py-16 sm:py-24 px-4 overflow-hidden" style={{ opacity, contain: 'layout style', contentVisibility: 'auto' }}>
+    <m.section ref={ref} id="about" className="relative py-16 sm:py-24 px-4 overflow-hidden">
       <m.div
         style={{ y: fast }}
         className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
@@ -107,7 +107,7 @@ const About = () => {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, margin: '0px 0px -10% 0px' }}
         >
           <m.div variants={itemVariants} className="text-center mb-12">
             <span className="eyebrow text-accent-blue">Who I am</span>
