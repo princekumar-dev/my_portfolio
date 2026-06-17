@@ -856,7 +856,7 @@ h1 {
   z-index: -1;
 }
 
-/* Animated gradient text */
+/* Animated gradient text with shimmer sweep */
 @property --text-gradient-angle {
   syntax: '<angle>';
   initial-value: 0deg;
@@ -864,23 +864,47 @@ h1 {
 }
 
 .animated-gradient-text {
+  position: relative;
+  display: inline-block;
   background: linear-gradient(
-    var(--text-gradient-angle),
-    #577590,
-    #B5838D,
-    #6B9080,
-    #577590
+    90deg,
+    #3D5A73 0%,
+    #4A7060 25%,
+    #996B75 45%,
+    rgba(255, 255, 255, 0.8) 50%,
+    #996B75 55%,
+    #4A7060 75%,
+    #3D5A73 100%
   );
-  background-size: 300% 300%;
+  background-size: 250% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradientTextShift 30s ease infinite;
+  animation: gradientTextShimmer 5s ease-in-out infinite;
 }
 
-@keyframes gradientTextShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+.animated-gradient-text::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(255, 255, 255, 0.25) 55%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerSweep 4s ease-in-out infinite 1s;
+  pointer-events: none;
+}
+
+@keyframes gradientTextShimmer {
+  0%, 100% { background-position: 200% center; }
+  50% { background-position: 0% center; }
 }
 
 /* Aurora mesh gradient — GPU-composited only */
