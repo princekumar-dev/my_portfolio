@@ -73,7 +73,8 @@ const Navigation = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
           const currentY = window.scrollY
-          setScrollDir(currentY > lastScrollY.current && currentY > 80 ? 'down' : 'up')
+          const nextDir = currentY > lastScrollY.current && currentY > 80 ? 'down' : 'up'
+          setScrollDir((prev) => (prev === nextDir ? prev : nextDir))
           const rawDepth = Math.min(currentY / 400, 1)
           const quantized = Math.round(rawDepth * 4) / 4
           setScrollDepth((prev) => (prev === quantized ? prev : quantized))

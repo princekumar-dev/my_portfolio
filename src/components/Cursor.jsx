@@ -42,6 +42,13 @@ const Cursor = () => {
   const targetRectRef = useRef(null)
   const rafRef = useRef(0)
   const hoveredElRef = useRef(null)
+  const lastRotTime = useRef(0)
+  const lastRotVal = useRef(0)
+  const lastPosX = useRef(-100)
+  const lastPosY = useRef(-100)
+  const lastW = useRef(20)
+  const lastH = useRef(20)
+  const lastPointerTime = useRef(0)
 
   const posX = useMotionValue(-100)
   const posY = useMotionValue(-100)
@@ -56,9 +63,12 @@ const Cursor = () => {
   const scaleVal = useMotionValue(1)
   const smoothScale = useSpring(scaleVal, { stiffness: 300, damping: 20 })
 
-  const tiltX = useSpring(useMotionValue(0), { stiffness: 300, damping: 30 })
-  const tiltY = useSpring(useMotionValue(0), { stiffness: 300, damping: 30 })
-  const rotateZ = useSpring(useMotionValue(0), { stiffness: 300, damping: 30 })
+  const tiltXVal = useMotionValue(0)
+  const tiltYVal = useMotionValue(0)
+  const rotateZVal = useMotionValue(0)
+  const tiltX = useSpring(tiltXVal, { stiffness: 300, damping: 30 })
+  const tiltY = useSpring(tiltYVal, { stiffness: 300, damping: 30 })
+  const rotateZ = useSpring(rotateZVal, { stiffness: 300, damping: 30 })
   const transform = useMotionTemplate`translate(${sx}px, ${sy}px) translate(-50%, -50%) scale(${smoothScale}) perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotateZ(${rotateZ}deg)`
 
   // Highly responsive tracking values for the cursor pointer dot
@@ -105,7 +115,7 @@ const Cursor = () => {
       return null
     }
 
-    const getRotation = (el) => {
+    const computeRotation = (el) => {
       const cs = getComputedStyle(el).transform
       if (!cs || cs === 'none') return 0
       const m = cs.match(/matrix(?:3d)?\(([^)]+)\)/)
@@ -114,6 +124,15 @@ const Cursor = () => {
       if (vals.length === 6) return Math.atan2(vals[1], vals[0]) * (180 / Math.PI)
       if (vals.length === 16) return Math.atan2(vals[1], vals[0]) * (180 / Math.PI)
       return 0
+    }
+
+    const getRotationCached = (el) => {
+      const now = performance.now()
+      if (now - lastRotTime.current < 60) return lastRotVal.current
+      lastRotTime.current = now
+      const r = computeRotation(el)
+      lastRotVal.current = r
+      return r
     }
 
     const color = (el) => {
@@ -195,18 +214,18 @@ const Cursor = () => {
 
     let tgt = null
     let bobT = 0
+    let loopRunning = false
+    let scrollDirty = false
 
-    const updateRect = () => {
-      if (tgt) {
-        const rect = tgt.getBoundingClientRect()
-        targetRectRef.current = {
-          ...targetRectRef.current,
-          centerX: rect.left + rect.width / 2,
-          centerY: rect.top + rect.height / 2,
-          width: tgt.offsetWidth || rect.width,
-          height: tgt.offsetHeight || rect.height
-        }
+    const startLoop = () => {
+      if (!loopRunning) {
+        loopRunning = true
+        rafRef.current = requestAnimationFrame(loop)
       }
+    }
+
+    const scheduleLoop = () => {
+      if (!loopRunning) startLoop()
     }
 
     const loop = () => {
@@ -226,22 +245,28 @@ const Cursor = () => {
         const ecx = r.centerX
         const ecy = r.centerY
 
-        posX.set(ecx)
-        posY.set(ecy)
-        targetW.set(r.width + 8)
-        targetH.set(r.height + 8)
+        if (ecx !== lastPosX.current) { posX.set(ecx); lastPosX.current = ecx }
+        if (ecy !== lastPosY.current) { posY.set(ecy); lastPosY.current = ecy }
+        if (r.width + 8 !== lastW.current) { targetW.set(r.width + 8); lastW.current = r.width + 8 }
+        if (r.height + 8 !== lastH.current) { targetH.set(r.height + 8); lastH.current = r.height + 8 }
 
-        const { rotateX: rx, rotateY: ry, isActive: ta } = tiltContext
-        if (isTiltCard && ta) {
-          tiltX.set(rx)
-          tiltY.set(ry)
+        const isMoving = (performance.now() - lastPointerTime.current) < 100
+        if (isTiltCard) {
+          const { rotateX: rx, rotateY: ry, isActive: ta } = tiltContext
+          if (ta) {
+            tiltX.set(rx)
+            tiltY.set(ry)
+          } else {
+            tiltX.set(0)
+            tiltY.set(0)
+          }
           rotateZ.set(0)
-        } else {
+        } else if (isMoving) {
           tiltX.set(0)
           tiltY.set(0)
           const he = hoveredElRef.current
           if (he) {
-            rotateZ.set(getRotation(he))
+            rotateZ.set(getRotationCached(he))
           } else {
             rotateZ.set(0)
           }
@@ -272,13 +297,34 @@ const Cursor = () => {
           scaleVal.set(1 + Math.sin(bobT) * 0.05)
         }
 
-        posX.set(clientX.get())
-        posY.set(clientY.get())
-        targetW.set(20)
-        targetH.set(20)
+        const cx = clientX.get()
+        const cy = clientY.get()
+        if (cx !== lastPosX.current) { posX.set(cx); lastPosX.current = cx }
+        if (cy !== lastPosY.current) { posY.set(cy); lastPosY.current = cy }
+        if (lastW.current !== 20) { targetW.set(20); lastW.current = 20 }
+        if (lastH.current !== 20) { targetH.set(20); lastH.current = 20 }
 
         const b = bubbleRef.current
         if (b) b.style.borderRadius = '50%'
+      }
+
+      const now = performance.now()
+      const isIdle = now - lastMoveTime.current > 2000
+      if (isIdle && !tgt) {
+        loopRunning = false
+        return
+      }
+
+      if (scrollDirty && tgt) {
+        scrollDirty = false
+        const rect = tgt.getBoundingClientRect()
+        targetRectRef.current = {
+          ...targetRectRef.current,
+          centerX: rect.left + rect.width / 2,
+          centerY: rect.top + rect.height / 2,
+          width: tgt.offsetWidth || rect.width,
+          height: tgt.offsetHeight || rect.height
+        }
       }
 
       rafRef.current = requestAnimationFrame(loop)
@@ -286,6 +332,27 @@ const Cursor = () => {
 
     const onPointerMove = () => {
       lastMoveTime.current = performance.now()
+      lastPointerTime.current = lastMoveTime.current
+      scheduleLoop()
+    }
+
+    const onScroll = () => {
+      if (tgt) scrollDirty = true
+      scheduleLoop()
+    }
+
+    const onResize = () => {
+      if (tgt) scrollDirty = true
+      scheduleLoop()
+    }
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        loopRunning = false
+        cancelAnimationFrame(rafRef.current)
+      } else {
+        scheduleLoop()
+      }
     }
 
     const over = (e) => {
@@ -345,10 +412,11 @@ const Cursor = () => {
     window.addEventListener('mouseup', up, { passive: true })
     document.addEventListener('mouseover', over, { passive: true })
     document.addEventListener('mouseout', out, { passive: true })
-    window.addEventListener('scroll', updateRect, { passive: true })
-    window.addEventListener('resize', updateRect, { passive: true })
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onResize, { passive: true })
+    document.addEventListener('visibilitychange', onVisibilityChange)
 
-    rafRef.current = requestAnimationFrame(loop)
+    startLoop()
 
     return () => {
       window.removeEventListener('pointermove', onPointerMove)
@@ -356,8 +424,9 @@ const Cursor = () => {
       window.removeEventListener('mouseup', up)
       document.removeEventListener('mouseover', over)
       document.removeEventListener('mouseout', out)
-      window.removeEventListener('scroll', updateRect)
-      window.removeEventListener('resize', updateRect)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       if (resizeObserver) {
         resizeObserver.disconnect()
       }

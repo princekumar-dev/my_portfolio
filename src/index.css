@@ -41,6 +41,8 @@ body {
 
 .dark .glass-card {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(30, 41, 59, 0.55) 50%, rgba(30, 41, 59, 0.7) 100%);
+  backdrop-filter: blur(4px) saturate(110%);
+  -webkit-backdrop-filter: blur(4px) saturate(110%);
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow:
     0 8px 32px -8px rgba(0, 0, 0, 0.3),
@@ -160,9 +162,7 @@ h1 {
 .glass-card {
   position: relative;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0.7) 100%);
-  backdrop-filter: blur(4px) saturate(110%);
-  -webkit-backdrop-filter: blur(4px) saturate(110%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0.8) 100%);
   border: 1px solid rgba(255, 255, 255, 0.75);
   box-shadow:
     0 8px 32px -8px rgba(31, 41, 55, 0.1),
@@ -234,7 +234,7 @@ h1 {
 
 .glass-card:hover::after {
   opacity: 1;
-  filter: blur(12px);
+  filter: blur(4px);
 }
 
 /* ── Gradient Edge Light (Premium Border) ─────────── */

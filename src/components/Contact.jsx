@@ -7,6 +7,60 @@ import TiltCard from './TiltCard'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8 },
+  },
+}
+
+const contactLinks = [
+  {
+    icon: FiMail,
+    label: 'Email',
+    value: 'prince55833kumar',
+    href: 'mailto:prince55833kumar@gmail.com',
+    color: 'text-accent-blue',
+    hoverBg: 'hover:bg-accent-blue/15',
+  },
+  {
+    icon: FiLinkedin,
+    label: 'LinkedIn',
+    value: 'Prince R',
+    href: 'https://www.linkedin.com/in/prince-r-b9685130b',
+    color: 'text-accent-purple',
+    hoverBg: 'hover:bg-accent-purple/15',
+  },
+  {
+    icon: FiGithub,
+    label: 'GitHub',
+    value: 'princekumar-dev',
+    href: 'https://github.com/princekumar-dev',
+    color: 'text-accent-cyan',
+    hoverBg: 'hover:bg-accent-cyan/15',
+  },
+  {
+    icon: SiInstagram,
+    label: 'Instagram',
+    value: '@prince_r_94',
+    href: 'https://instagram.com/prince_r_94',
+    color: 'text-accent-pink',
+    hoverBg: 'hover:bg-accent-pink/15',
+  }
+]
+
 const linkItemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -53,60 +107,6 @@ const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [errors, setErrors] = useState({})
   const formRef = useRef(null)
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8 },
-    },
-  }
-
-  const contactLinks = [
-    {
-      icon: FiMail,
-      label: 'Email',
-      value: 'prince55833kumar',
-      href: 'mailto:prince55833kumar@gmail.com',
-      color: 'text-accent-blue',
-      hoverBg: 'hover:bg-accent-blue/15',
-    },
-    {
-      icon: FiLinkedin,
-      label: 'LinkedIn',
-      value: 'Prince R',
-      href: 'https://www.linkedin.com/in/prince-r-b9685130b',
-      color: 'text-accent-purple',
-      hoverBg: 'hover:bg-accent-purple/15',
-    },
-    {
-      icon: FiGithub,
-      label: 'GitHub',
-      value: 'princekumar-dev',
-      href: 'https://github.com/princekumar-dev',
-      color: 'text-accent-cyan',
-      hoverBg: 'hover:bg-accent-cyan/15',
-    },
-    {
-      icon: SiInstagram,
-      label: 'Instagram',
-      value: '@prince_r_94',
-      href: 'https://instagram.com/prince_r_94',
-      color: 'text-accent-pink',
-      hoverBg: 'hover:bg-accent-pink/15',
-    }
-  ]
 
   const validate = () => {
     const newErrors = {}

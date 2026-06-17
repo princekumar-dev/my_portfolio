@@ -20,6 +20,7 @@ const TiltCard = ({
   const cardRef = useRef(null)
   const rafRef = useRef(0)
   const hoverRef = useRef(false)
+  const rectRef = useRef(null)
   const isInView = useInView(cardRef, { margin: '-50px' })
   const { setTilt, clearTilt } = useTiltContext()
 
@@ -35,13 +36,13 @@ const TiltCard = ({
 
   useMotionValueEvent(rotateX, "change", (v) => {
     if (reduceMotion || touchDevice) return
-    const rect = cardRef.current?.getBoundingClientRect()
+    const rect = rectRef.current
     setTilt({ x: v, y: rotateY.get(), rect, active: hoverRef.current })
   })
 
   useMotionValueEvent(rotateY, "change", (v) => {
     if (reduceMotion || touchDevice) return
-    const rect = cardRef.current?.getBoundingClientRect()
+    const rect = rectRef.current
     setTilt({ x: rotateX.get(), y: v, rect, active: hoverRef.current })
   })
 
@@ -56,6 +57,7 @@ const TiltCard = ({
     rafRef.current = requestAnimationFrame(() => {
       const rect = cardRef.current?.getBoundingClientRect()
       if (!rect) return
+      rectRef.current = rect
       px.set((ex - rect.left) / rect.width - 0.5)
       py.set((ey - rect.top) / rect.height - 0.5)
     })
@@ -120,7 +122,10 @@ const TiltCard = ({
       onPointerEnter={() => {
         hoverRef.current = true
         const rect = cardRef.current?.getBoundingClientRect()
-        if (rect) setTilt({ x: rotateX.get(), y: rotateY.get(), rect, active: true })
+        if (rect) {
+          rectRef.current = rect
+          setTilt({ x: rotateX.get(), y: rotateY.get(), rect, active: true })
+        }
       }}
       onPointerMove={handleMove}
       onPointerLeave={() => {

@@ -15,6 +15,26 @@ const STAGGER_MS = 35
 const ENCODE_STAGGER_MS = 20
 const GAP_MS = 80
 
+const heroContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.15,
+    },
+  },
+}
+
+const heroItemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+}
+
 function SplitText({ text, className, delay = 0 }) {
   return (
     <span className={className} aria-label={text}>
@@ -397,26 +417,6 @@ const Hero = () => {
   const contentY = useTransform(smooth, [0, 1], [0, -40])
   const contentOpacity = useTransform(smooth, [0, 0.8], [1, 0])
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.15,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-    },
-  }
-
   return (
     <section
       ref={sectionRef}
@@ -449,13 +449,13 @@ const Hero = () => {
       </m.div>
 
       <m.div
-        variants={containerVariants}
+        variants={heroContainerVariants}
         initial="hidden"
         animate="visible"
         style={{ y: contentY, opacity: contentOpacity, perspective: 1000 }}
         className="relative z-10 text-center px-4 max-w-4xl"
       >
-        <m.div variants={itemVariants} className="mb-6 flex justify-center">
+        <m.div variants={heroItemVariants} className="mb-6 flex justify-center">
           {badgeVisible && (
             <m.div
               initial={{ opacity: 0, scale: 0.8, filter: 'blur(8px)' }}
@@ -474,7 +474,7 @@ const Hero = () => {
           )}
         </m.div>
 
-        <m.div variants={itemVariants} className="mb-6">
+        <m.div variants={heroItemVariants} className="mb-6">
           <span className="eyebrow text-accent-blue">Welcome to my portfolio</span>
         </m.div>
 
@@ -494,14 +494,14 @@ const Hero = () => {
         </h1>
 
         <m.p
-          variants={itemVariants}
+          variants={heroItemVariants}
           className="text-lg sm:text-xl md:text-2xl text-light-700 mb-6 sm:mb-8 font-light"
         >
           <TextScramble texts={ROLE_TEXTS} className="text-accent-blue font-semibold" />
         </m.p>
 
         <m.p
-          variants={itemVariants}
+          variants={heroItemVariants}
           className="text-light-600 text-base sm:text-lg mb-8 sm:mb-12 max-w-2xl mx-auto px-2"
         >
           Building intelligent systems that transform data into meaningful experiences.
@@ -509,7 +509,7 @@ const Hero = () => {
         </m.p>
 
         <m.div
-          variants={itemVariants}
+          variants={heroItemVariants}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <MagneticButton
