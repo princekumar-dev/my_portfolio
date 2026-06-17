@@ -37,7 +37,7 @@ const StatCard = memo(({ stat, index }) => (
     className="glass-card glass-edge animated-border rounded-2xl p-6 text-center group"
     data-cursor-target="card"
   >
-    <div className={`text-4xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
+    <div className="text-4xl font-bold text-light-900 mb-2">
       <AnimatedCounter target={stat.target} suffix={stat.suffix} />
     </div>
     <p className="text-light-600 text-sm">{stat.label}</p>
@@ -64,10 +64,10 @@ const LineReveal = ({ children, delay = 0 }) => {
 }
 
 const stats = [
-  { target: 5, suffix: '+', label: 'Projects Completed', color: 'from-accent-blue to-accent-cyan' },
-  { target: 15, suffix: '+', label: 'Technologies', color: 'from-accent-cyan to-accent-purple' },
-  { target: 3, suffix: '+', label: 'Years Experience', color: 'from-accent-purple to-accent-pink' },
-  { target: 5, suffix: '+', label: 'Certifications', color: 'from-accent-pink to-accent-blue' },
+  { target: 5, suffix: '+', label: 'Projects Completed', color: 'from-accent-slate to-accent-sage' },
+  { target: 15, suffix: '+', label: 'Technologies', color: 'from-accent-sage to-accent-rose' },
+  { target: 3, suffix: '+', label: 'Years Experience', color: 'from-accent-rose to-accent-sand' },
+  { target: 5, suffix: '+', label: 'Certifications', color: 'from-accent-sand to-accent-slate' },
 ]
 
 const containerVariants = {
@@ -99,11 +99,11 @@ const About = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <m.div
           style={{ y: fast }}
-          className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-accent-slate/10 rounded-full blur-lg"
         ></m.div>
         <m.div
           style={{ y: slow }}
-          className="absolute top-40 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-lg"
+          className="absolute top-40 -left-32 w-64 h-64 bg-accent-sage/10 rounded-full blur-lg"
         ></m.div>
       </div>
 
@@ -115,7 +115,7 @@ const About = () => {
           viewport={{ once: true }}
         >
           <m.div variants={itemVariants} className="text-center mb-12">
-            <span className="eyebrow text-accent-blue">Who I am</span>
+            <span className="eyebrow text-accent-slate">Who I am</span>
             <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
               <span className="animated-gradient-text">
                 About Me

@@ -57,7 +57,7 @@ const AnimatedBackground = () => {
           className="absolute inset-0"
           style={{
             backgroundImage:
-              'linear-gradient(to right, rgba(59,130,246,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(59,130,246,0.05) 1px, transparent 1px)',
+              'linear-gradient(to right, rgba(61,90,115,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(61,90,115,0.05) 1px, transparent 1px)',
             backgroundSize: '52px 52px',
             maskImage:
               'radial-gradient(circle at 50% 30%, black, transparent 75%)',
@@ -71,14 +71,14 @@ const AnimatedBackground = () => {
         style={{ x: blob1X, y: blob1Y, willChange: 'transform' }}
         className="absolute -top-32 -left-24 h-[22rem] w-[22rem]"
       >
-        <div className="h-full w-full rounded-full bg-accent-blue/20" />
+        <div className="h-full w-full rounded-full bg-accent-slate/20" />
       </m.div>
 
       <m.div
         style={{ x: blob2X, y: blob2Y, willChange: 'transform' }}
         className="absolute top-1/3 -right-24 h-[18rem] w-[18rem]"
       >
-        <div className="h-full w-full rounded-full bg-accent-cyan/20" />
+        <div className="h-full w-full rounded-full bg-accent-sage/20" />
       </m.div>
     </div>
   )

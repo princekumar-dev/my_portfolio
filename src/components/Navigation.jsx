@@ -27,17 +27,17 @@ function MorphingHamburger({ isOpen }) {
       aria-controls="mobile-menu"
     >
       <m.span
-        className="block w-full h-0.5 bg-accent-blue rounded-full origin-left"
+        className="block w-full h-0.5 bg-accent-slate rounded-full origin-left"
         animate={isOpen ? { rotate: 45, y: -1 } : { rotate: 0, y: 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       />
       <m.span
-        className="block w-full h-0.5 bg-accent-blue rounded-full"
+        className="block w-full h-0.5 bg-accent-slate rounded-full"
         animate={isOpen ? { opacity: 0, x: -10 } : { opacity: 1, x: 0 }}
         transition={{ duration: 0.2 }}
       />
       <m.span
-        className="block w-full h-0.5 bg-accent-blue rounded-full origin-left"
+        className="block w-full h-0.5 bg-accent-slate rounded-full origin-left"
         animate={isOpen ? { rotate: -45, y: 1 } : { rotate: 0, y: 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       />
@@ -161,7 +161,7 @@ const Navigation = () => {
           <m.a
             href="#home"
             whileHover={{ scale: 1.05 }}
-            className="text-2xl font-bold bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent"
+            className="text-2xl font-bold text-light-900"
             onClick={(e) => { e.preventDefault(); lenisRef?.current?.scrollTo('#home') }}
           >
             Prince.dev
@@ -181,11 +181,11 @@ const Navigation = () => {
                   {isActive && (
                     <m.span
                       layoutId="nav-pill"
-                      className="absolute inset-0 bg-accent-blue/10 border border-accent-blue/20 rounded-full"
+                      className="absolute inset-0 bg-accent-slate/10 border border-accent-slate/20 rounded-full"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
-                  <span className={`relative z-10 ${isActive ? 'text-accent-blue' : 'text-light-600 hover:text-accent-blue'}`}>
+                  <span className={`relative z-10 ${isActive ? 'text-accent-slate' : 'text-light-600 hover:text-accent-slate'}`}>
                     {item.name}
                   </span>
                 </a>
@@ -199,7 +199,7 @@ const Navigation = () => {
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="p-2 rounded-full text-light-600 hover:text-accent-blue hover:bg-accent-blue/10 transition-colors duration-200"
+              className="p-2 rounded-full text-light-600 hover:text-accent-slate hover:bg-accent-slate/10 transition-colors duration-200"
             >
               <m.span
                 key={isDark ? 'sun' : 'moon'}
@@ -244,15 +244,15 @@ const Navigation = () => {
                     transition={{ delay: i * 0.05 }}
                     className={`relative block px-4 py-2.5 transition-colors duration-200 ${
                       active === item.id
-                        ? 'text-accent-blue font-semibold'
-                        : 'text-light-600 hover:text-accent-blue hover:bg-accent-blue/5'
+                        ? 'text-accent-slate font-semibold'
+                        : 'text-light-600 hover:text-accent-slate hover:bg-accent-slate/5'
                     }`}
                     onClick={(e) => { e.preventDefault(); setIsOpen(false); lenisRef?.current?.scrollTo(item.href) }}
                   >
                     {active === item.id && (
                       <m.span
                         layoutId="nav-pill-mobile"
-                        className="absolute inset-0 bg-accent-blue/5 border border-accent-blue/20 rounded-lg"
+                        className="absolute inset-0 bg-accent-slate/5 border border-accent-slate/20 rounded-lg"
                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                       />
                     )}

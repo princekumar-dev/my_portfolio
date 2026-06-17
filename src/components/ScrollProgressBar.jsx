@@ -8,7 +8,7 @@ const ScrollProgressBar = () => {
   return (
     <m.div
       style={{ scaleX: scrollYProgress, willChange: 'transform', contain: 'layout style' }}
-      className="fixed top-0 left-0 right-0 z-[60] h-1 origin-left bg-gradient-to-r from-accent-blue via-accent-purple to-accent-cyan"
+      className="fixed top-0 left-0 right-0 z-[60] h-1 origin-left bg-gradient-to-r from-accent-slate via-accent-rose to-accent-sage shadow-[0_0_8px_rgba(61,90,115,0.4)]"
     />
   )
 }

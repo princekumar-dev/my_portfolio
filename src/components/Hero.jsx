@@ -304,7 +304,7 @@ const ParticleCanvas = ({ isMobile }) => {
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(59, 130, 246, ${p.opacity})`
+        ctx.fillStyle = `rgba(61, 90, 115, ${p.opacity})`
         ctx.fill()
       }
 
@@ -321,7 +321,7 @@ const ParticleCanvas = ({ isMobile }) => {
           }
         }
       }
-      ctx.strokeStyle = 'rgba(59, 130, 246, 0.06)'
+      ctx.strokeStyle = 'rgba(61, 90, 115, 0.06)'
       ctx.lineWidth = 0.5
       ctx.stroke()
 
@@ -336,7 +336,7 @@ const ParticleCanvas = ({ isMobile }) => {
             ctx.lineTo(particles[i].x, particles[i].y)
           }
         }
-        ctx.strokeStyle = 'rgba(59, 130, 246, 0.10)'
+        ctx.strokeStyle = 'rgba(61, 90, 115, 0.10)'
         ctx.lineWidth = 0.5
         ctx.stroke()
       }
@@ -429,7 +429,7 @@ const Hero = () => {
           className="absolute inset-0"
           style={{
             backgroundImage:
-              'linear-gradient(to right, rgba(59,130,246,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(59,130,246,0.06) 1px, transparent 1px)',
+              'linear-gradient(to right, rgba(61,90,115,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(61,90,115,0.06) 1px, transparent 1px)',
             backgroundSize: '48px 48px',
           }}
         />
@@ -438,12 +438,12 @@ const Hero = () => {
       <ParticleCanvas isMobile={isMobile} />
 
       <m.div style={{ y: blobsY }} className="absolute inset-0 z-0">
-        <div className={`absolute top-16 left-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-blue/20 rounded-full blur-lg`} />
-        <div className={`absolute bottom-24 right-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-cyan/20 rounded-full blur-lg`} />
+        <div className={`absolute top-16 left-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-slate/20 rounded-full blur-lg`} />
+        <div className={`absolute bottom-24 right-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-sage/20 rounded-full blur-lg`} />
         {!isMobile && (
           <>
-            <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-purple/15 rounded-full blur-lg" />
-            <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-indigo/15 rounded-full blur-lg" />
+            <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-rose/15 rounded-full blur-lg" />
+            <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-deep/15 rounded-full blur-lg" />
           </>
         )}
       </m.div>
@@ -475,11 +475,11 @@ const Hero = () => {
         </m.div>
 
         <m.div variants={heroItemVariants} className="mb-6">
-          <span className="eyebrow text-accent-blue">Welcome to my portfolio</span>
+          <span className="eyebrow text-accent-slate">Welcome to my portfolio</span>
         </m.div>
 
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-light-900">
-          <span className="hero-shimmer bg-gradient-to-r from-accent-blue via-accent-purple to-accent-cyan bg-clip-text text-transparent">
+          <span className="hero-shimmer text-light-900">
             {typingDone ? (
               <SplitText text={FULL_NAME} className="inline-block" delay={0} />
             ) : (
@@ -488,7 +488,7 @@ const Hero = () => {
           </span>
           {!typingDone && (
             <span
-              className="inline-block w-[3px] h-[0.85em] ml-1 align-middle bg-accent-blue animate-pulse"
+              className="inline-block w-[3px] h-[0.85em] ml-1 align-middle bg-accent-slate animate-pulse"
             />
           )}
         </h1>
@@ -497,7 +497,7 @@ const Hero = () => {
           variants={heroItemVariants}
           className="text-lg sm:text-xl md:text-2xl text-light-700 mb-6 sm:mb-8 font-light"
         >
-          <TextScramble texts={ROLE_TEXTS} className="text-accent-blue font-semibold" />
+          <TextScramble texts={ROLE_TEXTS} className="text-accent-slate font-semibold" />
         </m.p>
 
         <m.p
@@ -514,7 +514,7 @@ const Hero = () => {
         >
           <MagneticButton
             href="#projects"
-            className="px-8 py-3 bg-gradient-to-r from-accent-blue to-accent-cyan text-white rounded-full font-semibold shadow-lg shadow-accent-blue/20 hover:shadow-xl hover:shadow-accent-blue/40 transition-shadow"
+            className="px-8 py-3 bg-gradient-to-r from-accent-slate to-accent-sage text-light-900 rounded-full font-semibold shadow-lg shadow-accent-slate/20 hover:shadow-xl hover:shadow-accent-slate/40 transition-shadow"
           >
             View My Work
           </MagneticButton>
@@ -522,7 +522,7 @@ const Hero = () => {
             href="https://drive.google.com/file/d/15iuECh0MvqrQLKrAnKAN0q7IWkSN_PnL/view?usp=sharing"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-8 py-3 btn-glass rounded-full font-semibold text-accent-blue"
+            className="px-8 py-3 btn-glass rounded-full font-semibold text-accent-slate"
           >
             Download Resume
           </MagneticButton>
@@ -536,7 +536,7 @@ const Hero = () => {
         style={{ x: arrowX }}
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10"
       >
-        <FiArrowDown className="text-accent-blue text-2xl" />
+        <FiArrowDown className="text-accent-slate text-2xl" />
       </m.div>
     </section>
   )

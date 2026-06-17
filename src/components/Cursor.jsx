@@ -5,16 +5,16 @@ import { useTheme } from '../context/ThemeContext'
 import { useTiltContext } from '../context/TiltContext'
 
 const SECTION_COLORS = {
-  home:           '#3B82F6',
-  about:          '#06B6D4',
-  skills:         '#8B5CF6',
-  projects:       '#6366F1',
-  experience:     '#3B82F6',
-  certifications: '#06B6D4',
-  contact:        '#8B5CF6',
+  home:           '#3D5A73',
+  about:          '#4A7060',
+  skills:         '#996B75',
+  projects:       '#3A5258',
+  experience:     '#3D5A73',
+  certifications: '#4A7060',
+  contact:        '#996B75',
 }
 
-    const SELECTOR = 'a, button, [role="button"], [data-cursor-target], .btn-glass, .tag-glass'
+    const SELECTOR = 'a, button, [role="button"], [data-cursor-target], .btn-glass, .tag-glass, .tag-glass-dark'
 let burstId = 0
 
 const Cursor = () => {
@@ -32,7 +32,7 @@ const Cursor = () => {
   const ringRef = useRef(null)
   const hoverRef = useRef(false)
   const targetRef = useRef(null)
-  const colorRef = useRef('#3B82F6')
+  const colorRef = useRef('#3D5A73')
   const borderRadiusRef = useRef('50%')
   const lastMoveTime = useRef(0)
   const blurActiveRef = useRef(false)
@@ -178,23 +178,23 @@ const Cursor = () => {
             'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 70%, transparent 100%)',
           ].join(', ')
         : [
-            'radial-gradient(ellipse at 30% 20%, rgba(59,130,246,0.3) 0%, transparent 50%)',
-            'radial-gradient(ellipse at 70% 80%, rgba(6,182,212,0.1) 0%, transparent 40%)',
-            'radial-gradient(circle at 50% 50%, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.04) 70%, transparent 100%)',
+            'radial-gradient(ellipse at 30% 20%, rgba(61,90,115,0.3) 0%, transparent 50%)',
+            'radial-gradient(ellipse at 70% 80%, rgba(74,112,96,0.1) 0%, transparent 40%)',
+            'radial-gradient(circle at 50% 50%, rgba(61,90,115,0.15) 0%, rgba(61,90,115,0.04) 70%, transparent 100%)',
           ].join(', ')
-      b.style.border = isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid rgba(59,130,246,0.5)'
+      b.style.border = isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid rgba(61,90,115,0.5)'
       b.style.boxShadow = isDark
-        ? 'inset 0 2px 8px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.15), 0 0 20px rgba(0,0,0,0.25), 0 0 12px rgba(59,130,246,0.12), 0 4px 16px rgba(0,0,0,0.15)'
-        : 'inset 0 2px 8px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(59,130,246,0.06), 0 0 20px rgba(59,130,246,0.1), 0 0 0 1px rgba(59,130,246,0.15), 0 4px 16px rgba(0,0,0,0.06)'
+        ? 'inset 0 2px 8px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.15), 0 0 20px rgba(0,0,0,0.25), 0 0 12px rgba(61,90,115,0.12), 0 4px 16px rgba(0,0,0,0.15)'
+        : 'inset 0 2px 8px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(61,90,115,0.06), 0 0 20px rgba(61,90,115,0.1), 0 0 0 1px rgba(61,90,115,0.15), 0 4px 16px rgba(0,0,0,0.06)'
       if (specular1Ref.current) specular1Ref.current.style.opacity = '1'
       if (specular2Ref.current) specular2Ref.current.style.opacity = '1'
       if (specular3Ref.current) specular3Ref.current.style.opacity = '1'
       if (ringRef.current) ringRef.current.style.opacity = '0.8'
 
-      const activeColor = isDark ? '#ffffff' : '#3B82F6'
+      const activeColor = isDark ? '#ffffff' : '#3D5A73'
       if (dotRef.current) {
         dotRef.current.style.backgroundColor = activeColor
-        dotRef.current.style.boxShadow = isDark ? '0 0 4px rgba(255,255,255,0.6)' : '0 0 4px rgba(59,130,246,0.4)'
+        dotRef.current.style.boxShadow = isDark ? '0 0 4px rgba(255,255,255,0.6)' : '0 0 4px rgba(61,90,115,0.4)'
       }
     }
 
@@ -447,8 +447,8 @@ const Cursor = () => {
           width: '4px',
           height: '4px',
           borderRadius: '50%',
-          backgroundColor: isDark ? '#ffffff' : '#3B82F6',
-          boxShadow: isDark ? '0 0 4px rgba(255,255,255,0.6)' : '0 0 4px rgba(59,130,246,0.4)',
+          backgroundColor: isDark ? '#ffffff' : '#3D5A73',
+          boxShadow: isDark ? '0 0 4px rgba(255,255,255,0.6)' : '0 0 4px rgba(61,90,115,0.4)',
           transform: dotTransform,
           willChange: 'transform',
           zIndex: 10000,
@@ -478,14 +478,14 @@ const Cursor = () => {
                 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 70%, transparent 100%)',
               ].join(', ')
             : [
-                'radial-gradient(ellipse at 30% 20%, rgba(59,130,246,0.3) 0%, transparent 50%)',
-                'radial-gradient(ellipse at 70% 80%, rgba(6,182,212,0.1) 0%, transparent 40%)',
-                'radial-gradient(circle at 50% 50%, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.04) 70%, transparent 100%)',
+                'radial-gradient(ellipse at 30% 20%, rgba(61,90,115,0.3) 0%, transparent 50%)',
+                'radial-gradient(ellipse at 70% 80%, rgba(74,112,96,0.1) 0%, transparent 40%)',
+                'radial-gradient(circle at 50% 50%, rgba(61,90,115,0.15) 0%, rgba(61,90,115,0.04) 70%, transparent 100%)',
               ].join(', '),
-          border: isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid rgba(59,130,246,0.5)',
+          border: isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid rgba(61,90,115,0.5)',
           boxShadow: isDark
-            ? 'inset 0 2px 8px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.15), 0 0 20px rgba(0,0,0,0.25), 0 0 12px rgba(59,130,246,0.12), 0 4px 16px rgba(0,0,0,0.15)'
-            : 'inset 0 2px 8px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(59,130,246,0.06), 0 0 20px rgba(59,130,246,0.1), 0 0 0 1px rgba(59,130,246,0.15), 0 4px 16px rgba(0,0,0,0.06)',
+            ? 'inset 0 2px 8px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.15), 0 0 20px rgba(0,0,0,0.25), 0 0 12px rgba(61,90,115,0.12), 0 4px 16px rgba(0,0,0,0.15)'
+            : 'inset 0 2px 8px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(61,90,115,0.06), 0 0 20px rgba(61,90,115,0.1), 0 0 0 1px rgba(61,90,115,0.15), 0 4px 16px rgba(0,0,0,0.06)',
           transition: 'background 0.4s, border 0.4s, box-shadow 0.4s, border-radius 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s, backdrop-filter 0.3s',
         }}
       >
@@ -533,7 +533,7 @@ const Cursor = () => {
           position: 'absolute',
           inset: 0,
           borderRadius: 'inherit',
-          background: 'conic-gradient(from 45deg, rgba(59,130,246,0.55), rgba(6,182,212,0.4), rgba(139,92,246,0.55), rgba(99,102,241,0.4), rgba(236,72,153,0.3), rgba(59,130,246,0.55))',
+          background: 'conic-gradient(from 45deg, rgba(61,90,115,0.55), rgba(74,112,96,0.4), rgba(153,107,117,0.55), rgba(58,82,88,0.4), rgba(176,125,98,0.3), rgba(61,90,115,0.55))',
           WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
           WebkitMaskComposite: 'xor',
           maskComposite: 'exclude',

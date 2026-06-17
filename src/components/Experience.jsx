@@ -12,11 +12,11 @@ const MetroidBeam = ({ scrollYProgress }) => {
 
   return (
     <div ref={beamRef} className="absolute left-[7px] top-0 w-[3px] h-full z-0 pointer-events-none" style={{ contain: 'layout style' }}>
-      <div className="absolute inset-0 w-full rounded-full bg-gradient-to-b from-accent-blue/10 via-accent-cyan/10 to-accent-purple/10" />
+      <div className="absolute inset-0 w-full rounded-full bg-gradient-to-b from-accent-slate/10 via-accent-sage/10 to-accent-rose/10" />
 
       <m.div
         style={{ scaleY: beamScaleY, transformOrigin: 'top', willChange: 'transform' }}
-        className="absolute top-0 w-full h-full rounded-full bg-gradient-to-b from-accent-blue via-accent-cyan to-accent-purple opacity-70 shadow-[0_0_6px_rgba(59,130,246,0.3)]"
+        className="absolute top-0 w-full h-full rounded-full bg-gradient-to-b from-accent-slate via-accent-sage to-accent-rose opacity-100 shadow-[0_0_8px_rgba(61,90,115,0.5)]"
       />
       <m.div
         style={{ scaleY: beamScaleY, transformOrigin: 'top', willChange: 'transform' }}
@@ -33,9 +33,9 @@ const MetroidBeam = ({ scrollYProgress }) => {
             scale: [1, 1.45, 1],
             opacity: [0.6, 1, 0.6],
             boxShadow: [
-              '0 0 10px rgba(59,130,246,0.5)',
-              '0 0 22px rgba(59,130,246,0.9)',
-              '0 0 10px rgba(59,130,246,0.5)',
+              '0 0 10px rgba(61,90,115,0.5)',
+              '0 0 22px rgba(61,90,115,0.9)',
+              '0 0 10px rgba(61,90,115,0.5)',
             ],
           } : {}}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -62,7 +62,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
   const dotScale = useTransform(fillProgress, [0, 1], [1, 1.2])
   const dotOpacity = useTransform(fillProgress, [0, 0.3, 1], [0.3, 1, 1])
 
-  const accent = exp.accentColor || '#3B82F6'
+  const accent = exp.accentColor || '#577590'
 
   return (
     <m.div
@@ -136,7 +136,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
                     {exp.technologies.map((tech) => (
                       <span
                         key={tech}
-                        className="tag-glass px-2.5 py-1 text-xs rounded-full text-accent-blue"
+                        className="tag-glass px-2.5 py-1 text-xs rounded-full text-accent-slate"
                       >
                         {tech}
                       </span>
@@ -167,7 +167,7 @@ const Experience = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <m.div
           style={{ y: fast }}
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-rose/10 rounded-full blur-lg"
         />
       </div>
 
@@ -177,7 +177,7 @@ const Experience = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="eyebrow text-accent-blue block"
+            className="eyebrow text-accent-slate block"
           >
             Where I've worked
           </m.span>

@@ -26,9 +26,9 @@ const itemVariants = {
 const CertCard = memo(({ cert }) => (
   <m.div variants={itemVariants}>
     <TiltCard className="group glass-card glass-edge h-full rounded-2xl overflow-hidden">
-      <div className="relative h-32 sm:h-40 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden flex items-center justify-center">
+      <div className="relative h-32 sm:h-40 bg-gradient-to-br from-accent-slate/15 to-accent-sage/15 overflow-hidden flex items-center justify-center">
         <m.div
-          className="absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-cyan opacity-0 group-hover:opacity-15 transition-opacity duration-300"
+          className="absolute inset-0 bg-gradient-to-r from-accent-slate to-accent-sage opacity-0 group-hover:opacity-15 transition-opacity duration-300"
         />
         <div className="text-center relative z-10">
           <div className="text-4xl mb-2 float-medium">🏆</div>
@@ -36,7 +36,7 @@ const CertCard = memo(({ cert }) => (
         </div>
       </div>
       <div className="p-4 sm:p-5">
-        <h3 className="text-lg font-bold text-accent-blue mb-2">{cert.title}</h3>
+        <h3 className="text-lg font-bold text-accent-slate mb-2">{cert.title}</h3>
         <p className="text-light-500 text-sm">{cert.issuer}</p>
       </div>
     </TiltCard>
@@ -53,7 +53,7 @@ const Certifications = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <m.div
           style={{ y: fast }}
-          className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-accent-slate/10 rounded-full blur-lg"
         ></m.div>
       </div>
 
@@ -64,7 +64,7 @@ const Certifications = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="eyebrow text-accent-blue">Recognitions</span>
+          <span className="eyebrow text-accent-slate">Recognitions</span>
           <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
             <span className="animated-gradient-text">
               Certifications

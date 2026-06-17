@@ -11,7 +11,7 @@ export const experienceData = [
       'Collaborated with senior developers on code reviews'
     ],
     technologies: ['React', 'Node.js', 'PostgreSQL', 'Docker'],
-    accentColor: '#3B82F6'
+    accentColor: '#3D5A73'
   },
   {
     id: 2,
@@ -25,7 +25,7 @@ export const experienceData = [
       'Implemented responsive design for mobile devices'
     ],
     technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Figma'],
-    accentColor: '#8B5CF6'
+    accentColor: '#996B75'
   },
   {
     id: 3,
@@ -39,6 +39,6 @@ export const experienceData = [
       'Learned best practices in code organization'
     ],
     technologies: ['JavaScript', 'Python', 'MongoDB', 'Git'],
-    accentColor: '#06B6D4'
+    accentColor: '#4A7060'
   }
 ]

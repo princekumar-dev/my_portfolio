@@ -48,7 +48,7 @@ const ShimmerImage = ({ src, alt, className, style }) => {
   return (
     <div className="absolute inset-0">
       <div
-        className={`absolute inset-0 bg-gradient-to-br from-accent-blue/10 to-accent-cyan/10 ${loaded ? 'opacity-0' : 'opacity-100 shimmer'} transition-opacity duration-500`}
+        className={`absolute inset-0 bg-gradient-to-br from-accent-slate/10 to-accent-sage/10 ${loaded ? 'opacity-0' : 'opacity-100 shimmer'} transition-opacity duration-500`}
       />
       {src && (
         <picture>
@@ -74,7 +74,7 @@ const ShimmerImage = ({ src, alt, className, style }) => {
 const ProjectCard = memo(({ project, itemVariants }) => (
   <m.div variants={itemVariants}>
     <TiltCard className="group glass-card glass-edge animated-border h-full rounded-2xl">
-      <div className="relative h-48 sm:h-56 bg-gradient-to-br from-accent-blue/15 to-accent-cyan/15 overflow-hidden">
+      <div className="relative h-48 sm:h-56 bg-gradient-to-br from-accent-slate/15 to-accent-sage/15 overflow-hidden">
         <span
           aria-hidden="true"
           className="absolute inset-0 rounded-none blur-xl opacity-20 group-hover:opacity-50 transition-opacity duration-300"
@@ -89,7 +89,7 @@ const ProjectCard = memo(({ project, itemVariants }) => (
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/10 to-transparent" />
-        <m.div className="absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-cyan opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+        <m.div className="absolute inset-0 bg-gradient-to-r from-accent-slate to-accent-sage opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
 
         {project.status && (
           <span
@@ -115,7 +115,7 @@ const ProjectCard = memo(({ project, itemVariants }) => (
             {project.technologies.map((tech) => (
               <span
                 key={tech}
-                className="tag-glass px-3 py-1 text-xs rounded-full text-accent-blue"
+                className="tag-glass px-3 py-1 text-xs rounded-full text-accent-slate"
               >
                 {tech}
               </span>
@@ -129,7 +129,7 @@ const ProjectCard = memo(({ project, itemVariants }) => (
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue ml-1.5"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-slate ml-1.5"
             >
               <FiGithub size={18} />
               <span className="text-sm font-semibold">Code</span>
@@ -141,7 +141,7 @@ const ProjectCard = memo(({ project, itemVariants }) => (
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-blue"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-slate"
               >
                 <FiExternalLink size={18} />
                 <span className="text-sm font-semibold">Live Demo</span>
@@ -168,11 +168,11 @@ const Projects = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <m.div
           style={{ y: fast }}
-          className="absolute -top-40 -right-40 w-80 h-80 bg-accent-blue/10 rounded-full blur-lg"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-accent-slate/10 rounded-full blur-lg"
         ></m.div>
         <m.div
           style={{ y: slow }}
-          className="absolute bottom-0 -left-32 w-64 h-64 bg-accent-cyan/10 rounded-full blur-lg"
+          className="absolute bottom-0 -left-32 w-64 h-64 bg-accent-sage/10 rounded-full blur-lg"
         ></m.div>
       </div>
 
@@ -183,7 +183,7 @@ const Projects = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="eyebrow text-accent-blue">Selected work</span>
+          <span className="eyebrow text-accent-slate">Selected work</span>
           <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
             <span className="animated-gradient-text">
               Featured Projects

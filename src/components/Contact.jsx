@@ -32,32 +32,32 @@ const contactLinks = [
     label: 'Email',
     value: 'prince55833kumar',
     href: 'mailto:prince55833kumar@gmail.com',
-    color: 'text-accent-blue',
-    hoverBg: 'hover:bg-accent-blue/15',
+    color: 'text-accent-slate',
+    hoverBg: 'hover:bg-accent-slate/15',
   },
   {
     icon: FiLinkedin,
     label: 'LinkedIn',
     value: 'Prince R',
     href: 'https://www.linkedin.com/in/prince-r-b9685130b',
-    color: 'text-accent-purple',
-    hoverBg: 'hover:bg-accent-purple/15',
+    color: 'text-accent-rose',
+    hoverBg: 'hover:bg-accent-rose/15',
   },
   {
     icon: FiGithub,
     label: 'GitHub',
     value: 'princekumar-dev',
     href: 'https://github.com/princekumar-dev',
-    color: 'text-accent-cyan',
-    hoverBg: 'hover:bg-accent-cyan/15',
+    color: 'text-accent-sage',
+    hoverBg: 'hover:bg-accent-sage/15',
   },
   {
     icon: SiInstagram,
     label: 'Instagram',
     value: '@prince_r_94',
     href: 'https://instagram.com/prince_r_94',
-    color: 'text-accent-pink',
-    hoverBg: 'hover:bg-accent-pink/15',
+    color: 'text-accent-sand',
+    hoverBg: 'hover:bg-accent-sand/15',
   }
 ]
 
@@ -91,7 +91,7 @@ const ContactLink = memo(({ link }) => {
               <Icon size={24} />
             </m.div>
           </div>
-          <h3 className="text-sm font-bold text-accent-blue mb-1">{link.label}</h3>
+          <h3 className="text-sm font-bold text-accent-slate mb-1">{link.label}</h3>
           <p className="text-light-600 text-center text-xs break-all">{link.value}</p>
         </a>
       </TiltCard>
@@ -152,7 +152,7 @@ const Contact = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <m.div
           style={{ y: fast }}
-          className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-purple/10 rounded-full blur-lg"
+          className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent-rose/10 rounded-full blur-lg"
         ></m.div>
       </div>
 
@@ -164,7 +164,7 @@ const Contact = () => {
           viewport={{ once: true }}
         >
           <m.div variants={itemVariants} className="text-center">
-            <span className="eyebrow text-accent-blue">Let's talk</span>
+            <span className="eyebrow text-accent-slate">Let's talk</span>
             <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8">
               <span className="animated-gradient-text">
                 Get In Touch
@@ -264,8 +264,8 @@ const Contact = () => {
                       : formState === 'error'
                         ? 'bg-red-500 text-white'
                         : formState !== 'idle'
-                          ? 'bg-accent-blue/50 text-white cursor-not-allowed'
-                          : 'bg-gradient-to-r from-accent-blue to-accent-cyan text-white shadow-lg shadow-accent-blue/20 hover:shadow-xl hover:shadow-accent-blue/40'
+                          ? 'bg-accent-slate/50 text-light-900 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-accent-slate to-accent-sage text-light-900 shadow-lg shadow-accent-slate/20 hover:shadow-xl hover:shadow-accent-slate/40'
                   }`}
                   aria-live="polite"
                 >

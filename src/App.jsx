@@ -38,7 +38,7 @@ class ErrorBoundary extends Component {
             <p className="text-light-600 mb-6">An unexpected error occurred. Please refresh the page.</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-gradient-to-r from-accent-blue to-accent-cyan text-white rounded-full font-semibold"
+              className="px-6 py-3 bg-gradient-to-r from-accent-slate to-accent-sage text-light-900 rounded-full font-semibold"
             >
               Reload Page
             </button>
@@ -50,7 +50,7 @@ class ErrorBoundary extends Component {
   }
 }
 
-function WaveDivider({ flip = false, color = 'rgba(59,130,246,0.06)' }) {
+function WaveDivider({ flip = false, color = 'rgba(61,90,115,0.06)' }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-20px' })
 
@@ -110,23 +110,23 @@ function App() {
           <SectionReveal>
             <About />
           </SectionReveal>
-          <WaveDivider flip color="rgba(6,182,212,0.05)" />
+          <WaveDivider flip color="rgba(74,112,96,0.05)" />
           <SectionReveal>
             <Skills />
           </SectionReveal>
-          <WaveDivider color="rgba(139,92,246,0.05)" />
+          <WaveDivider color="rgba(153,107,117,0.05)" />
           <SectionReveal>
             <Projects />
           </SectionReveal>
-          <WaveDivider flip color="rgba(59,130,246,0.04)" />
+          <WaveDivider flip color="rgba(61,90,115,0.04)" />
           <SectionReveal>
             <Experience />
           </SectionReveal>
-          <WaveDivider color="rgba(6,182,212,0.04)" />
+          <WaveDivider color="rgba(74,112,96,0.04)" />
           <SectionReveal>
             <Certifications />
           </SectionReveal>
-          <WaveDivider flip color="rgba(139,92,246,0.04)" />
+          <WaveDivider flip color="rgba(153,107,117,0.04)" />
           <SectionReveal>
             <Contact />
           </SectionReveal>
