@@ -14,13 +14,19 @@ const SECTION_COLORS = {
   contact:        '#996B75',
 }
 
-    const SELECTOR = 'a, button, [role="button"], [data-cursor-target], .btn-glass, .tag-glass, .tag-glass-dark'
+const SELECTOR = 'a, button, [role="button"], [data-cursor-target], .btn-glass, .tag-glass, .tag-glass-dark'
 let burstId = 0
 
 const Cursor = () => {
+  const reduceMotion = useReducedMotion()
+  const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  if (reduceMotion || isTouch) return null
+  return <CursorDesktop />
+}
+
+const CursorDesktop = () => {
   const [visible, setVisible] = useState(false)
   const [bursts, setBursts] = useState([])
-  const reduceMotion = useReducedMotion()
   const { clientX, clientY } = usePointer()
   const { isDark } = useTheme()
   const tiltContext = useTiltContext()
@@ -434,10 +440,10 @@ const Cursor = () => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (reduceMotion || !visible) return null
+  if (!visible) return null
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999]" aria-hidden="true">
+    <div className="pointer-events-none fixed inset-0 z-40" aria-hidden="true">
       <m.div
         ref={dotRef}
         style={{
@@ -451,7 +457,7 @@ const Cursor = () => {
           boxShadow: isDark ? '0 0 4px rgba(255,255,255,0.6)' : '0 0 4px rgba(61,90,115,0.4)',
           transform: dotTransform,
           willChange: 'transform',
-          zIndex: 10000,
+          zIndex: 41,
           pointerEvents: 'none',
           opacity: 0.4,
           transition: 'background-color 0.3s, box-shadow 0.3s, opacity 0.3s',
@@ -469,7 +475,7 @@ const Cursor = () => {
           transform,
           willChange: 'transform',
           transformStyle: 'preserve-3d',
-          zIndex: 9999,
+          zIndex: 41,
           overflow: 'visible',
           background: isDark
             ? [
@@ -560,7 +566,7 @@ const Cursor = () => {
               background: `radial-gradient(circle, ${colorRef.current}88, ${colorRef.current}33)`,
               boxShadow: `0 0 ${p.s * 2}px ${colorRef.current}40`,
               pointerEvents: 'none',
-              zIndex: 9999,
+          zIndex: 40,
             }}
             initial={{ x: clientX.get(), y: clientY.get(), scale: 1, opacity: 0.85 }}
             animate={{

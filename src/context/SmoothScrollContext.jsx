@@ -10,10 +10,10 @@ export function SmoothScrollProvider({ children }) {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     const lenis = new Lenis({
-      duration: prefersReduced ? 0.1 : 1.8,
+      duration: prefersReduced ? 0.1 : 1.0,
       easing: (t) => 1 - Math.pow(1 - t, 3),
       smoothWheel: !prefersReduced,
-      smoothTouch: !prefersReduced,
+      smoothTouch: false,
       anchors: true,
     })
 

@@ -135,7 +135,7 @@ const Navigation = () => {
   const scrollToSection = useCallback((href) => {
     document.body.style.overflow = ''
     if (lenisRef?.current?.scrollTo) {
-      lenisRef.current.scrollTo(href, { offset: -80 })
+      lenisRef.current.scrollTo(href, { offset: -80, duration: 1.8 })
     } else {
       const el = document.querySelector(href)
       if (el) {
@@ -146,7 +146,7 @@ const Navigation = () => {
   }, [lenisRef])
 
   const isScrolled = scrollDepth > 0.05
-  const bgOpacity = isScrolled ? (0.4 + scrollDepth * 0.35) : 0
+  const bgOpacity = isScrolled ? (0.88 + scrollDepth * 0.08) : 0
 
   return (
     <m.nav

@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect, useState, useContext } from 'react'
-import { m, useMotionValue, useSpring, useTransform, useReducedMotion, useInView, useMotionValueEvent } from 'framer-motion'
+import { m, useMotionValue, useSpring, useTransform, useReducedMotion, useInView } from 'framer-motion'
 import { useTiltContext } from '../context/TiltContext'
 
 const isTouchDevice = () =>
@@ -33,18 +33,6 @@ const TiltCard = ({
 
   const rotateX = useSpring(useTransform(py, v => -v * maxTilt * 2), springCfg)
   const rotateY = useSpring(useTransform(px, v => v * maxTilt * 2), springCfg)
-
-  useMotionValueEvent(rotateX, "change", (v) => {
-    if (reduceMotion || touchDevice) return
-    const rect = rectRef.current
-    setTilt({ x: v, y: rotateY.get(), rect, active: hoverRef.current })
-  })
-
-  useMotionValueEvent(rotateY, "change", (v) => {
-    if (reduceMotion || touchDevice) return
-    const rect = rectRef.current
-    setTilt({ x: rotateX.get(), y: v, rect, active: hoverRef.current })
-  })
 
   const glareOpacity = useTransform(px, [-0.5, 0, 0.5], [0.3, 0, 0.3])
   const glowOpacity = useTransform([px, py], ([x, y]) => {
@@ -80,11 +68,19 @@ const TiltCard = ({
         el.style.setProperty('--mx', `${(v + 0.5) * 100}%`)
         el.style.setProperty('--card-mx', `${(v + 0.5) * 100}%`)
         el.style.setProperty('--mx-raw', v)
+        if (!touchDevice) {
+          const rect = rectRef.current
+          setTilt({ x: rotateX.get(), y: rotateY.get(), rect, active: hoverRef.current })
+        }
       })
       unsubY = py.on("change", (v) => {
         el.style.setProperty('--my', `${(v + 0.5) * 100}%`)
         el.style.setProperty('--card-my', `${(v + 0.5) * 100}%`)
         el.style.setProperty('--my-raw', v)
+        if (!touchDevice) {
+          const rect = rectRef.current
+          setTilt({ x: rotateX.get(), y: rotateY.get(), rect, active: hoverRef.current })
+        }
       })
     }
 
@@ -105,7 +101,7 @@ const TiltCard = ({
       card.removeEventListener('pointerenter', onEnter)
       card.removeEventListener('pointerleave', onLeave)
     }
-  }, [reduceMotion, isInView, px, py])
+  }, [reduceMotion, isInView, px, py, touchDevice, rotateX, rotateY, setTilt])
 
   if (reduceMotion) {
     return (

@@ -1,4 +1,4 @@
-import { m, useScroll, useTransform, useInView } from 'framer-motion'
+import { m, useTransform, useInView } from 'framer-motion'
 import { useRef, useState, memo } from 'react'
 import { FiChevronRight } from 'react-icons/fi'
 import { experienceData } from '../data/experienceData'
@@ -32,18 +32,9 @@ const MetroidBeam = ({ scrollYProgress }) => {
         style={{ top: tipY, willChange: 'transform' }}
         className="absolute -left-[4px] w-[11px] h-[11px]"
       >
-        <m.div
-          className="w-full h-full rounded-full bg-white"
-          animate={beamInView && !touchDevice ? {
-            scale: [1, 1.45, 1],
-            opacity: [0.6, 1, 0.6],
-            boxShadow: [
-              '0 0 10px rgba(61,90,115,0.5)',
-              '0 0 22px rgba(61,90,115,0.9)',
-              '0 0 10px rgba(61,90,115,0.5)',
-            ],
-          } : { opacity: 0.8 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+        <div
+          className={`w-full h-full rounded-full bg-white ${beamInView && !touchDevice ? 'beam-pulse' : ''}`}
+          style={!beamInView || touchDevice ? { opacity: 0.8 } : undefined}
         />
       </m.div>
     </div>
@@ -160,18 +151,14 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
 ExperienceCard.displayName = 'ExperienceCard'
 
 const Experience = () => {
-  const { ref, fast } = useSectionParallax({ fastDistance: 100, preset: 'default' })
+  const { ref, smooth } = useSectionParallax({ fastDistance: 100, preset: 'default' })
   const [touchDevice] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  })
 
   return (
     <m.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <m.div
-          style={{ y: fast }}
+          style={{ y: smooth }}
           className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-rose/10 rounded-full blur-lg"
         />
       </div>
@@ -208,13 +195,13 @@ const Experience = () => {
           </m.div>
         ) : (
           <div className="relative">
-            <MetroidBeam scrollYProgress={scrollYProgress} />
+            <MetroidBeam scrollYProgress={smooth} />
             {experienceData.map((exp, index) => (
               <ExperienceCard
                 key={exp.id}
                 exp={exp}
                 index={index}
-                scrollYProgress={scrollYProgress}
+                scrollYProgress={smooth}
                 total={experienceData.length}
                 touchDevice={touchDevice}
               />

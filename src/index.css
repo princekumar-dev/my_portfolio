@@ -979,6 +979,24 @@ h1 {
              cursorRingColor 8s ease infinite;
 }
 
+/* ── Metroid Beam Pulse ────────────────────────────── */
+
+@keyframes beamPulse {
+  0%, 100% { transform: scale(1);   opacity: 0.6; box-shadow: 0 0 10px rgba(61,90,115,0.5); }
+  50%      { transform: scale(1.45); opacity: 1;   box-shadow: 0 0 22px rgba(61,90,115,0.9); }
+}
+
+.beam-pulse {
+  animation: beamPulse 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beam-pulse {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cursor-ring-inner {
     animation: none;
