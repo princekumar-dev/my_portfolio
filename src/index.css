@@ -1128,4 +1128,23 @@ h1 {
   .scramble-char.settled {
     filter: none;
   }
+
+  .animated-gradient-text {
+    animation: none;
+  }
+
+  .animated-gradient-text::after {
+    animation: none;
+  }
+
+  .aurora-blob,
+  .aurora-blob-alt {
+    animation: none;
+  }
+
+  .floating-label-group input,
+  .floating-label-group textarea {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }

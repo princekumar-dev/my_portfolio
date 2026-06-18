@@ -417,6 +417,11 @@ const Hero = () => {
   const contentY = useTransform(smooth, [0, 1], [0, -40])
   const contentOpacity = useTransform(smooth, [0, 0.8], [1, 0])
 
+  const mobileBlobsY = 0
+  const mobileGridY = 0
+  const mobileContentY = 0
+  const mobileContentOpacity = 1
+
   return (
     <section
       ref={sectionRef}
@@ -424,7 +429,7 @@ const Hero = () => {
       className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-16 sm:pt-20"
       style={{ contain: 'layout style', contentVisibility: 'auto' }}
     >
-      <m.div style={{ y: gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]">
+      <m.div style={{ y: isMobile ? mobileGridY : gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]">
         <div
           className="absolute inset-0"
           style={{
@@ -437,7 +442,7 @@ const Hero = () => {
 
       <ParticleCanvas isMobile={isMobile} />
 
-      <m.div style={{ y: blobsY }} className="absolute inset-0 z-0">
+      <m.div style={{ y: isMobile ? mobileBlobsY : blobsY }} className="absolute inset-0 z-0">
         <div className={`absolute top-16 left-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-slate/20 rounded-full blur-lg`} />
         <div className={`absolute bottom-24 right-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-sage/20 rounded-full blur-lg`} />
         {!isMobile && (
@@ -452,7 +457,7 @@ const Hero = () => {
         variants={heroContainerVariants}
         initial="hidden"
         animate="visible"
-        style={{ y: contentY, opacity: contentOpacity, perspective: 1000 }}
+        style={{ y: isMobile ? mobileContentY : contentY, opacity: isMobile ? mobileContentOpacity : contentOpacity, perspective: 1000 }}
         className="relative z-10 text-center px-4 max-w-4xl"
       >
         <m.div variants={heroItemVariants} className="mb-6 flex justify-center">

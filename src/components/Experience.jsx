@@ -4,11 +4,16 @@ import { FiChevronRight } from 'react-icons/fi'
 import { experienceData } from '../data/experienceData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 
+const isTouchDevice = () =>
+  typeof window !== 'undefined' &&
+  ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+
 const MetroidBeam = ({ scrollYProgress }) => {
   const beamRef = useRef(null)
   const beamInView = useInView(beamRef, { margin: '-50px' })
   const beamScaleY = useTransform(scrollYProgress, [0, 1], [0, 1])
   const tipY = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
+  const [touchDevice] = useState(isTouchDevice)
 
   return (
     <div ref={beamRef} className="absolute left-[7px] top-0 w-[3px] h-full z-0 pointer-events-none" style={{ contain: 'layout style' }}>
@@ -29,7 +34,7 @@ const MetroidBeam = ({ scrollYProgress }) => {
       >
         <m.div
           className="w-full h-full rounded-full bg-white"
-          animate={beamInView ? {
+          animate={beamInView && !touchDevice ? {
             scale: [1, 1.45, 1],
             opacity: [0.6, 1, 0.6],
             boxShadow: [
@@ -37,7 +42,7 @@ const MetroidBeam = ({ scrollYProgress }) => {
               '0 0 22px rgba(61,90,115,0.9)',
               '0 0 10px rgba(61,90,115,0.5)',
             ],
-          } : {}}
+          } : { opacity: 0.8 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
         />
       </m.div>

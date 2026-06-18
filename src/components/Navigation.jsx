@@ -5,6 +5,10 @@ import { useActiveSection } from '../hooks/useActiveSection'
 import { useTheme } from '../context/ThemeContext'
 import { useSmoothScroll } from '../context/SmoothScrollContext'
 
+const isTouchDevice = () =>
+  typeof window !== 'undefined' &&
+  ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+
 const navItems = [
   { name: 'Home', href: '#home', id: 'home' },
   { name: 'About', href: '#about', id: 'about' },
@@ -55,6 +59,7 @@ const Navigation = () => {
   const lastScrollY = useRef(0)
   const menuRef = useRef(null)
   const menuButtonRef = useRef(null)
+  const [touchDevice] = useState(isTouchDevice)
 
   useEffect(() => {
     const menuOpen = () => setIsOpen(true)
@@ -141,12 +146,12 @@ const Navigation = () => {
       className="fixed w-full z-50 transition-[border-color] duration-500"
       style={{
         contain: 'layout style',
-        backdropFilter: isScrolled ? 'blur(16px) saturate(180%)' : 'none',
-        WebkitBackdropFilter: isScrolled ? 'blur(16px) saturate(180%)' : 'none',
+        backdropFilter: !touchDevice && isScrolled ? 'blur(16px) saturate(180%)' : 'none',
+        WebkitBackdropFilter: !touchDevice && isScrolled ? 'blur(16px) saturate(180%)' : 'none',
         background: isScrolled
           ? isDark
-            ? `rgba(15, 23, 42, ${bgOpacity})`
-            : `rgba(255, 255, 255, ${bgOpacity})`
+            ? `rgba(15, 23, 42, ${touchDevice ? Math.min(bgOpacity + 0.15, 0.92) : bgOpacity})`
+            : `rgba(255, 255, 255, ${touchDevice ? Math.min(bgOpacity + 0.15, 0.92) : bgOpacity})`
           : 'transparent',
         borderBottom: isScrolled
           ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`
