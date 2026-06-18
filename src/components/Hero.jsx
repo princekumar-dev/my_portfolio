@@ -417,7 +417,6 @@ const Hero = () => {
   const contentY = useTransform(smooth, [0, 1], [0, -40])
   const contentOpacity = useTransform(smooth, [0, 0.8], [1, 0])
 
-  const mobileBlobsY = 0
   const mobileGridY = 0
   const mobileContentY = 0
   const mobileContentOpacity = 1
@@ -427,9 +426,8 @@ const Hero = () => {
       ref={sectionRef}
       id="home"
       className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-16 sm:pt-20"
-      style={{ contain: 'layout style', contentVisibility: 'auto' }}
     >
-      <m.div style={{ y: isMobile ? mobileGridY : gridY }} className="pointer-events-none absolute inset-0 z-0 opacity-[0.4]">
+      <m.div style={{ y: isMobile ? mobileGridY : gridY }} className={`pointer-events-none absolute inset-0 z-0 ${isMobile ? 'opacity-[0.15]' : 'opacity-[0.4]'}`}>
         <div
           className="absolute inset-0"
           style={{
@@ -442,16 +440,14 @@ const Hero = () => {
 
       <ParticleCanvas isMobile={isMobile} />
 
-      <m.div style={{ y: isMobile ? mobileBlobsY : blobsY }} className="absolute inset-0 z-0">
-        <div className={`absolute top-16 left-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-slate/20 rounded-full blur-lg`} />
-        <div className={`absolute bottom-24 right-10 ${isMobile ? 'w-48 h-48' : 'w-72 h-72'} bg-accent-sage/20 rounded-full blur-lg`} />
-        {!isMobile && (
-          <>
-            <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-rose/15 rounded-full blur-lg" />
-            <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-deep/15 rounded-full blur-lg" />
-          </>
-        )}
+      {!isMobile && (
+      <m.div style={{ y: blobsY }} className="absolute inset-0 z-0">
+        <div className="absolute top-16 left-10 w-72 h-72 bg-accent-slate/20 rounded-full blur-lg" />
+        <div className="absolute bottom-24 right-10 w-72 h-72 bg-accent-sage/20 rounded-full blur-lg" />
+        <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-rose/15 rounded-full blur-lg" />
+        <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-accent-deep/15 rounded-full blur-lg" />
       </m.div>
+      )}
 
       <m.div
         variants={heroContainerVariants}

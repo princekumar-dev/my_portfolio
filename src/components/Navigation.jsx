@@ -179,7 +179,7 @@ const Navigation = () => {
           <m.a
             href="#home"
             whileHover={{ scale: 1.05 }}
-            className="text-2xl font-bold text-light-900"
+            className="text-2xl font-bold text-light-900 px-3 py-1 rounded-full transition-colors duration-300 hover:bg-accent-slate/10 hover:border hover:border-accent-slate/20"
             onClick={(e) => { e.preventDefault(); scrollToSection('#home') }}
           >
             Prince.dev

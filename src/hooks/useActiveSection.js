@@ -1,39 +1,48 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 
-// Scroll-spy: returns the id of the section currently in view.
-// Uses IntersectionObserver and picks the most visible matching section.
-export function useActiveSection(sectionIds, { rootMargin = '-45% 0px -45% 0px' } = {}) {
+// Scroll-spy: returns the id of the section closest to viewport center.
+// Uses scroll position instead of IntersectionObserver for reliable
+// detection with Lenis smooth scroll and lazy-loaded sections.
+export function useActiveSection(sectionIds) {
   const [active, setActive] = useState(sectionIds[0] || '')
-  const timeoutRef = useRef(null)
+  const ticking = useRef(false)
+
+  const check = useCallback(() => {
+    const scrollY = window.scrollY
+    const viewH = window.innerHeight
+    const anchor = scrollY + viewH * 0.35
+
+    let bestId = sectionIds[0] || ''
+    let bestDist = Infinity
+
+    for (const id of sectionIds) {
+      const el = document.getElementById(id)
+      if (!el) continue
+      const top = el.getBoundingClientRect().top + scrollY
+      const dist = Math.abs(anchor - top)
+      if (dist < bestDist) {
+        bestDist = dist
+        bestId = id
+      }
+    }
+
+    setActive(bestId)
+  }, [sectionIds])
 
   useEffect(() => {
-    const elements = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter(Boolean)
-
-    if (elements.length === 0) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-        if (visible[0]) {
-          clearTimeout(timeoutRef.current)
-          timeoutRef.current = setTimeout(() => {
-            setActive(visible[0].target.id)
-          }, 100)
-        }
-      },
-      { rootMargin, threshold: [0.1, 0.5] }
-    )
-
-    elements.forEach((el) => observer.observe(el))
-    return () => {
-      observer.disconnect()
-      clearTimeout(timeoutRef.current)
+    const onScroll = () => {
+      if (!ticking.current) {
+        ticking.current = true
+        requestAnimationFrame(() => {
+          check()
+          ticking.current = false
+        })
+      }
     }
-  }, [sectionIds, rootMargin])
+    window.addEventListener('scroll', onScroll, { passive: true })
+    check()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [check])
 
   return active
 }

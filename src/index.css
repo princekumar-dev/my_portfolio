@@ -379,8 +379,8 @@ h1 {
 
 :focus-visible {
   outline: 2px solid #577590;
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline-offset: 4px;
+  border-radius: 9999px;
 }
 
 /* ── Skip to Content ──────────────────────────────── */
@@ -1062,7 +1062,7 @@ h1 {
 
   .badge-shimmer::after,
   .hero-shimmer::after {
-    animation: none !important;
+    display: none !important;
   }
 
   .dark .glass {
