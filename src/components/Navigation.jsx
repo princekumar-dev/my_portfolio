@@ -132,6 +132,19 @@ const Navigation = () => {
     return () => menu.removeEventListener('keydown', handleKeyDown)
   }, [isOpen])
 
+  const scrollToSection = useCallback((href) => {
+    document.body.style.overflow = ''
+    if (lenisRef?.current?.scrollTo) {
+      lenisRef.current.scrollTo(href, { offset: -80 })
+    } else {
+      const el = document.querySelector(href)
+      if (el) {
+        const y = el.getBoundingClientRect().top + window.scrollY - 80
+        window.scrollTo({ top: y, behavior: 'smooth' })
+      }
+    }
+  }, [lenisRef])
+
   const isScrolled = scrollDepth > 0.05
   const bgOpacity = isScrolled ? (0.4 + scrollDepth * 0.35) : 0
 
@@ -167,7 +180,7 @@ const Navigation = () => {
             href="#home"
             whileHover={{ scale: 1.05 }}
             className="text-2xl font-bold text-light-900"
-            onClick={(e) => { e.preventDefault(); lenisRef?.current?.scrollTo('#home') }}
+            onClick={(e) => { e.preventDefault(); scrollToSection('#home') }}
           >
             Prince.dev
           </m.a>
@@ -181,7 +194,7 @@ const Navigation = () => {
                   href={item.href}
                   aria-current={isActive ? 'page' : undefined}
                   className="relative px-3 py-1.5 text-sm font-medium transition-colors duration-300 rounded-full"
-                  onClick={(e) => { e.preventDefault(); lenisRef?.current?.scrollTo(item.href) }}
+                  onClick={(e) => { e.preventDefault(); scrollToSection(item.href) }}
                 >
                   {isActive && (
                     <m.span
@@ -252,7 +265,7 @@ const Navigation = () => {
                         ? 'text-accent-slate font-semibold'
                         : 'text-light-600 hover:text-accent-slate hover:bg-accent-slate/5'
                     }`}
-                    onClick={(e) => { e.preventDefault(); setIsOpen(false); lenisRef?.current?.scrollTo(item.href) }}
+                    onClick={(e) => { e.preventDefault(); setIsOpen(false); scrollToSection(item.href) }}
                   >
                     {active === item.id && (
                       <m.span

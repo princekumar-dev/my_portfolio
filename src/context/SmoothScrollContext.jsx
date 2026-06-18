@@ -3,23 +3,17 @@ import Lenis from 'lenis'
 
 const SmoothScrollContext = createContext(null)
 
-const isMobileDevice = () =>
-  typeof window !== 'undefined' &&
-  (window.innerWidth < 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0)
-
 export function SmoothScrollProvider({ children }) {
   const lenisRef = useRef(null)
 
   useEffect(() => {
-    if (isMobileDevice()) return
-
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     const lenis = new Lenis({
-      duration: prefersReduced ? 0.1 : 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: prefersReduced ? 0.1 : 1.8,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
       smoothWheel: !prefersReduced,
-      smoothTouch: false,
+      smoothTouch: !prefersReduced,
       anchors: true,
     })
 
