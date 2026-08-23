@@ -1,0 +1,165 @@
+import { m, useInView } from 'framer-motion'
+import { useSectionParallax } from '../hooks/useSectionParallax'
+import { useRef, useEffect, useState, useMemo, memo } from 'react'
+
+const AnimatedCounter = ({ target, suffix = '+', duration = 2 }) => {
+  const viewRef = useRef(null)
+  const countRef = useRef(null)
+  const isInView = useInView(viewRef, { once: true })
+
+  useEffect(() => {
+    if (!isInView) return
+    const end = parseInt(target)
+    const startTime = performance.now()
+    let frameId
+
+    const tick = (now) => {
+      const elapsed = (now - startTime) / (duration * 1000)
+      const progress = Math.min(elapsed, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      if (countRef.current) countRef.current.textContent = `${Math.round(eased * end)}${suffix}`
+      if (progress < 1) frameId = requestAnimationFrame(tick)
+    }
+
+    frameId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frameId)
+  }, [isInView, target, duration, suffix])
+
+  return <span ref={viewRef} className="counter-value"><span ref={countRef}>0{suffix}</span></span>
+}
+
+const StatCard = memo(({ stat, index }) => (
+  <m.div
+    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ delay: 0.1 * index, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    className="glass-card glass-edge animated-border rounded-2xl p-6 text-center group"
+    data-cursor-target="card"
+  >
+    <div className="text-4xl font-bold text-light-900 mb-2">
+      <AnimatedCounter target={stat.target} suffix={stat.suffix} />
+    </div>
+    <p className="text-light-600 text-sm">{stat.label}</p>
+  </m.div>
+))
+
+StatCard.displayName = 'StatCard'
+
+const LineReveal = ({ children, delay = 0 }) => {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-50px' })
+
+  return (
+    <div ref={ref} className="overflow-hidden">
+      <m.div
+        initial={{ y: '100%', opacity: 0 }}
+        animate={isInView ? { y: 0, opacity: 1 } : { y: '100%', opacity: 0 }}
+        transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {children}
+      </m.div>
+    </div>
+  )
+}
+
+const stats = [
+  { target: 6, suffix: '+', label: 'Projects Completed', color: 'from-accent-slate to-accent-sage' },
+  { target: 15, suffix: '+', label: 'Technologies', color: 'from-accent-sage to-accent-rose' },
+  { target: 3, suffix: '+', label: 'Years Experience', color: 'from-accent-rose to-accent-sand' },
+  { target: 5, suffix: '+', label: 'Certifications', color: 'from-accent-sand to-accent-slate' },
+]
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -40, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  },
+}
+
+const About = () => {
+  const { ref, slow, fast } = useSectionParallax({ slowDistance: 60, fastDistance: 100, preset: 'soft' })
+
+  return (
+    <m.section ref={ref} id="about" className="relative py-16 sm:py-24 px-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <m.div
+          style={{ y: fast }}
+          className="absolute -top-40 -right-40 w-80 h-80 bg-accent-slate/10 rounded-full blur-lg"
+        ></m.div>
+        <m.div
+          style={{ y: slow }}
+          className="absolute top-40 -left-32 w-64 h-64 bg-accent-sage/10 rounded-full blur-lg"
+        ></m.div>
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
+        <m.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <m.div variants={itemVariants} className="text-center mb-12">
+            <span className="eyebrow text-accent-slate">Who I am</span>
+            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
+              <span className="animated-gradient-text">
+                About Me
+              </span>
+            </h2>
+          </m.div>
+
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <m.div variants={itemVariants} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4" data-cursor-target="card">
+              <LineReveal delay={0}>
+                <p className="text-light-600 text-lg leading-relaxed">
+                  I'm an AI & Data Science engineer with a strong foundation in modern web and machine learning
+                  technologies. With experience in building scalable applications and solving complex problems,
+                  I'm dedicated to creating solutions that make a real impact.
+                </p>
+              </LineReveal>
+              <LineReveal delay={0.1}>
+                <p className="text-light-600 text-lg leading-relaxed">
+                  My journey in tech has been driven by curiosity and a desire to continuously learn and grow.
+                  I thrive in collaborative environments and love turning ideas into reality through clean,
+                  efficient code.
+                </p>
+              </LineReveal>
+              <LineReveal delay={0.2}>
+                <p className="text-light-600 text-lg leading-relaxed">
+                  When I'm not coding, you can find me exploring new technologies, contributing to open-source
+                  projects, or sharing knowledge with the developer community.
+                </p>
+              </LineReveal>
+            </m.div>
+
+            <m.div
+              variants={itemVariants}
+              className="grid grid-cols-2 gap-3 sm:gap-4"
+            >
+              {stats.map((stat, i) => (
+                <StatCard key={stat.label} stat={stat} index={i} />
+              ))}
+            </m.div>
+          </div>
+        </m.div>
+      </div>
+    </m.section>
+  )
+}
+
+export default About
