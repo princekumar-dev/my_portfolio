@@ -48,8 +48,11 @@ export function useSectionParallax({
   const opacityTransform = useTransform(smooth, [0, 0.2, 0.8, 1], away ? [1, 1, 1, 1] : [0, 1, 1, 0])
   const opacity = opacityFade ? opacityTransform : null
 
+  // Touch devices keep parallax translations off (they jank mobile scroll),
+  // but `smooth` must stay live — it's the scroll-progress signal that drives
+  // the Experience timeline beam and its per-card dots.
   if (touchDevice) {
-    return { ref, smooth: zeroVal, slow: zeroVal, fast: zeroVal, opacity: null }
+    return { ref, smooth, slow: zeroVal, fast: zeroVal, opacity: null }
   }
 
   return { ref, smooth, slow, fast, opacity }

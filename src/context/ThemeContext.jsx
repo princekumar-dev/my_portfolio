@@ -13,6 +13,10 @@ const applyThemeClass = (dark) => {
   else root.classList.remove('dark')
 }
 
+// Matches the site's body gradients; Android Chrome paints its status/URL
+// bar with the theme-color meta, so these keep the browser chrome on-palette.
+const THEME_COLOR = { dark: '#0F172A', light: '#FAFBFC' }
+
 /* Origin + wavefront for the theme spread, measured from the toggle button so
    the ripple grows out of the control the user pressed. The front is an
    organic "wave": three sine bands whose lobe counts, weights, phases,
@@ -25,21 +29,42 @@ const rand = (min, max) => min + Math.random() * (max - min)
 
 const setSpreadOrigin = (source) => {
   const root = document.documentElement
+
+  // Measure the control's SETTLED position: the fixed nav slides in/out with
+  // a transform, so a tap right as it settles would otherwise anchor the wave
+  // to its mid-flight spot. Neutralize ancestor transforms just for the read.
+  const neutralized = []
+  let node = source
+  while (node && node !== document.body) {
+    if (node.style && node.style.transform && node.style.transform !== 'none') {
+      neutralized.push([node, node.style.transform])
+      node.style.transform = 'none'
+    }
+    node = node.parentElement
+  }
+
   const rect =
     source && typeof source.getBoundingClientRect === 'function'
       ? source.getBoundingClientRect()
-      : {
-          left: window.innerWidth / 2,
-          top: window.innerHeight / 2,
-          width: 0,
-          height: 0,
-        }
+      : null
 
-  const x = rect.left + rect.width / 2
-  const y = rect.top + rect.height / 2
+  for (const [el, t] of neutralized) el.style.transform = t
+
+  const scrollX = window.scrollX || 0
+  const scrollY = window.scrollY || 0
+
+  // clip-path on the root resolves against the DOCUMENT canvas, not the
+  // viewport (verified in Chrome: a viewport-space circle renders scrollY px
+  // above the button once the page is scrolled). Convert to document
+  // coordinates or the wave detaches from the control on any scrolled page.
+  const x = (rect ? rect.left + rect.width / 2 : window.innerWidth / 2) + scrollX
+  const y = (rect ? rect.top + rect.height / 2 : window.innerHeight / 2) + scrollY
   const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
   const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
-  const endRadius = Math.hypot(Math.max(x, vw - x), Math.max(y, vh - y))
+  // Farthest corner of the VISIBLE viewport (document space spans scrollY..scrollY+vh).
+  const dyTop = y - scrollY
+  const dyBottom = scrollY + vh - y
+  const endRadius = Math.hypot(Math.max(x, vw - x), Math.max(dyTop, dyBottom))
 
   // Roll a fresh wavefront: lobe count, band frequencies, band weights,
   // phases and amplitude — different on every single toggle.
@@ -101,6 +126,12 @@ export const ThemeProvider = ({ children }) => {
   useEffect(() => {
     applyThemeClass(isDark)
     localStorage.setItem('theme', isDark ? 'dark' : 'light')
+    // Keep the mobile browser chrome (Android status/URL bar) on the site's
+    // palette — it only re-reads theme-color when the meta content changes.
+    const color = isDark ? THEME_COLOR.dark : THEME_COLOR.light
+    document
+      .querySelectorAll('meta[name="theme-color"]')
+      .forEach((m) => m.setAttribute('content', color))
   }, [isDark])
 
   const toggleTheme = useCallback(
