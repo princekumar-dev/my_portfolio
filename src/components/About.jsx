@@ -1,6 +1,7 @@
 import { m, useInView } from 'framer-motion'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 import { useRef, useEffect, useState, useMemo, memo } from 'react'
+import { certificationsData } from '../data/certificationsData'
 
 const AnimatedCounter = ({ target, suffix = '+', duration = 2 }) => {
   const viewRef = useRef(null)
@@ -67,7 +68,7 @@ const stats = [
   { target: 6, suffix: '+', label: 'Projects Completed', color: 'from-accent-slate to-accent-sage' },
   { target: 15, suffix: '+', label: 'Technologies', color: 'from-accent-sage to-accent-rose' },
   { target: 3, suffix: '+', label: 'Years Experience', color: 'from-accent-rose to-accent-sand' },
-  { target: 5, suffix: '+', label: 'Certifications', color: 'from-accent-sand to-accent-slate' },
+  { target: certificationsData.length, suffix: '+', label: 'Certificates & Awards', color: 'from-accent-sand to-accent-slate' },
 ]
 
 const containerVariants = {

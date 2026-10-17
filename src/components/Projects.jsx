@@ -88,7 +88,7 @@ const ProjectCard = memo(({ project, itemVariants }) => (
             style={{ transform: 'translateZ(0)' }}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/10 to-transparent" />
+        <div className="absolute inset-0 media-overlay" />
         <m.div className="absolute inset-0 bg-gradient-to-r from-accent-slate to-accent-sage opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
 
         {project.status && (

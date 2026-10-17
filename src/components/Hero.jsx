@@ -1,19 +1,11 @@
 import { m, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
-import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { FiArrowDown } from 'react-icons/fi'
 import { usePointer } from '../context/PointerContext'
 
 const FULL_NAME = 'Prince R'
 const TYPING_SPEED = 80
 const START_DELAY = 600
-const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-const ROLE_TEXTS = ['AI Engineer', 'Data Scientist', 'Full Stack Developer', 'ML Researcher']
-const HOLD_MS = 2800
-const DECODE_MS = 500
-const ENCODE_MS = 250
-const STAGGER_MS = 35
-const ENCODE_STAGGER_MS = 20
-const GAP_MS = 80
 
 const heroContainerVariants = {
   hidden: { opacity: 0 },
@@ -35,136 +27,38 @@ const heroItemVariants = {
   },
 }
 
+/* Per-character cascade reveal. Words are kept in nowrap groups so any phrase
+   wraps between words, never mid-character. */
 function SplitText({ text, className, delay = 0 }) {
+  let charIndex = 0
   return (
     <span className={className} aria-label={text}>
-      {text.split('').map((char, i) => (
-        <m.span
-          key={i}
-          initial={{ opacity: 0, y: 40, rotateX: -80 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{
-            duration: 0.6,
-            delay: delay + i * 0.04,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+      {text.split(' ').map((word, wi) => (
+        <span
+          key={wi}
+          className="inline-block whitespace-nowrap"
+          style={{ marginRight: '0.25em' }}
         >
-          {char}
-        </m.span>
+          {word.split('').map((char) => {
+            const i = charIndex++
+            return (
+              <m.span
+                key={i}
+                initial={{ opacity: 0, y: 22, rotateX: -60 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{
+                  duration: 0.55,
+                  delay: delay + i * 0.035,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                style={{ display: 'inline-block' }}
+              >
+                {char}
+              </m.span>
+            )
+          })}
+        </span>
       ))}
-    </span>
-  )
-}
-
-function TextScramble({ texts, className }) {
-  const containerRef = useRef(null)
-  const rafRef = useRef(0)
-  const stateRef = useRef({ phase: 'in', textIdx: 0, startTime: 0 })
-  const maxLen = useMemo(() => Math.max(...texts.map(t => t.length)), [texts])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    container.innerHTML = ''
-    const spans = []
-    for (let i = 0; i < maxLen; i++) {
-      const s = document.createElement('span')
-      s.className = 'scramble-char'
-      container.appendChild(s)
-      spans.push(s)
-    }
-
-    const state = stateRef.current
-    state.phase = 'in'
-    state.textIdx = 0
-    state.startTime = performance.now()
-    let completedCycles = 0
-
-    const rnd = () => SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
-
-    const tick = (now) => {
-      const elapsed = now - state.startTime
-      const text = texts[state.textIdx]
-
-      if (state.phase === 'in') {
-        let allSettled = true
-        for (let i = 0; i < maxLen; i++) {
-          if (i >= text.length) {
-            spans[i].textContent = ''
-            spans[i].className = 'scramble-char'
-            continue
-          }
-          const delay = i * STAGGER_MS
-          const charTime = elapsed - delay
-          if (charTime < 0) {
-            spans[i].textContent = rnd()
-            spans[i].className = 'scramble-char scrambling'
-            allSettled = false
-          } else if (charTime < DECODE_MS * 0.5) {
-            spans[i].textContent = rnd()
-            spans[i].className = 'scramble-char scrambling'
-            allSettled = false
-          } else {
-            spans[i].textContent = text[i]
-            spans[i].className = 'scramble-char settled'
-          }
-        }
-        if (allSettled) {
-          for (let i = 0; i < text.length; i++) {
-            spans[i].textContent = text[i]
-            spans[i].className = 'scramble-char settled'
-          }
-          state.phase = 'hold'
-          state.startTime = now
-        }
-      } else if (state.phase === 'hold') {
-        if (elapsed >= HOLD_MS) {
-          state.phase = 'out'
-          state.startTime = now
-        }
-      } else if (state.phase === 'out') {
-        let allCleared = true
-        for (let i = 0; i < maxLen; i++) {
-          if (i >= text.length) continue
-          const delay = (text.length - 1 - i) * ENCODE_STAGGER_MS
-          const charTime = elapsed - delay
-          if (charTime < 0) {
-            spans[i].textContent = text[i]
-            spans[i].className = 'scramble-char settled'
-            allCleared = false
-          } else if (charTime < ENCODE_MS * 0.5) {
-            spans[i].textContent = rnd()
-            spans[i].className = 'scramble-char scrambling'
-            allCleared = false
-          } else {
-            spans[i].textContent = ''
-            spans[i].className = 'scramble-char'
-          }
-        }
-        if (allCleared) {
-          completedCycles++
-          if (completedCycles >= texts.length) return
-          state.textIdx = (state.textIdx + 1) % texts.length
-          state.phase = 'in'
-          state.startTime = now + GAP_MS
-        }
-      }
-
-      rafRef.current = requestAnimationFrame(tick)
-    }
-
-    rafRef.current = requestAnimationFrame(tick)
-    return () => {
-      cancelAnimationFrame(rafRef.current)
-      container.innerHTML = ''
-    }
-  }, [texts, maxLen])
-
-  return (
-    <span className={`scramble-container ${className || ''}`}>
-      <span ref={containerRef} className="scramble-text" />
     </span>
   )
 }
@@ -498,7 +392,11 @@ const Hero = () => {
           variants={heroItemVariants}
           className="text-lg sm:text-xl md:text-2xl text-light-700 mb-6 sm:mb-8 font-light"
         >
-          <TextScramble texts={ROLE_TEXTS} className="text-accent-slate font-semibold" />
+          <SplitText
+            text="Turning Data Into Intelligence"
+            className="inline-block text-accent-slate font-semibold"
+            delay={0.45}
+          />
         </m.p>
 
         <m.p

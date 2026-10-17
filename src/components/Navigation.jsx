@@ -24,12 +24,13 @@ const sectionIds = navItems.map((item) => item.id)
 function MorphingHamburger({ isOpen }) {
   return (
     <button
-      className="md:hidden relative w-6 h-5 flex flex-col justify-between"
+      className="md:hidden -m-1.5 p-1.5 flex items-center justify-center"
       onClick={() => isOpen ? document.dispatchEvent(new CustomEvent('closemenu')) : document.dispatchEvent(new CustomEvent('openmenu'))}
       aria-label={isOpen ? 'Close menu' : 'Open menu'}
       aria-expanded={isOpen}
       aria-controls="mobile-menu"
     >
+      <span className="flex h-5 w-6 flex-col justify-between">
       <m.span
         className="block w-full h-0.5 bg-accent-slate rounded-full origin-left"
         animate={isOpen ? { rotate: 45, y: -1 } : { rotate: 0, y: 0 }}
@@ -45,6 +46,7 @@ function MorphingHamburger({ isOpen }) {
         animate={isOpen ? { rotate: -45, y: 1 } : { rotate: 0, y: 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       />
+      </span>
     </button>
   )
 }
@@ -179,7 +181,7 @@ const Navigation = () => {
           <m.a
             href="#home"
             whileHover={{ scale: 1.05 }}
-            className="text-2xl font-bold text-light-900 px-3 py-1 rounded-full transition-colors duration-300 hover:bg-accent-slate/10 hover:border hover:border-accent-slate/20"
+            className="text-xl sm:text-2xl font-bold text-light-900 px-2.5 sm:px-3 py-1 rounded-full transition-colors duration-300 hover:bg-accent-slate/10 hover:border hover:border-accent-slate/20"
             onClick={(e) => { e.preventDefault(); scrollToSection('#home') }}
           >
             Prince.dev
@@ -211,13 +213,13 @@ const Navigation = () => {
             })}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <m.button
               whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="p-2 rounded-full text-light-600 hover:text-accent-slate hover:bg-accent-slate/10 transition-colors duration-200"
+              className="p-2.5 sm:p-2 rounded-full text-light-600 hover:text-accent-slate hover:bg-accent-slate/10 transition-colors duration-200"
             >
               <m.span
                 key={isDark ? 'sun' : 'moon'}

@@ -223,6 +223,21 @@ const CursorDesktop = () => {
     let loopRunning = false
     let scrollDirty = false
 
+    // Drop any sticky hover state (e.g. a card that was covered by the
+    // certificate modal) so the cursor returns to its idle look instead of
+    // still tracking the element behind the modal.
+    const resetHover = () => {
+      tgt = null
+      targetRectRef.current = null
+      if (resizeObserver) resizeObserver.disconnect()
+      borderRadiusRef.current = '50%'
+      hoverRef.current = false
+      blurActiveRef.current = false
+      isTiltCardRef.current = false
+      hoveredElRef.current = null
+      paintIdle()
+    }
+
     const startLoop = () => {
       if (!loopRunning) {
         loopRunning = true
@@ -362,8 +377,20 @@ const CursorDesktop = () => {
     }
 
     const over = (e) => {
+      // While a modal is open, only elements inside it are hover targets —
+      // anything behind the backdrop must not keep/drive the hover state.
+      const dialog = document.querySelector('[role="dialog"]')
+      if (dialog && !(e.target instanceof Element && dialog.contains(e.target))) {
+        if (hoverRef.current || tgt) resetHover()
+        return
+      }
+
       const t = find(e.target)
-      if (!t || tgt === t) return
+      if (!t || tgt === t) {
+        // Moving over plain, non-interactive content: drop any stale state.
+        if (!t && hoverRef.current) resetHover()
+        return
+      }
       tgt = t
       hoverRef.current = true
 
@@ -418,6 +445,7 @@ const CursorDesktop = () => {
     window.addEventListener('mouseup', up, { passive: true })
     document.addEventListener('mouseover', over, { passive: true })
     document.addEventListener('mouseout', out, { passive: true })
+    document.addEventListener('certificate-modal-open', resetHover)
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onResize, { passive: true })
     document.addEventListener('visibilitychange', onVisibilityChange)
@@ -430,6 +458,7 @@ const CursorDesktop = () => {
       window.removeEventListener('mouseup', up)
       document.removeEventListener('mouseover', over)
       document.removeEventListener('mouseout', out)
+      document.removeEventListener('certificate-modal-open', resetHover)
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onResize)
       document.removeEventListener('visibilitychange', onVisibilityChange)
@@ -443,7 +472,7 @@ const CursorDesktop = () => {
   if (!visible) return null
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-40" aria-hidden="true">
+    <div className="pointer-events-none fixed inset-0 z-[90]" aria-hidden="true">
       <m.div
         ref={dotRef}
         style={{
@@ -492,7 +521,7 @@ const CursorDesktop = () => {
           boxShadow: isDark
             ? 'inset 0 2px 8px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.15), 0 0 20px rgba(0,0,0,0.25), 0 0 12px rgba(61,90,115,0.12), 0 4px 16px rgba(0,0,0,0.15)'
             : 'inset 0 2px 8px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(61,90,115,0.06), 0 0 20px rgba(61,90,115,0.1), 0 0 0 1px rgba(61,90,115,0.15), 0 4px 16px rgba(0,0,0,0.06)',
-          transition: 'background 0.4s, border 0.4s, box-shadow 0.4s, border-radius 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s, backdrop-filter 0.3s',
+          transition: 'background 0.55s, border 0.55s, box-shadow 0.55s, border-radius 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.45s, backdrop-filter 0.45s',
         }}
       >
         <div ref={specular1Ref} style={{
