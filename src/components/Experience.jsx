@@ -155,7 +155,7 @@ const Experience = () => {
   const [touchDevice] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
 
   return (
-    <m.section ref={ref} id="experience" className="relative py-16 sm:py-24 px-4">
+    <m.section ref={ref} id="experience" className="relative py-12 sm:py-24 px-3 sm:px-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <m.div
           style={{ y: smooth }}

@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  // The app toggles a `.dark` class on <html> (ThemeContext) — dark: utilities
+  // must follow that class, not the OS media query.
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,jsx}",

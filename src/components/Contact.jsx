@@ -148,7 +148,7 @@ const Contact = () => {
   }
 
   return (
-    <m.section ref={ref} id="contact" className="relative py-16 sm:py-24 px-4">
+    <m.section ref={ref} id="contact" className="relative py-12 sm:py-24 px-3 sm:px-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <m.div
           style={{ y: fast }}

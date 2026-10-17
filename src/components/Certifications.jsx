@@ -70,7 +70,7 @@ const CertImage = memo(({ cert }) => {
       {/* Frosted glass well: a fixed inset from the card edges with the logo
           centred and capped per its own aspect ratio (max-h/max-w %), so wide
           wordmarks and square emblems all keep the same generous padding. */}
-      <div className="absolute inset-3 sm:inset-4 overflow-hidden rounded-xl border border-white/70 bg-white/50 shadow-[0_2px_12px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/[0.07]">
+      <div className="absolute inset-3 sm:inset-4 overflow-hidden rounded-xl border border-white/70 bg-white/50 shadow-[0_2px_12px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/10">
         <div className="absolute inset-0 flex items-center justify-center">
           <img
             src={cert.image}
@@ -306,7 +306,7 @@ const Certifications = () => {
   }, [selected, lenisRef])
 
   return (
-    <section ref={ref} id="certifications" className="relative py-16 sm:py-24 px-4">
+    <section ref={ref} id="certifications" className="relative py-12 sm:py-24 px-3 sm:px-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <m.div
           style={{ y: fast }}

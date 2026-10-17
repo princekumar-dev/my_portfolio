@@ -265,7 +265,9 @@ const Hero = () => {
   const [displayed, setDisplayed] = useState('')
   const [typingDone, setTypingDone] = useState(false)
   const [badgeVisible, setBadgeVisible] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  )
   const { nx } = usePointer()
   const arrowX = useSpring(useTransform(nx, (v) => v * 10), { stiffness: 350, damping: 20 })
 
@@ -294,10 +296,11 @@ const Hero = () => {
   }, [])
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
+    const mq = window.matchMedia('(max-width: 767px)')
+    const check = (e) => setIsMobile(e.matches)
+    check(mq)
+    mq.addEventListener('change', check)
+    return () => mq.removeEventListener('change', check)
   }, [])
 
   const { scrollYProgress } = useScroll({
