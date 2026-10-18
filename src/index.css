@@ -547,25 +547,37 @@ h1 {
 :root {
   /* Matches .text-light-900 per theme — hero and section titles both use it. */
   --shimmer-base: linear-gradient(#111827, #111827);
-  /* The travelling highlight: green -> teal -> pink, the same colour family as
-     the Skills level bars (accent-sage / accent-slate / accent-rose), vivid
-     siblings so it actually reads on text. One gradient serves BOTH themes —
-     over the dark base the hues brighten the glyphs, over the near-white dark
-     base they saturate it, so contrast comes from hue either way. Alpha ramps
-     to 0 at both ends (same hue, not 'transparent') to keep the fringes clean,
-     hits 0.92 at the core, and the stops span wide enough that the band lays
-     the full green-to-pink ramp across the word as it crosses. */
+  /* The travelling highlight IS the Skills level-bar gradient: accent-sage and
+     accent-slate exact, rose taken one step deeper than accent-rose so the
+     small badge text still clears 4.5:1 where the band crosses it. Core at
+     full alpha, so mid-crossing the letters take the bar's own colours.
+     Measured worst-case on the light ground: rose 4.6:1 (was 1.96:1 for the
+     old vivid teal) — every sample now passes body contrast, so the state
+     raises text contrast instead of washing it out. */
   --shimmer-sheen: linear-gradient(
     102deg,
-    rgba(74, 222, 128, 0) 28%,
-    rgba(74, 222, 128, 0.55) 40%,
-    rgba(45, 212, 191, 0.92) 50%,
-    rgba(244, 114, 182, 0.55) 60%,
-    rgba(244, 114, 182, 0) 72%
+    rgba(74, 112, 96, 0) 28%,
+    rgba(74, 112, 96, 0.55) 40%,
+    rgba(61, 90, 115, 1) 50%,
+    rgba(143, 95, 107, 0.55) 60%,
+    rgba(143, 95, 107, 0) 72%
   );
 }
 .dark {
   --shimmer-base: linear-gradient(#f8fafc, #f8fafc);
+  /* Same three hues lifted into tints. Unlifted accents sink on the dark
+     ground (accent-slate measures ~2.5:1 there — under the 2.6 floor), while
+     white of any alpha composites into the near-white ink and disappears.
+     Tints keep every sample above 4.5:1 even on the lightest ground stop
+     (rgb(30,41,59)) and shift the ink by hue, not by brightness. */
+  --shimmer-sheen: linear-gradient(
+    102deg,
+    rgba(140, 197, 168, 0) 28%,
+    rgba(140, 197, 168, 0.55) 40%,
+    rgba(157, 190, 220, 1) 50%,
+    rgba(222, 176, 192, 0.55) 60%,
+    rgba(222, 176, 192, 0) 72%
+  );
 }
 
 .hero-shimmer,
