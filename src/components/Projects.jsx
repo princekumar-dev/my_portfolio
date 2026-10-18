@@ -95,7 +95,7 @@ const ProjectCard = memo(({ project, itemVariants }) => (
 
         {project.status && (
           <span
-            className={`absolute top-3 right-3 rounded-full border px-3 py-0.5 text-[0.7rem] font-medium backdrop-blur-sm ${
+            className={`absolute top-3 right-3 rounded-full border px-3 py-0.5 text-[0.7rem] font-medium ${
               statusStyles[project.status] || statusStyles.Completed
             }`}
           >

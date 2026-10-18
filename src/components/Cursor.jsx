@@ -156,15 +156,13 @@ const CursorDesktop = () => {
       return (s && SECTION_COLORS[s.id]) || colorRef.current
     }
 
-    const applyBlur = (b, on) => {
-      if (on) {
-        b.style.backdropFilter = 'blur(4px)'
-        b.style.webkitBackdropFilter = 'blur(4px)'
-      } else {
-        b.style.backdropFilter = 'none'
-        b.style.webkitBackdropFilter = 'none'
-      }
-    }
+    // The idle frosted-glass effect used to toggle a backdrop-filter on the
+    // cursor bubble. Capturing and blurring everything behind an element is
+    // one of the most expensive paint operations a browser performs, and this
+    // one repositions on every single frame — so it forced a full backdrop
+    // re-capture each time the pointer started and stopped moving. The bubble
+    // still reads as glass from its gradients, border and inset highlight.
+    const applyBlur = () => {}
 
     const paintHover = (c) => {
       const b = bubbleRef.current
@@ -172,7 +170,6 @@ const CursorDesktop = () => {
       b.style.background = 'transparent'
       b.style.border = `1.5px solid ${c}55`
       b.style.boxShadow = `0 0 24px ${c}22, 0 0 48px ${c}0c, inset 0 0 12px ${c}10`
-      applyBlur(b, false)
       if (specular1Ref.current) specular1Ref.current.style.opacity = '0'
       if (specular2Ref.current) specular2Ref.current.style.opacity = '0'
       if (specular3Ref.current) specular3Ref.current.style.opacity = '0'
@@ -187,21 +184,22 @@ const CursorDesktop = () => {
     const paintIdle = () => {
       const b = bubbleRef.current
       if (!b) return
+      // Two gradient layers, three shadow layers — matches the JSX default
+      // below, and every one of these is repainted on each frame the cursor
+      // moves, so each layer saved is a real per-frame win.
       b.style.background = isDark
         ? [
             'radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.35) 0%, transparent 50%)',
-            'radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.08) 0%, transparent 40%)',
             'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 70%, transparent 100%)',
           ].join(', ')
         : [
             'radial-gradient(ellipse at 30% 20%, rgba(61,90,115,0.3) 0%, transparent 50%)',
-            'radial-gradient(ellipse at 70% 80%, rgba(74,112,96,0.1) 0%, transparent 40%)',
             'radial-gradient(circle at 50% 50%, rgba(61,90,115,0.15) 0%, rgba(61,90,115,0.04) 70%, transparent 100%)',
           ].join(', ')
       b.style.border = isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid rgba(61,90,115,0.5)'
       b.style.boxShadow = isDark
-        ? 'inset 0 2px 8px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.15), 0 0 20px rgba(0,0,0,0.25), 0 0 12px rgba(61,90,115,0.12), 0 4px 16px rgba(0,0,0,0.15)'
-        : 'inset 0 2px 8px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(61,90,115,0.06), 0 0 20px rgba(61,90,115,0.1), 0 0 0 1px rgba(61,90,115,0.15), 0 4px 16px rgba(0,0,0,0.06)'
+        ? 'inset 0 2px 8px rgba(255,255,255,0.3), 0 0 20px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.15)'
+        : 'inset 0 2px 8px rgba(255,255,255,0.8), 0 0 20px rgba(61,90,115,0.1), 0 4px 16px rgba(0,0,0,0.06)'
       if (specular1Ref.current) specular1Ref.current.style.opacity = '1'
       if (specular2Ref.current) specular2Ref.current.style.opacity = '1'
       if (specular3Ref.current) specular3Ref.current.style.opacity = '1'
@@ -515,25 +513,27 @@ const CursorDesktop = () => {
           height: sh,
           transform,
           willChange: 'transform',
-          transformStyle: 'preserve-3d',
           zIndex: 41,
           overflow: 'visible',
+          // This element repositions on EVERY frame, so everything it paints is
+          // repainted constantly. Deliberately not preserve-3d (its children are
+          // coplanar highlights), two gradients rather than three, and three
+          // shadows rather than five — the hairline inset and the 1px ring were
+          // redundant with the real 2px border.
           background: isDark
             ? [
                 'radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.35) 0%, transparent 50%)',
-                'radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.08) 0%, transparent 40%)',
                 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 70%, transparent 100%)',
               ].join(', ')
             : [
                 'radial-gradient(ellipse at 30% 20%, rgba(61,90,115,0.3) 0%, transparent 50%)',
-                'radial-gradient(ellipse at 70% 80%, rgba(74,112,96,0.1) 0%, transparent 40%)',
                 'radial-gradient(circle at 50% 50%, rgba(61,90,115,0.15) 0%, rgba(61,90,115,0.04) 70%, transparent 100%)',
               ].join(', '),
           border: isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid rgba(61,90,115,0.5)',
           boxShadow: isDark
-            ? 'inset 0 2px 8px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.15), 0 0 20px rgba(0,0,0,0.25), 0 0 12px rgba(61,90,115,0.12), 0 4px 16px rgba(0,0,0,0.15)'
-            : 'inset 0 2px 8px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(61,90,115,0.06), 0 0 20px rgba(61,90,115,0.1), 0 0 0 1px rgba(61,90,115,0.15), 0 4px 16px rgba(0,0,0,0.06)',
-          transition: 'background 0.55s, border 0.55s, box-shadow 0.55s, border-radius 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.45s, backdrop-filter 0.45s',
+            ? 'inset 0 2px 8px rgba(255,255,255,0.3), 0 0 20px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.15)'
+            : 'inset 0 2px 8px rgba(255,255,255,0.8), 0 0 20px rgba(61,90,115,0.1), 0 4px 16px rgba(0,0,0,0.06)',
+          transition: 'background 0.55s, border 0.55s, box-shadow 0.55s, border-radius 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.45s',
         }}
       >
         <div ref={specular1Ref} style={{
