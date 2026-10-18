@@ -49,11 +49,28 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+/* The light-mode hover paints a 65–90% OPAQUE white gradient — a deliberate
+   "lit from behind" lift. Without this override that white fell through to
+   dark mode, turning every glass card into a white slab while its text stayed
+   light, so the copy vanished on hover (About, Projects, Experience, Skills,
+   Certifications, Contact). Mirror the lift with the dark surface instead:
+   denser slate + the same glossy inset rim the light theme gets, so the card
+   still brightens and lifts but the text keeps its contrast. */
 .dark .glass-card:hover {
-  border-color: rgba(61, 90, 115, 0.3);
+  border-color: rgba(61, 90, 115, 0.45);
+  background: linear-gradient(
+    135deg,
+    rgba(30, 41, 59, 0.94) 0%,
+    rgba(30, 41, 59, 0.7) 50%,
+    rgba(30, 41, 59, 0.88) 100%
+  );
   box-shadow:
-    0 24px 60px -16px rgba(61, 90, 115, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 24px 60px -16px rgba(61, 90, 115, 0.22),
+    0 12px 28px -8px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    inset 1px 0 0 rgba(255, 255, 255, 0.05),
+    inset -1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
 .dark .glass-card::before {
@@ -74,6 +91,18 @@ body {
 .dark .tag-glass {
   background: rgba(30, 41, 59, 0.5);
   border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Same gap as .glass-card:hover: the light rule below sets an opaque white
+   and sits LATER in the file at equal specificity, so it beat .dark .tag-glass
+   on hover — filter pills (Certifications tabs, skill tags) flashed white and
+   their text went invisible. One specificity bump restores the dark lift. */
+.dark .tag-glass:hover {
+  background: rgba(30, 41, 59, 0.78);
+  border-color: rgba(61, 90, 115, 0.5);
+  box-shadow:
+    0 4px 12px -2px rgba(61, 90, 115, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .text-light-500, .text-light-600, .text-light-700, .text-light-800, .text-light-900 {
