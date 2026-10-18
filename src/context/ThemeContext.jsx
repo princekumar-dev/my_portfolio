@@ -109,6 +109,7 @@ const setSpreadOrigin = (source) => {
 
 export const ThemeProvider = ({ children }) => {
   const spreadSeqRef = useRef(0)
+  const toggleLockRef = useRef(0)
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme')
@@ -134,6 +135,15 @@ export const ThemeProvider = ({ children }) => {
   // setTimeout arrives with a null target and the wave anchors on <body>.
   const toggleTheme = useCallback(
     (origin) => {
+      // One wave per gesture. A double-click — or an impatient second click
+      // while waitForNavSettle is still resolving — queued a second flip, so
+      // the theme bounced back mid-spread and read as "changing on its own".
+      // Re-triggers inside the spread window are dropped: the view transition
+      // runs ~560ms, the reduced-motion fallback 650ms, so 900ms covers both
+      // plus the pointer's own travel between clicks.
+      const now = performance.now()
+      if (now - toggleLockRef.current < 900) return
+      toggleLockRef.current = now
       const next = !isDark
       const canSpread =
         typeof document !== 'undefined' &&

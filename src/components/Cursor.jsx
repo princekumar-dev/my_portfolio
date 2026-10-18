@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { AnimatePresence, m, useReducedMotion, useSpring, useMotionValue, useMotionTemplate, useTransform } from 'framer-motion'
 import { usePointer } from '../context/PointerContext'
-import { useTheme } from '../context/ThemeContext'
 
 const SECTION_COLORS = {
   home:           '#3D5A73',
@@ -14,6 +13,12 @@ const SECTION_COLORS = {
 }
 
 const SELECTOR = 'a, button, [role="button"], [data-cursor-target], .btn-glass, .tag-glass, .tag-glass-dark'
+// One look in both themes: a solid white dot held off the page by its shadow.
+// White reads on the dark ground; the shadow separates it on the light one —
+// so nothing here depends on the theme, and the cursor's appearance can't
+// drift when the theme toggles.
+const IDLE_SHADOW = '0 4px 14px rgba(15,23,42,0.18), 0 1px 4px rgba(15,23,42,0.12)'
+const HOVER_SHADOW = '0 8px 26px rgba(15,23,42,0.24), 0 2px 8px rgba(15,23,42,0.16)'
 let burstId = 0
 
 const Cursor = () => {
@@ -27,13 +32,8 @@ const CursorDesktop = () => {
   const [visible, setVisible] = useState(false)
   const [bursts, setBursts] = useState([])
   const { clientX, clientY } = usePointer()
-  const { isDark } = useTheme()
 
   const bubbleRef = useRef(null)
-  const specular1Ref = useRef(null)
-  const specular2Ref = useRef(null)
-  const specular3Ref = useRef(null)
-  const ringRef = useRef(null)
   const hoverRef = useRef(false)
   const targetRef = useRef(null)
   const colorRef = useRef('#3D5A73')
@@ -48,7 +48,6 @@ const CursorDesktop = () => {
   const lastFrameTimeRef = useRef(0)
   const lastRadiusRef = useRef('')
 
-  const dotRef = useRef(null)
   const targetRectRef = useRef(null)
   const rafRef = useRef(0)
   const hoveredElRef = useRef(null)
@@ -88,11 +87,6 @@ const CursorDesktop = () => {
   // average frame time, and frames over 33ms jumping from 11% to 45%. The
   // card already carries the tilt; the outline only has to follow it.
   const transform = useMotionTemplate`translate(${sx}px, ${sy}px) translate(-50%, -50%) scale(${revealScale}) rotateZ(${rotateZ}deg)`
-
-  // Highly responsive tracking values for the cursor pointer dot
-  const dx = useSpring(clientX, { stiffness: 900, damping: 32 })
-  const dy = useSpring(clientY, { stiffness: 900, damping: 32 })
-  const dotTransform = useMotionTemplate`translate(${dx}px, ${dy}px) translate(-50%, -50%)`
 
   useEffect(() => {
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return
@@ -174,55 +168,25 @@ const CursorDesktop = () => {
       return (s && SECTION_COLORS[s.id]) || colorRef.current
     }
 
-    const paintHover = (c) => {
+    // White in every state: the swell itself is the hover feedback, so the
+    // cursor never takes a colour from the theme or the section under it.
+    const paintHover = () => {
       const b = bubbleRef.current
       if (!b) return
-      b.style.background = 'transparent'
-      b.style.border = `1.5px solid ${c}55`
-      // One glow rather than three. Box-shadow blur cost scales with the
-      // element's area, and at card size the wide second glow plus the inset
-      // ring were by far the most expensive thing this cursor painted.
-      b.style.boxShadow = `0 0 28px ${c}33`
-      if (specular1Ref.current) specular1Ref.current.style.opacity = '0'
-      if (specular2Ref.current) specular2Ref.current.style.opacity = '0'
-      if (specular3Ref.current) specular3Ref.current.style.opacity = '0'
-      if (ringRef.current) ringRef.current.style.opacity = '0'
-
-      if (dotRef.current) {
-        dotRef.current.style.backgroundColor = c
-        dotRef.current.style.boxShadow = `0 0 4px ${c}`
-      }
+      b.style.background = '#ffffff'
+      b.style.boxShadow = HOVER_SHADOW
     }
 
     const paintIdle = () => {
       const b = bubbleRef.current
       if (!b) return
-      // Two gradient layers, three shadow layers — matches the JSX default
-      // below, and every one of these is repainted on each frame the cursor
-      // moves, so each layer saved is a real per-frame win.
-      b.style.background = isDark
-        ? [
-            'radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.35) 0%, transparent 50%)',
-            'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 70%, transparent 100%)',
-          ].join(', ')
-        : [
-            'radial-gradient(ellipse at 30% 20%, rgba(61,90,115,0.3) 0%, transparent 50%)',
-            'radial-gradient(circle at 50% 50%, rgba(61,90,115,0.15) 0%, rgba(61,90,115,0.04) 70%, transparent 100%)',
-          ].join(', ')
-      b.style.border = isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid rgba(61,90,115,0.5)'
-      b.style.boxShadow = isDark
-        ? 'inset 0 2px 8px rgba(255,255,255,0.3), 0 0 20px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.15)'
-        : 'inset 0 2px 8px rgba(255,255,255,0.8), 0 0 20px rgba(61,90,115,0.1), 0 4px 16px rgba(0,0,0,0.06)'
-      if (specular1Ref.current) specular1Ref.current.style.opacity = '1'
-      if (specular2Ref.current) specular2Ref.current.style.opacity = '1'
-      if (specular3Ref.current) specular3Ref.current.style.opacity = '1'
-      if (ringRef.current) ringRef.current.style.opacity = '0.8'
-
-      const activeColor = isDark ? '#ffffff' : '#3D5A73'
-      if (dotRef.current) {
-        dotRef.current.style.backgroundColor = activeColor
-        dotRef.current.style.boxShadow = isDark ? '0 0 4px rgba(255,255,255,0.6)' : '0 0 4px rgba(61,90,115,0.4)'
-      }
+      // Back to the resting dot. Deliberately no theme read here: this runs
+      // on every hover-out from a mount-time closure, and the old
+      // theme-conditional repaint is what made the cursor snap back to the
+      // previous theme's look after a toggle. The white fill is
+      // theme-independent by construction.
+      b.style.background = '#ffffff'
+      b.style.boxShadow = IDLE_SHADOW
     }
 
     const down = () => {
@@ -446,7 +410,7 @@ const CursorDesktop = () => {
 
       const c = color(t)
       colorRef.current = c
-      paintHover(c)
+      paintHover()
       // Compositor-only reveal: the size itself is applied instantly by the
       // loop, so the transition must not come from animating layout.
       swellReveal.set(0.92)
@@ -509,26 +473,6 @@ const CursorDesktop = () => {
   return (
     <div className="pointer-events-none fixed inset-0 z-[90]" aria-hidden="true">
       <m.div
-        ref={dotRef}
-        style={{
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          width: '4px',
-          height: '4px',
-          borderRadius: '50%',
-          backgroundColor: isDark ? '#ffffff' : '#3D5A73',
-          boxShadow: isDark ? '0 0 4px rgba(255,255,255,0.6)' : '0 0 4px rgba(61,90,115,0.4)',
-          transform: dotTransform,
-          willChange: 'transform',
-          zIndex: 41,
-          pointerEvents: 'none',
-          opacity: 0.4,
-          transition: 'background-color 0.3s, box-shadow 0.3s, opacity 0.3s',
-        }}
-      />
-
-      <m.div
         ref={bubbleRef}
         style={{
           position: 'fixed',
@@ -540,86 +484,16 @@ const CursorDesktop = () => {
           willChange: 'transform',
           zIndex: 41,
           overflow: 'visible',
-          // This element repositions on EVERY frame, so everything it paints is
-          // repainted constantly. Deliberately not preserve-3d (its children are
-          // coplanar highlights), two gradients rather than three, and three
-          // shadows rather than five — the hairline inset and the 1px ring were
-          // redundant with the real 2px border.
-          background: isDark
-            ? [
-                'radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.35) 0%, transparent 50%)',
-                'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 70%, transparent 100%)',
-              ].join(', ')
-            : [
-                'radial-gradient(ellipse at 30% 20%, rgba(61,90,115,0.3) 0%, transparent 50%)',
-                'radial-gradient(circle at 50% 50%, rgba(61,90,115,0.15) 0%, rgba(61,90,115,0.04) 70%, transparent 100%)',
-              ].join(', '),
-          border: isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid rgba(61,90,115,0.5)',
-          boxShadow: isDark
-            ? 'inset 0 2px 8px rgba(255,255,255,0.3), 0 0 20px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.15)'
-            : 'inset 0 2px 8px rgba(255,255,255,0.8), 0 0 20px rgba(61,90,115,0.1), 0 4px 16px rgba(0,0,0,0.06)',
-          // Short paint transitions only. border-radius is deliberately not
-          // eased: it now changes at the same instant as the size, and a
-          // 550ms radius morph on a card-sized layer is a lot of repainting
-          // for something the eye reads as a single snap.
-          transition: 'background 0.18s, border 0.18s, box-shadow 0.18s, opacity 0.3s',
+          // The filled white dot. Solid fill and one shadow pair — no
+          // gradients, no specular children, no conic ring, nothing that
+          // reads the theme. The swell (size set instantly by the loop) is
+          // the only thing that changes on hover: the shadow deepens.
+          background: '#ffffff',
+          border: 'none',
+          boxShadow: IDLE_SHADOW,
+          transition: 'box-shadow 0.18s, opacity 0.3s',
         }}
-      >
-        <div ref={specular1Ref} style={{
-          position: 'absolute',
-          top: '6%',
-          left: '10%',
-          width: '48%',
-          height: '36%',
-          borderRadius: '50%',
-          background: isDark
-            ? 'radial-gradient(ellipse, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 50%, transparent 70%)'
-            : 'radial-gradient(ellipse, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.3) 50%, transparent 70%)',
-          pointerEvents: 'none',
-          transition: 'opacity 0.3s',
-        }} />
-        <div ref={specular2Ref} style={{
-          position: 'absolute',
-          bottom: '12%',
-          right: '14%',
-          width: '30%',
-          height: '22%',
-          borderRadius: '50%',
-          background: isDark
-            ? 'radial-gradient(ellipse, rgba(255,255,255,0.35) 0%, transparent 70%)'
-            : 'radial-gradient(ellipse, rgba(255,255,255,0.4) 0%, transparent 70%)',
-          pointerEvents: 'none',
-          transition: 'opacity 0.3s',
-        }} />
-        <div ref={specular3Ref} style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          width: '20%',
-          height: '15%',
-          borderRadius: '50%',
-          transform: 'translate(-50%, -50%)',
-          background: isDark
-            ? 'radial-gradient(ellipse, rgba(255,255,255,0.15) 0%, transparent 70%)'
-            : 'radial-gradient(ellipse, rgba(255,255,255,0.2) 0%, transparent 70%)',
-          pointerEvents: 'none',
-          transition: 'opacity 0.3s',
-        }} />
-        <div ref={ringRef} style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: 'inherit',
-          background: 'conic-gradient(from 45deg, rgba(61,90,115,0.55), rgba(74,112,96,0.4), rgba(153,107,117,0.55), rgba(58,82,88,0.4), rgba(176,125,98,0.3), rgba(61,90,115,0.55))',
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          padding: '2px',
-          pointerEvents: 'none',
-          opacity: 0.8,
-          transition: 'opacity 0.3s',
-          animation: 'cursorRingSpin 8s linear infinite',
-        }} />
-      </m.div>
+      />
 
       <AnimatePresence>
         {bursts.map((p) => (
