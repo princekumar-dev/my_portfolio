@@ -1169,7 +1169,13 @@ h1 {
   z-index: var(--vt-old-z, 1);
   animation-name: var(--vt-old-anim, none);
   animation-duration: 2s;
-  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  /* (0.4, 0, 0.2, 1) rather than the old (0.65, 0, 0.35, 1): that curve
+     eased in slowly then whipped through the middle at ~2x average
+     velocity — a burst rather than a glide, and it packed the largest
+     clip-path deltas (the heaviest frames, p95 55ms measured) into the
+     tightest window. The gentler curve accelerates softly and settles
+     longer: a calmer front on the eye and on the frame budget. */
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   animation-fill-mode: forwards;
 }
 
@@ -1177,7 +1183,7 @@ h1 {
   z-index: var(--vt-new-z, 999999);
   animation-name: var(--vt-new-anim, themeSpreadNew);
   animation-duration: 2s;
-  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   animation-fill-mode: forwards;
 }
 
@@ -1194,7 +1200,7 @@ h1 {
 
 ::view-transition-group(root) {
   animation-duration: 2s;
-  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reverse direction (dark -> light): the OLD screen wave-shrinks back into the

@@ -19,11 +19,11 @@ const THEME_COLOR = { dark: '#0F172A', light: '#FAFBFC' }
 
 /* Origin + wavefront for the theme spread, measured from the toggle button so
    the ripple grows out of the control the user pressed. The front is an
-   organic "wave": three sine bands whose lobe counts, weights, phases,
-   amplitude and per-point jitter are ALL re-rolled on every toggle, so no two
-   spreads ever share the same flow — each one leaks out in its own random
-   pattern instead of a perfect circle. Both path variants share the same point
-   structure so the browser interpolates them frame-by-frame. */
+   organic "wave": three sine bands whose lobe counts, weights, phases and
+   amplitude are ALL re-rolled on every toggle, so no two spreads ever share
+   the same flow — each one leaks out in its own random pattern instead of a
+   perfect circle. Both path variants share the same point structure so the
+   browser interpolates them frame-by-frame. */
 
 const rand = (min, max) => min + Math.random() * (max - min)
 
@@ -65,18 +65,23 @@ const setSpreadOrigin = (source) => {
   const endRadius = Math.hypot(Math.max(x, vw - x), Math.max(y, vh - y))
 
   // Roll a fresh wavefront: lobe count, band frequencies, band weights,
-  // phases and amplitude — different on every single toggle.
-  const points = 64 + 2 * Math.floor(rand(0, 9)) // 64..80 lobes, always even
+  // phases and amplitude — different on every single toggle. The front is
+  // kept CALM for smoothness: gentler amplitude, a light fine-ripple
+  // weight, and no per-point jitter (the old ±1.5% hand-drawn wobble on
+  // top of a 7-11-lobe fine band made the edge read rough as it traveled).
+  // Fewer points too: the path is re-interpolated every frame of the 2s
+  // spread, so the point count IS the per-frame cost of the effect.
+  const points = 56 + 2 * Math.floor(rand(0, 8)) // 56..70 points, always even
   const p1 = rand(0, Math.PI * 2)
   const p2 = rand(0, Math.PI * 2)
   const p3 = rand(0, Math.PI * 2)
   const k1 = 2 + Math.floor(rand(0, 3)) // 2..4 lobes (slow drift)
   const k2 = 4 + Math.floor(rand(0, 4)) // 4..7 lobes (mid waves)
-  const k3 = 7 + Math.floor(rand(0, 5)) // 7..11 lobes (fine ripples)
-  const w1 = rand(0.3, 0.5)
-  const w2 = rand(0.2, 0.35)
-  const w3 = Math.max(0.15, 1 - w1 - w2) // weights sum to 1 -> w stays in [0,1]
-  const amp = rand(0.28, 0.55)
+  const k3 = 6 + Math.floor(rand(0, 3)) // 6..8 lobes (fine ripples)
+  const w1 = rand(0.4, 0.55)
+  const w3 = rand(0.1, 0.18)
+  const w2 = 1 - w1 - w3 // weights sum to 1 -> w stays in [0,1]
+  const amp = rand(0.2, 0.38)
 
   const radii = []
   for (let i = 0; i < points; i++) {
@@ -86,10 +91,8 @@ const setSpreadOrigin = (source) => {
       w1 * ((1 + Math.sin(th * k1 + p1)) / 2) +
       w2 * ((1 + Math.sin(th * k2 + p2)) / 2) +
       w3 * ((1 + Math.sin(th * k3 + p3)) / 2)
-    // tiny per-point jitter: an irregular, hand-drawn edge on top of the waves
-    const jitter = rand(-0.015, 0.015)
     // clamped at endRadius so every corner stays covered at full spread
-    radii.push(endRadius * Math.max(1, 1 + amp * w + jitter))
+    radii.push(endRadius * Math.max(1, 1 + amp * w))
   }
 
   const build = (rAt) => {
@@ -136,13 +139,16 @@ export const ThemeProvider = ({ children }) => {
   const toggleTheme = useCallback(
     (origin) => {
       // One wave per gesture. A double-click — or an impatient second click
-      // while waitForNavSettle is still resolving — queued a second flip, so
-      // the theme bounced back mid-spread and read as "changing on its own".
-      // Re-triggers inside the spread window are dropped: the view transition
-      // runs ~560ms, the reduced-motion fallback 650ms, so 900ms covers both
-      // plus the pointer's own travel between clicks.
+      // while waitForNavSettle is still resolving — used to queue a second
+      // flip, so the theme bounced back mid-spread and read as "changing on
+      // its own". A running spread blocks re-triggers outright:
+      // data-theme-animating is set before startViewTransition and cleared
+      // only when its animation finishes (~2s), so the gate lasts exactly as
+      // long as the wave. The timestamp covers the no-View-Transitions
+      // fallback (650ms) and same-gesture double-fire.
+      if (document.documentElement.hasAttribute('data-theme-animating')) return
       const now = performance.now()
-      if (now - toggleLockRef.current < 900) return
+      if (now - toggleLockRef.current < 700) return
       toggleLockRef.current = now
       const next = !isDark
       const canSpread =

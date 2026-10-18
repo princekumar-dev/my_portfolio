@@ -71,8 +71,13 @@ const CursorDesktop = () => {
 
   const posX = useMotionValue(-100)
   const posY = useMotionValue(-100)
-  const sx = useSpring(posX, { stiffness: 180, damping: 18 })
-  const sy = useSpring(posY, { stiffness: 180, damping: 18 })
+  // Tight, critically damped tracking: critical damping for k=700 is
+  // 2*sqrt(700) ≈ 53. The old 180/18 was UNDERdamped (critical would be
+  // 26.8) — slow to settle and it overshot, which read as the cursor
+  // trailing and wobbling behind the pointer: measured 89.5px mean lag on
+  // a 1000px/s sweep, max 139px.
+  const sx = useSpring(posX, { stiffness: 700, damping: 53 })
+  const sy = useSpring(posY, { stiffness: 700, damping: 53 })
 
   // Size is set INSTANTLY, never sprung. Animating width/height makes the
   // browser re-run layout and re-raster this layer — its gradients, its
@@ -98,10 +103,11 @@ const CursorDesktop = () => {
   // card already carries the tilt; the outline only has to follow it.
   const transform = useMotionTemplate`translate(${sx}px, ${sy}px) translate(-50%, -50%) scale(${revealScale}) rotateZ(${rotateZ}deg)`
 
-  // Highly responsive tracking values for the cursor pointer dot
-  const dx = useSpring(clientX, { stiffness: 900, damping: 32 })
-  const dy = useSpring(clientY, { stiffness: 900, damping: 32 })
-  const dotTransform = useMotionTemplate`translate(${dx}px, ${dy}px) translate(-50%, -50%)`
+  // The dot rides the SAME spring as the orb. It used to have its own
+  // (900/32 vs the orb's 180/18), so in flight it raced ahead of the orb
+  // by up to ~120px — a visible second object drifting beside the cursor
+  // instead of sitting in its centre. Glued to sx/sy it can't separate.
+  const dotTransform = useMotionTemplate`translate(${sx}px, ${sy}px) translate(-50%, -50%)`
 
   useEffect(() => {
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return
@@ -294,11 +300,16 @@ const CursorDesktop = () => {
           }
           targetRectRef.current = r
         }
-        const ecx = r.centerX
-        const ecy = r.centerY
-
-        if (ecx !== lastPosX.current) { posX.set(ecx); lastPosX.current = ecx }
-        if (ecy !== lastPosY.current) { posY.set(ecy); lastPosY.current = ecy }
+        // Follow the POINTER, never the target's centre. Pinning the swell
+        // to the card centre made it sit still while the pointer crossed
+        // the card — mean 33px off the pointer, and the dot up to 109px
+        // off the orb — reading as the cursor lagging behind, then swim
+        // across after the pointer on leave. Only the SIZE and radius come
+        // from the target.
+        const cx = clientX.get()
+        const cy = clientY.get()
+        if (cx !== lastPosX.current) { posX.set(cx); lastPosX.current = cx }
+        if (cy !== lastPosY.current) { posY.set(cy); lastPosY.current = cy }
         // Instant, never sprung — see the note by targetW. On a device that
         // can't afford the swell, the bubble simply stays its resting size.
         const w = liteRef.current ? 20 : r.width + 8
