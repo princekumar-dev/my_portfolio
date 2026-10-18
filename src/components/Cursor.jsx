@@ -106,6 +106,16 @@ const CursorDesktop = () => {
     const find = (el) => {
       let n = el
       while (n && n !== document.body) {
+        // A disabled control is inert: its whole subtree must not trigger a
+        // hover morph, and we must not fall through to an interactive ancestor
+        // (otherwise the cursor swells to the entire form once the send button
+        // disables itself) — and it never fires the mouseout that would
+        // otherwise release tracking.
+        if (n.disabled || n.getAttribute?.('aria-disabled') === 'true') return null
+        // Explicit escape hatch: a container can opt out of hover tracking
+        // (used while the contact form is busy, so the cursor stops swelling
+        // to the whole card when the toast shifts layout underneath it).
+        if (n.hasAttribute?.('data-cursor-disabled')) return null
         if (n.matches?.(SELECTOR)) return n
         n = n.parentElement
       }
@@ -446,6 +456,7 @@ const CursorDesktop = () => {
     document.addEventListener('mouseover', over, { passive: true })
     document.addEventListener('mouseout', out, { passive: true })
     document.addEventListener('certificate-modal-open', resetHover)
+    document.addEventListener('cursor-reset', resetHover)
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onResize, { passive: true })
     document.addEventListener('visibilitychange', onVisibilityChange)
@@ -459,6 +470,7 @@ const CursorDesktop = () => {
       document.removeEventListener('mouseover', over)
       document.removeEventListener('mouseout', out)
       document.removeEventListener('certificate-modal-open', resetHover)
+      document.removeEventListener('cursor-reset', resetHover)
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onResize)
       document.removeEventListener('visibilitychange', onVisibilityChange)

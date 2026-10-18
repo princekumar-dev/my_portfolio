@@ -6,8 +6,10 @@ import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
 
 const statusStyles = {
-  Completed: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30',
-  'In Progress': 'bg-amber-500/15 text-amber-600 border-amber-500/30',
+  Completed:
+    'bg-emerald-50 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-400 border-emerald-500/40',
+  'In Progress':
+    'bg-amber-50 dark:bg-amber-900 text-amber-800 dark:text-amber-400 border-amber-500/40',
 }
 
 const containerVariants = {
@@ -127,24 +129,29 @@ const ProjectCard = memo(({ project, itemVariants }) => (
               href={project.github}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`${project.title} source code (opens in new tab)`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-slate ml-1.5"
+              className="flex items-center gap-2 px-4 py-3 rounded-lg btn-glass text-accent-slate ml-1.5"
             >
               <FiGithub size={18} />
-              <span className="text-sm font-semibold">Code</span>
+              <span className="text-sm font-semibold">Source code</span>
             </m.a>
-            {project.liveUrl && (
+            {/* Advertise a demo only when it is a real deployment. Five of the
+                six projects had liveUrl identical to github, so the button
+                promised a running site and delivered the repository again. */}
+            {project.liveUrl && project.liveUrl !== project.github && (
               <m.a
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={`${project.title} live demo (opens in new tab)`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg btn-glass text-accent-slate"
+                className="flex items-center gap-2 px-4 py-3 rounded-lg btn-glass text-accent-slate"
               >
                 <FiExternalLink size={18} />
-                <span className="text-sm font-semibold">Live Demo</span>
+                <span className="text-sm font-semibold">Live demo</span>
               </m.a>
             )}
           </div>
@@ -158,7 +165,7 @@ const ProjectCard = memo(({ project, itemVariants }) => (
 ProjectCard.displayName = 'ProjectCard'
 
 const Projects = () => {
-  const { ref, slow, fast } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy' })
+  const { ref, slow, fast } = useSectionParallax({ slowDistance: 50, fastDistance: 110 })
   const [touchDevice] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
 
   const itemVariants = touchDevice ? mobileItemVariants : desktopItemVariants
@@ -183,11 +190,8 @@ const Projects = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="eyebrow text-accent-slate">Selected work</span>
-          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
-            <span className="animated-gradient-text">
-              Featured Projects
-            </span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-light-900">
+            Featured Projects
           </h2>
         </m.div>
 

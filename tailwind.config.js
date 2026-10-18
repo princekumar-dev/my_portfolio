@@ -15,8 +15,7 @@ export default {
         accent: ['Sora', 'ui-sans-serif', 'sans-serif']
       },
       letterSpacing: {
-        tightest: '-0.03em',
-        eyebrow: '0.22em'
+        tightest: '-0.03em'
       },
       colors: {
         light: {

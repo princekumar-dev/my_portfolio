@@ -4,6 +4,17 @@ import { FiChevronRight } from 'react-icons/fi'
 import { experienceData } from '../data/experienceData'
 import { useSectionParallax } from '../hooks/useSectionParallax'
 
+/* The initials tile carries white 14px bold, so its accent must clear
+   WCAG AA (4.5:1) at full opacity. The old `accent + 'cc'` alpha faded
+   the hue toward the card instead — washing sage to 4.2:1 and rose to
+   3.0:1. Darken the hue to keep the depth rather than fading it out. */
+const shade = (hex, amount) => {
+  const n = parseInt(hex.slice(1), 16)
+  const ch = (v) => Math.max(0, Math.min(255, Math.round(v * (1 + amount))))
+  const to2 = (v) => v.toString(16).padStart(2, '0')
+  return `#${to2(ch(n >> 16))}${to2(ch((n >> 8) & 255))}${to2(ch(n & 255))}`
+}
+
 const isTouchDevice = () =>
   typeof window !== 'undefined' &&
   ('ontouchstart' in window || navigator.maxTouchPoints > 0)
@@ -21,7 +32,7 @@ const MetroidBeam = ({ scrollYProgress }) => {
 
       <m.div
         style={{ scaleY: beamScaleY, transformOrigin: 'top', willChange: 'transform' }}
-        className="absolute top-0 w-full h-full rounded-full bg-gradient-to-b from-accent-slate via-accent-sage to-accent-rose opacity-100 shadow-[0_0_8px_rgba(61,90,115,0.5)]"
+        className="absolute top-0 w-full h-full rounded-full bg-gradient-to-b from-accent-slate via-accent-sage to-accent-rose opacity-100 shadow-[0_3px_10px_rgba(61,90,115,0.45)]"
       />
       <m.div
         style={{ scaleY: beamScaleY, transformOrigin: 'top', willChange: 'transform' }}
@@ -75,7 +86,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
           opacity: dotOpacity,
           backgroundColor: accent,
           borderColor: accent,
-          boxShadow: `0 0 12px ${accent}88`,
+          boxShadow: `0 4px 12px -3px ${accent}88`,
           willChange: 'transform',
         }}
       />
@@ -91,7 +102,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
             <div className="flex items-start gap-4 mb-4">
               <div
                 className="shrink-0 flex h-12 w-12 items-center justify-center rounded-xl font-bold text-sm text-white shadow-lg"
-                style={{ background: `linear-gradient(135deg, ${accent}, ${accent}cc)` }}
+                style={{ background: `linear-gradient(135deg, ${shade(accent, -0.15)}, ${shade(accent, -0.3)})` }}
               >
                 {getInitials(exp.company)}
               </div>
@@ -103,7 +114,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
                 <div className="flex items-center gap-3 mt-1">
                   <p className="text-light-500 text-sm">{exp.company}</p>
                   {exp.duration.includes('Present') && (
-                    <span className="badge-shimmer inline-flex rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-0.5 text-[0.65rem] font-semibold text-green-600">
+                    <span className="badge-shimmer inline-flex rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-0.5 text-[0.75rem] font-semibold text-green-700 dark:text-green-400">
                       Current
                     </span>
                   )}
@@ -111,7 +122,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
               </div>
             </div>
 
-            <p className="text-light-600 mb-4 text-sm leading-relaxed">{exp.description}</p>
+            <p className="text-light-600 mb-4 max-w-[62ch] text-sm leading-relaxed">{exp.description}</p>
 
             <div className="card-reveal-wrap">
               <div className="card-reveal-content">
@@ -119,7 +130,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
                   {exp.achievements.map((achievement, idx) => (
                     <li
                       key={idx}
-                      className="text-light-600 text-sm flex items-start"
+                      className="text-light-600 text-sm flex max-w-[62ch] items-start"
                     >
                       <FiChevronRight className="mr-3 mt-0.5 shrink-0" size={14} style={{ color: accent }} />
                       {achievement}
@@ -151,7 +162,7 @@ const ExperienceCard = memo(({ exp, index, scrollYProgress, total, touchDevice }
 ExperienceCard.displayName = 'ExperienceCard'
 
 const Experience = () => {
-  const { ref, smooth } = useSectionParallax({ fastDistance: 100, preset: 'default' })
+  const { ref, smooth } = useSectionParallax({ fastDistance: 100 })
   const [touchDevice] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
 
   return (
@@ -165,23 +176,13 @@ const Experience = () => {
 
       <div className="max-w-4xl mx-auto relative z-10 px-2 sm:px-0">
         <div className="text-center mb-12 sm:mb-16">
-          <m.span
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="eyebrow text-accent-slate block"
-          >
-            Where I've worked
-          </m.span>
           <m.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold"
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-light-900"
           >
-            <span className="animated-gradient-text">
-              Experience
-            </span>
+            Experience
           </m.h2>
         </div>
 

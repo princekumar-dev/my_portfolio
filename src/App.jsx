@@ -38,7 +38,7 @@ class ErrorBoundary extends Component {
             <p className="text-light-600 mb-6">An unexpected error occurred. Please refresh the page.</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-gradient-to-r from-accent-slate to-accent-sage text-light-900 rounded-full font-semibold"
+              className="px-6 py-3 bg-gradient-to-r from-accent-slate to-accent-sage text-white rounded-full font-semibold"
             >
               Reload Page
             </button>

@@ -1,11 +1,5 @@
 import { useRef } from 'react'
-import { useScroll, useSpring, useTransform, useReducedMotion, useInView, useMotionValue } from 'framer-motion'
-
-const PRESETS = {
-  snappy:  { stiffness: 200, damping: 35, restDelta: 0.001 },
-  default: { stiffness: 120, damping: 35, restDelta: 0.001 },
-  soft:    { stiffness: 80,  damping: 30, restDelta: 0.001 },
-}
+import { useScroll, useTransform, useReducedMotion, useInView, useMotionValue } from 'framer-motion'
 
 const isTouchDevice = () =>
   typeof window !== 'undefined' &&
@@ -14,7 +8,6 @@ const isTouchDevice = () =>
 export function useSectionParallax({
   slowDistance = 60,
   fastDistance = 120,
-  preset = 'default',
   opacityFade = false,
 } = {}) {
   const ref = useRef(null)
@@ -29,8 +22,11 @@ export function useSectionParallax({
     offset: ['start end', 'end start'],
   })
 
-  const springConfig = PRESETS[preset] || PRESETS.default
-  const smooth = useSpring(scrollYProgress, springConfig)
+  // Deliberately NOT wrapped in a spring. Lenis already smooths the wheel
+  // input, so a spring here made the parallax trail the scroll position on
+  // top of that — the visible lag — and, because springs keep ticking after
+  // motion stops, six of them kept writing styles for ~1s after you did.
+  const smooth = scrollYProgress
 
   const away = touchDevice || reduceMotion || !isNear
 

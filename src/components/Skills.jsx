@@ -51,11 +51,11 @@ const SkillCard = memo(({ skill, touchDevice, itemVariants }) => {
         </m.div>
       </div>
 
-      <h3 className="text-light-800 font-accent font-semibold text-sm">{skill.name}</h3>
+      <h4 className="text-light-800 font-accent font-semibold text-sm">{skill.name}</h4>
       {skill.level && (
         <>
           <span
-            className={`mt-1.5 inline-block rounded-full border px-2.5 py-0.5 text-[0.65rem] font-medium ${
+            className={`mt-1.5 inline-block rounded-full border px-2.5 py-0.5 text-[0.75rem] font-medium ${
               levelStyles[skill.level] || levelStyles.Intermediate
             }`}
           >
@@ -80,7 +80,7 @@ const ProgressBar = ({ level, percent }) => {
         initial={{ scaleX: 0 }}
         animate={isInView ? { scaleX: percent / 100 } : { scaleX: 0 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        className={`h-full w-full rounded-full bg-gradient-to-r shadow-[0_0_6px_rgba(61,90,115,0.3)] ${levelBarColors[level] || levelBarColors.Intermediate}`}
+        className={`h-full w-full rounded-full bg-gradient-to-r shadow-[0_3px_8px_rgba(61,90,115,0.3)] ${levelBarColors[level] || levelBarColors.Intermediate}`}
         style={{ transformOrigin: 'left' }}
       />
     </div>
@@ -116,7 +116,7 @@ const mobileItemVariants = {
 }
 
 const Skills = () => {
-  const { ref, slow, fast } = useSectionParallax({ slowDistance: 50, fastDistance: 110, preset: 'snappy' })
+  const { ref, slow, fast } = useSectionParallax({ slowDistance: 50, fastDistance: 110 })
   const [touchDevice, setTouchDevice] = useState(false)
 
   useEffect(() => {
@@ -150,11 +150,8 @@ const Skills = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="eyebrow text-accent-slate">What I work with</span>
-          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
-            <span className="animated-gradient-text">
-              Skills &amp; Technologies
-            </span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-light-900">
+            Skills &amp; Technologies
           </h2>
         </m.div>
 

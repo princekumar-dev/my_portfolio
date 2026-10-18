@@ -76,16 +76,41 @@ const Navigation = () => {
 
   useEffect(() => {
     let ticking = false
+    // Direction must survive a frame where scrollY doesn't move. Lenis glides
+    // in sub-pixel steps, so scrollY regularly holds still for a frame while
+    // the page is still in motion — treating that as "direction changed" is
+    // what made the bar pop back out and then tuck away again when you
+    // stopped scrolling.
+    const pending = { sign: 0, total: 0 }
+
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
           const currentY = window.scrollY
-          const nextDir = currentY > lastScrollY.current && currentY > 80 ? 'down' : 'up'
-          setScrollDir((prev) => (prev === nextDir ? prev : nextDir))
+          const delta = currentY - lastScrollY.current
+
+          // React only to real movement, and require a short committed run of
+          // it before reversing — 1-2px of wheel jitter on a reversal can no
+          // longer flip the bar back and forth frame by frame.
+          if (Math.abs(delta) >= 1) {
+            const sign = Math.sign(delta)
+            if (sign !== pending.sign) {
+              pending.sign = sign
+              pending.total = 0
+            }
+            pending.total += delta
+
+            if (Math.abs(pending.total) >= 10) {
+              const nextDir = pending.total > 0 && currentY > 80 ? 'down' : 'up'
+              setScrollDir((prev) => (prev === nextDir ? prev : nextDir))
+              pending.total = 0
+            }
+            lastScrollY.current = currentY
+          }
+
           const rawDepth = Math.min(currentY / 400, 1)
           const quantized = Math.round(rawDepth * 4) / 4
           setScrollDepth((prev) => (prev === quantized ? prev : quantized))
-          lastScrollY.current = currentY
           ticking = false
         })
         ticking = true

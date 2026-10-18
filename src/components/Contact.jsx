@@ -1,4 +1,4 @@
-import { m } from 'framer-motion'
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FiMail, FiLinkedin, FiGithub, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi'
 import { SiInstagram } from 'react-icons/si'
 import { useState, useRef, memo } from 'react'
@@ -6,6 +6,7 @@ import { useSectionParallax } from '../hooks/useSectionParallax'
 import TiltCard from './TiltCard'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -101,11 +102,98 @@ const ContactLink = memo(({ link }) => {
 
 ContactLink.displayName = 'ContactLink'
 
+// ── Easter egg ───────────────────────────────────────────────────────────────
+// A sender on this list gets a subtle pastel heart-particle flourish on success.
+const SPECIAL_SENDERS = ['preethiy694@gmail.com']
+
+const HEART_D =
+  'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'
+const SPARKLE_D = 'M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z'
+
+const PASTEL_TONES = [
+  '#f3b8c6', '#efc3d4', '#e8bcd0',
+  '#f6cfc0', '#dcc4ea', '#cfd9ea',
+]
+
+const makeHearts = (n = 18) =>
+  Array.from({ length: n }, (_, i) => {
+    const sparkle = i % 5 === 0
+    return {
+      id: i,
+      sparkle,
+      // fan out from the button instead of stacking in one column
+      x: (Math.random() - 0.5) * 340,
+      sway: (Math.random() - 0.5) * 80,
+      y: -(70 + Math.random() * 200),
+      size: sparkle ? 7 + Math.random() * 6 : 10 + Math.random() * 14,
+      rot: (Math.random() - 0.5) * 60,
+      delay: Math.random() * 0.7,
+      duration: 2 + Math.random() * 1.4,
+      color: PASTEL_TONES[i % PASTEL_TONES.length],
+      opacity: 0.7 + Math.random() * 0.3,
+    }
+  })
+
+const HEARTS = makeHearts()
+
+const HeartBurst = memo(({ reduced }) => (
+  <div
+    className="pointer-events-none absolute inset-x-0 z-30 overflow-visible"
+    style={{ bottom: '-3.25rem' }}
+    data-heart-burst=""
+    aria-hidden="true"
+  >
+    <AnimatePresence>
+      {HEARTS.map((h) => (
+        <m.svg
+          key={h.id}
+          viewBox="0 0 24 24"
+          width={h.size}
+          height={h.size}
+          className="absolute left-1/2 bottom-0"
+          style={{
+            marginLeft: -h.size / 2,
+            filter: 'drop-shadow(0 2px 6px rgba(153,107,117,0.22))',
+          }}
+          initial={{ opacity: 0, y: 0, x: 0, scale: 0.15, rotate: 0 }}
+          animate={
+            reduced
+              ? { opacity: 0, y: 0, x: 0, scale: 0.15 }
+              : {
+                  opacity: [0, h.opacity, h.opacity * 0.8, 0],
+                  y: [0, h.y * 0.6, h.y],
+                  x: [0, h.sway * 0.3, h.x + h.sway],
+                  scale: [0.15, 1, 1, 0.75],
+                  rotate: [0, h.rot * 0.5, h.rot],
+                }
+          }
+          exit={{ opacity: 0 }}
+          transition={{
+            duration: reduced ? 0.4 : h.duration,
+            delay: h.delay,
+            ease: 'easeOut',
+            times: [0, 0.28, 0.72, 1],
+          }}
+        >
+          <path d={h.sparkle ? SPARKLE_D : HEART_D} fill={h.color} />
+        </m.svg>
+      ))}
+    </AnimatePresence>
+  </div>
+))
+
+HeartBurst.displayName = 'HeartBurst'
+
+
 const Contact = () => {
-  const { ref, fast } = useSectionParallax({ fastDistance: 100, preset: 'soft' })
+  const { ref, fast } = useSectionParallax({ fastDistance: 100 })
   const [formState, setFormState] = useState('idle')
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [errors, setErrors] = useState({})
+  const [statusMsg, setStatusMsg] = useState('')
+  const [special, setSpecial] = useState(false)
+  const [sentName, setSentName] = useState('')
+  const prefersReduced = useReducedMotion()
   const formRef = useRef(null)
 
   const validate = () => {
@@ -125,26 +213,70 @@ const Contact = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validate()) return
+
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
+    if (!accessKey) {
+      setFormState('error')
+      setStatusMsg('Contact form is not configured yet — add VITE_WEB3FORMS_ACCESS_KEY to your .env file.')
+      setTimeout(() => { setFormState('idle'); setStatusMsg('') }, 6000)
+      return
+    }
+
     setFormState('sending')
+    setStatusMsg('')
+    // The submit button becomes disabled, which swallows the mouseout that
+    // would normally release the cursor's hover tracking — release it manually.
+    document.dispatchEvent(new CustomEvent('cursor-reset'))
 
-    const submission = { ...formData, timestamp: new Date().toISOString() }
+    try {
+      const res = await fetch(WEB3FORMS_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: accessKey,
+          subject: `New message from your portfolio — ${formData.name}`,
+          from_name: 'Portfolio Contact Form',
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          replyto: formData.email,
+          // Honeypot: hidden anti-bot field. Real users never set it.
+          botcheck: false,
+        }),
+      })
 
-    setTimeout(() => {
-      try {
-        const existing = JSON.parse(localStorage.getItem('contact_messages') || '[]')
-        existing.push(submission)
-        localStorage.setItem('contact_messages', JSON.stringify(existing))
-      } catch { /* localStorage unavailable */ }
-      console.log('Message received:', submission)
+      const data = await res.json().catch(() => ({ success: false, message: 'Unexpected response from server.' }))
+      if (!res.ok || !data.success) throw new Error(data.message || 'Something went wrong. Please try again.')
+
+      const senderEmail = formData.email.trim().toLowerCase()
+      const isSpecial = SPECIAL_SENDERS.includes(senderEmail)
+      const firstName = formData.name.trim().split(/\s+/)[0]
 
       setFormState('sent')
+      setSpecial(isSpecial)
+      setSentName(firstName)
+      setStatusMsg(
+        isSpecial
+          ? `Got it, ${firstName}. This one made my day.`
+          : 'Your message is in my inbox — I will get back to you soon.'
+      )
       setFormData({ name: '', email: '', message: '' })
       setErrors({})
-      setTimeout(() => setFormState('idle'), 3000)
-    }, 1200)
+      setTimeout(() => {
+        setFormState('idle')
+        setStatusMsg('')
+        setSpecial(false)
+        setSentName('')
+      }, 4600)
+    } catch (err) {
+      setSpecial(false)
+      setFormState('error')
+      setStatusMsg(err?.message || 'Failed to send. Please email me directly instead.')
+      setTimeout(() => { setFormState('idle'); setStatusMsg('') }, 6000)
+    }
   }
 
   return (
@@ -164,11 +296,8 @@ const Contact = () => {
           viewport={{ once: true }}
         >
           <m.div variants={itemVariants} className="text-center">
-            <span className="eyebrow text-accent-slate">Let's talk</span>
-            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8">
-              <span className="animated-gradient-text">
-                Get In Touch
-              </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-light-900">
+              Get In Touch
             </h2>
           </m.div>
 
@@ -191,11 +320,19 @@ const Contact = () => {
             </m.div>
 
             <m.div variants={itemVariants}>
-              <form ref={formRef} onSubmit={handleSubmit} className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4 sm:space-y-5" data-cursor-target="card" noValidate>
+              <form
+                ref={formRef}
+                onSubmit={handleSubmit}
+                className="glass-card glass-edge rounded-2xl p-6 sm:p-8 space-y-4 sm:space-y-5"
+                data-cursor-target="card"
+                data-cursor-disabled={formState !== 'idle' ? 'true' : undefined}
+                noValidate
+              >
                 <div className="floating-label-group rounded-xl" data-cursor-target="card">
                   <input
                     id="contact-name"
                     type="text"
+                    required
                     placeholder=" "
                     autoComplete="name"
                     value={formData.name}
@@ -214,6 +351,7 @@ const Contact = () => {
                   <input
                     id="contact-email"
                     type="email"
+                    required
                     placeholder=" "
                     autoComplete="email"
                     value={formData.email}
@@ -231,6 +369,7 @@ const Contact = () => {
                 <div className="floating-label-group rounded-xl" data-cursor-target="card">
                   <textarea
                     id="contact-message"
+                    required
                     placeholder=" "
                     rows={4}
                     maxLength={1000}
@@ -252,20 +391,148 @@ const Contact = () => {
                   </div>
                 </div>
 
+                <div className="relative">
+                  <AnimatePresence mode="wait">
+                    {statusMsg && (
+                      <m.div
+                        key={formState}
+                        role="status"
+                        aria-live="polite"
+                        initial={{ opacity: 0, y: 14, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                        className={`relative overflow-hidden rounded-2xl border backdrop-blur-md ${
+                          formState === 'error'
+                            ? 'border-red-400/35 bg-gradient-to-br from-red-400/15 via-transparent to-red-300/10 shadow-[0_12px_32px_-16px_rgba(220,90,90,0.55)]'
+                            : special
+                              ? 'border-accent-rose/30 bg-gradient-to-br from-accent-rose/18 via-transparent to-accent-sand/12 shadow-[0_12px_32px_-16px_rgba(153,107,117,0.6)]'
+                              : 'border-accent-sage/30 bg-gradient-to-br from-accent-sage/15 via-transparent to-accent-slate/10 shadow-[0_12px_32px_-16px_rgba(74,112,96,0.5)]'
+                        }`}
+                      >
+                        {/* one-shot sheen sweep */}
+                        {!prefersReduced && (
+                          <m.span
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3"
+                            style={{ background: 'linear-gradient(100deg, transparent, rgba(255,255,255,0.5), transparent)' }}
+                            initial={{ x: '0%' }}
+                            animate={{ x: '430%' }}
+                            transition={{ duration: 1.5, delay: 0.15, ease: 'easeInOut' }}
+                          />
+                        )}
+
+                        <div className="relative flex items-start gap-3 px-4 py-3.5">
+                          <span
+                            className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border ${
+                              formState === 'error'
+                                ? 'border-red-400/40 bg-red-500/15 text-red-600 dark:text-red-300'
+                                : special
+                                  ? 'border-accent-rose/40 bg-accent-rose/15 text-accent-rose'
+                                  : 'border-accent-sage/40 bg-accent-sage/15 text-accent-sage'
+                            }`}
+                          >
+                            {formState === 'error' ? (
+                              <FiAlertCircle size={15} />
+                            ) : (
+                              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
+                                <m.path
+                                  d="M4.5 12.5l4.5 4.5 10-10"
+                                  stroke="currentColor"
+                                  strokeWidth="2.6"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  initial={{ pathLength: 0 }}
+                                  animate={{ pathLength: 1 }}
+                                  transition={{ duration: 0.45, delay: 0.2, ease: 'easeOut' }}
+                                />
+                              </svg>
+                            )}
+                          </span>
+
+                          <div className="min-w-0 flex-1">
+                            <p className={`text-sm font-bold tracking-tight ${
+                              formState === 'error'
+                                ? 'text-red-600 dark:text-red-300'
+                                : special
+                                  ? 'text-accent-rose'
+                                  : 'text-accent-sage'
+                            }`}>
+                              {formState === 'error' ? "Couldn't send" : special ? 'Sent with love' : 'Message sent'}
+                            </p>
+                            <p className="mt-0.5 text-xs leading-relaxed text-light-600 dark:text-light-400">
+                              {statusMsg}
+                            </p>
+                          </div>
+
+                          {/* drawn-then-filled heart, easter egg only */}
+                          {special && formState === 'sent' && (
+                            <m.svg
+                              viewBox="0 0 24 24"
+                              className="mt-0.5 h-4 w-4 shrink-0 text-accent-rose"
+                              initial={{ scale: 0, rotate: -12 }}
+                              animate={{ scale: [0, 1.3, 1], rotate: 0 }}
+                              transition={{ duration: 0.6, delay: 0.35, ease: 'easeOut' }}
+                              aria-hidden="true"
+                            >
+                              <m.path
+                                d={HEART_D}
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                initial={{ pathLength: 0, opacity: 1 }}
+                                animate={{ pathLength: 1, opacity: 0 }}
+                                transition={{ duration: 0.85, delay: 0.3, ease: 'easeInOut' }}
+                              />
+                              <m.path
+                                d={HEART_D}
+                                fill="currentColor"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.4, delay: 0.65 }}
+                              />
+                            </m.svg>
+                          )}
+                        </div>
+
+                        {/* draining timer bar */}
+                        <m.div
+                          aria-hidden="true"
+                          className={`absolute bottom-0 left-0 h-[2px] w-full origin-left ${
+                            formState === 'error'
+                              ? 'bg-red-400/70'
+                              : special
+                                ? 'bg-accent-rose/70'
+                                : 'bg-accent-sage/70'
+                          }`}
+                          initial={{ scaleX: 1 }}
+                          animate={{ scaleX: 0 }}
+                          transition={{ duration: formState === 'error' ? 6 : 4.6, ease: 'linear' }}
+                        />
+                      </m.div>
+                    )}
+                  </AnimatePresence>
+
+                  {special && formState === 'sent' && <HeartBurst reduced={prefersReduced} />}
+                </div>
+
                 <m.button
                   type="submit"
                   disabled={formState !== 'idle'}
                   whileHover={formState === 'idle' ? { scale: 1.02 } : {}}
                   whileTap={formState === 'idle' ? { scale: 0.98 } : {}}
+                  aria-busy={formState === 'sending'}
                   data-cursor-target="card"
                   className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
                     formState === 'sent'
-                      ? 'bg-green-500 text-white'
+                      ? special
+                        ? 'bg-[#7f545f] text-white shadow-lg shadow-accent-rose/30'
+                        : 'bg-green-700 text-white shadow-lg shadow-green-500/30'
                       : formState === 'error'
-                        ? 'bg-red-500 text-white'
+                        ? 'bg-red-600 text-white'
                         : formState !== 'idle'
                           ? 'bg-accent-slate/50 text-light-900 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-accent-slate to-accent-sage text-light-900 shadow-lg shadow-accent-slate/20 hover:shadow-xl hover:shadow-accent-slate/40'
+                          : 'bg-gradient-to-r from-accent-slate to-accent-sage text-white shadow-lg shadow-accent-slate/20 hover:shadow-xl hover:shadow-accent-slate/40'
                   }`}
                   aria-live="polite"
                 >

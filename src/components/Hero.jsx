@@ -307,7 +307,10 @@ const Hero = () => {
     target: sectionRef,
     offset: ['start start', 'end start'],
   })
-  const smooth = useSpring(scrollYProgress, { stiffness: 150, damping: 35 })
+  // Not spring-wrapped: Lenis already smooths the wheel input, so a spring on
+  // top of that only made the hero trail the scroll and keep ticking for ~1s
+  // after it stopped. Raw progress tracks the scroll 1:1.
+  const smooth = scrollYProgress
 
   const blobsY = useTransform(smooth, [0, 1], [0, 200])
   const gridY = useTransform(smooth, [0, 1], [0, 60])
@@ -324,7 +327,7 @@ const Hero = () => {
       id="home"
       className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-16 sm:pt-20"
     >
-      <m.div style={{ y: isMobile ? mobileGridY : gridY }} className={`pointer-events-none absolute inset-0 z-0 ${isMobile ? 'opacity-[0.15]' : 'opacity-[0.4]'}`}>
+      <m.div style={{ y: isMobile ? mobileGridY : gridY, willChange: 'transform' }} className={`pointer-events-none absolute inset-0 z-0 ${isMobile ? 'opacity-[0.15]' : 'opacity-[0.4]'}`}>
         <div
           className="absolute inset-0"
           style={{
@@ -338,7 +341,7 @@ const Hero = () => {
       <ParticleCanvas isMobile={isMobile} />
 
       {!isMobile && (
-      <m.div style={{ y: blobsY }} className="absolute inset-0 z-0">
+      <m.div style={{ y: blobsY, willChange: 'transform' }} className="absolute inset-0 z-0">
         <div className="absolute top-16 left-10 w-72 h-72 bg-accent-slate/20 rounded-full blur-lg" />
         <div className="absolute bottom-24 right-10 w-72 h-72 bg-accent-sage/20 rounded-full blur-lg" />
         <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-accent-rose/15 rounded-full blur-lg" />
@@ -350,7 +353,7 @@ const Hero = () => {
         variants={heroContainerVariants}
         initial="hidden"
         animate="visible"
-        style={{ y: isMobile ? mobileContentY : contentY, opacity: isMobile ? mobileContentOpacity : contentOpacity, perspective: 1000 }}
+        style={{ y: isMobile ? mobileContentY : contentY, opacity: isMobile ? mobileContentOpacity : contentOpacity, perspective: 1000, willChange: 'transform' }}
         className="relative z-10 text-center px-4 max-w-4xl"
       >
         <m.div variants={heroItemVariants} className="mb-6 flex justify-center">
@@ -365,15 +368,11 @@ const Hero = () => {
                 <span className="absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-60" style={{ animation: 'pulseRing 8s ease-out infinite' }} />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
               </span>
-              <span className="text-sm font-semibold text-green-600 tracking-wide" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <span className="text-sm font-semibold text-green-700 dark:text-green-400 tracking-wide" style={{ fontFamily: 'Sora, sans-serif' }}>
                 Open to Opportunities
               </span>
             </m.div>
           )}
-        </m.div>
-
-        <m.div variants={heroItemVariants} className="mb-6">
-          <span className="eyebrow text-accent-slate">Welcome to my portfolio</span>
         </m.div>
 
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-light-900">
@@ -416,7 +415,7 @@ const Hero = () => {
         >
           <MagneticButton
             href="#projects"
-            className="px-8 py-3 bg-gradient-to-r from-accent-slate to-accent-sage text-light-900 rounded-full font-semibold shadow-lg shadow-accent-slate/20 hover:shadow-xl hover:shadow-accent-slate/40 transition-shadow"
+            className="px-8 py-3 bg-gradient-to-r from-accent-slate to-accent-sage text-white rounded-full font-semibold shadow-lg shadow-accent-slate/20 hover:shadow-xl hover:shadow-accent-slate/40 transition-shadow"
           >
             View My Work
           </MagneticButton>

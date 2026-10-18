@@ -93,7 +93,7 @@ const itemVariants = {
 }
 
 const About = () => {
-  const { ref, slow, fast } = useSectionParallax({ slowDistance: 60, fastDistance: 100, preset: 'soft' })
+  const { ref, slow, fast } = useSectionParallax({ slowDistance: 60, fastDistance: 100 })
 
   return (
     <m.section ref={ref} id="about" className="relative py-12 sm:py-24 px-3 sm:px-4">
@@ -116,11 +116,8 @@ const About = () => {
           viewport={{ once: true }}
         >
           <m.div variants={itemVariants} className="text-center mb-12">
-            <span className="eyebrow text-accent-slate">Who I am</span>
-            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
-              <span className="animated-gradient-text">
-                About Me
-              </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-light-900">
+              About Me
             </h2>
           </m.div>
 

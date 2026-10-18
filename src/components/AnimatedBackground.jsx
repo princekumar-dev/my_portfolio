@@ -24,11 +24,10 @@ const AnimatedBackground = () => {
   const mx = useSpring(nx, { stiffness: 50, damping: 25 })
   const my = useSpring(ny, { stiffness: 50, damping: 25 })
 
-  const scroll = useSpring(scrollYProgress, {
-    stiffness: 150,
-    damping: 35,
-    restDelta: 0.001,
-  })
+  // Raw scroll progress, not a spring: Lenis already smooths the wheel input,
+  // so spring-wrapping it again only made these layers trail the scroll (and
+  // keep writing styles ~1s after motion stopped).
+  const scroll = scrollYProgress
 
   const mouseScale = reduceMotion ? 0 : 1
   const scrollScale = reduceMotion ? 0 : 1
@@ -50,7 +49,7 @@ const AnimatedBackground = () => {
       style={{ contain: 'layout style paint' }}
     >
       <m.div
-        style={{ y: gridY }}
+        style={{ y: gridY, willChange: 'transform' }}
         className="absolute inset-0 opacity-[0.35]"
       >
         <div

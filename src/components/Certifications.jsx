@@ -146,7 +146,7 @@ const CertCard = memo(({ cert, onOpen }) => (
           <button
             type="button"
             onClick={() => onOpen(cert)}
-            className="inline-flex items-center gap-1.5 rounded-lg text-sm font-semibold text-accent-slate hover:text-accent-sage transition-colors"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-accent-slate hover:text-accent-sage transition-colors"
           >
             <FiMaximize2 size={15} aria-hidden="true" />
             View
@@ -321,11 +321,8 @@ const Certifications = () => {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <span className="eyebrow text-accent-slate">Recognitions</span>
-          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold">
-            <span className="animated-gradient-text">
-              Certifications
-            </span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-light-900">
+            Certifications
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-light-600 text-sm sm:text-base">
             Every entry below is backed by the original document — select a card to view the
@@ -342,7 +339,7 @@ const Certifications = () => {
               aria-pressed={active === tab}
               className={`rounded-full border px-4 py-1.5 text-xs sm:text-sm font-semibold transition-colors duration-300 ${
                 active === tab
-                  ? 'border-transparent bg-gradient-to-r from-accent-slate to-accent-sage text-light-900 shadow-md shadow-accent-slate/25'
+                  ? 'border-transparent bg-gradient-to-r from-accent-slate to-accent-sage text-white shadow-md shadow-accent-slate/25'
                   : 'tag-glass text-accent-slate hover:border-accent-slate/40'
               }`}
             >

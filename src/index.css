@@ -85,6 +85,23 @@ body {
 .dark .text-light-800 { color: #f1f5f9; }
 .dark .text-light-900 { color: #f8fafc; }
 
+/* ── Accent text contrast ─────────────────────────────
+   The accent hues are tuned as fills. Used as *text*, rose and
+   sand fall to 3.0–3.9:1 on their own 10–15% chips, and every
+   accent lands near 2.5:1 on the dark page (slate #3D5A73 on
+   #0f172a is 2.47:1). Lift the text instances only — fills,
+   borders and gradients keep the original token. */
+.text-accent-rose { color: #845c65; }
+.text-accent-sand { color: #8a5a41; }
+
+.dark .text-accent-slate { color: #9db4c9; }
+.dark .text-accent-sage  { color: #86b79f; }
+.dark .text-accent-rose  { color: #d9a3b2; }
+.dark .text-accent-sand  { color: #e0b394; }
+/* escaped so a hover still wins over the blanket rule above */
+.dark .hover\:text-accent-sage:hover { color: #86b79f; }
+.dark .hover\:text-accent-slate:hover { color: #9db4c9; }
+
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-weight: 700;
@@ -94,14 +111,6 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   letter-spacing: -0.025em;
-}
-
-.eyebrow {
-  font-family: 'Sora', sans-serif;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
-  font-size: 0.8rem;
 }
 
 ::-webkit-scrollbar {
@@ -259,19 +268,27 @@ h1 {
     rgba(61, 90, 115, 0.4)
   );
   background-size: 300% 300%;
+  /* matches the animation's final keyframe exactly, so ending the flourish
+     (or removing it on unhover) never shifts the border's gradient */
+  background-position: 0% 50%;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.6s ease;
   pointer-events: none;
-  animation: edgeShimmer 5s ease infinite;
-  animation-play-state: paused;
 }
 
+/* One sweep per hover rather than an infinite loop. background-position is
+   not compositor-driven, so an infinite shimmer repaints this masked border
+   every frame for as long as the card is hovered — measured at ~15ms/frame
+   even with the pointer parked perfectly still. A single 2.8s pass reads as
+   the same premium edge-light, then rests on its 100% keyframe (0% 50%),
+   which is also the element's resting background-position, so the settle is
+   seamless. Base `animation: none` is what restarts it on every re-hover. */
 .glass-edge:hover::after {
   opacity: 1;
-  animation-play-state: running;
+  animation: edgeShimmer 2.8s ease 1 both;
 }
 
 @keyframes edgeShimmer {
@@ -324,10 +341,6 @@ h1 {
 /* Reduced animation mode — less ambient motion for performance */
 .reduce-animations .aurora-blob,
 .reduce-animations .aurora-blob-alt {
-  animation: none;
-}
-
-.reduce-animations .animated-gradient-text {
   animation: none;
 }
 
@@ -622,14 +635,18 @@ h1 {
   z-index: 3;
 }
 
-/* Dynamic shadow — CSS-driven via --mx-raw/--my-raw (zero JS string compute) */
+/* Dynamic shadow — CSS-driven via --mx-raw/--my-raw (zero JS string compute).
+   Resting state carries a real downward offset so elevation reads as depth,
+   not as a zero-offset chromatic halo (craft floor). */
 .glass-card .card-shadow {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   box-shadow:
-    calc(var(--mx-raw, 0) * 40px) calc(var(--my-raw, 0) * 40px) 25px rgba(0, 0, 0, 0.2),
-    calc(var(--mx-raw, 0) * 16px) calc(var(--my-raw, 0) * 16px) 10px rgba(58, 82, 88, 0.08);
+    calc(var(--mx-raw, 0) * 40px) calc(var(--my-raw, 0) * 40px + 10px) 30px -8px
+      rgba(0, 0, 0, 0.2),
+    calc(var(--mx-raw, 0) * 16px) calc(var(--my-raw, 0) * 16px + 4px) 14px -4px
+      rgba(58, 82, 88, 0.1);
   contain: layout style paint;
   z-index: 0;
 }
@@ -659,13 +676,15 @@ h1 {
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
-  animation: borderRotate 4s linear infinite;
-  animation-play-state: paused;
 }
 
+/* Same reasoning as .glass-edge above: --border-angle is an animated
+   registered custom property, so an infinite rotation repaints the conic
+   border gradient every frame while hovered. One 2.4s revolution lands on
+   360deg, which is identical to the 0deg initial value. */
 .animated-border:hover::before {
   opacity: 1;
-  animation-play-state: running;
+  animation: borderRotate 2.4s linear 1 both;
 }
 
 @keyframes borderRotate {
@@ -746,7 +765,7 @@ h1 {
 .floating-label-group input,
 .floating-label-group textarea {
   width: 100%;
-  padding: 1.25rem 1rem 0.5rem;
+  padding: 2rem 1rem 0.6rem;
   font-size: 1rem;
   border: 1.5px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
@@ -771,7 +790,7 @@ h1 {
   top: 50%;
   transform: translateY(-50%);
   font-size: 1rem;
-  color: #9ca3af;
+  color: #6b7280;
   pointer-events: none;
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
               opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -780,7 +799,7 @@ h1 {
 }
 
 .floating-label-group textarea ~ label {
-  top: 1.25rem;
+  top: 2rem;
   transform: translateY(0);
 }
 
@@ -788,7 +807,7 @@ h1 {
 .floating-label-group input:not(:placeholder-shown) ~ label,
 .floating-label-group textarea:focus ~ label,
 .floating-label-group textarea:not(:placeholder-shown) ~ label {
-  top: 0.55rem;
+  top: 0.25rem;
   transform: translateY(0) scale(0.75);
   color: #577590;
   font-weight: 600;
@@ -807,7 +826,16 @@ h1 {
 }
 
 .dark .floating-label-group label {
-  color: #64748b;
+  color: #94a3b8;
+}
+
+/* Floated label must invert for dark surfaces too — the light-mode
+   #577590 fails against a dark input, so it needs its own override. */
+.dark .floating-label-group input:focus ~ label,
+.dark .floating-label-group input:not(:placeholder-shown) ~ label,
+.dark .floating-label-group textarea:focus ~ label,
+.dark .floating-label-group textarea:not(:placeholder-shown) ~ label {
+  color: #cbd5e1;
 }
 
 /* Nav auto-hide */
@@ -831,50 +859,6 @@ h1 {
   syntax: '<angle>';
   initial-value: 0deg;
   inherits: false;
-}
-
-.animated-gradient-text {
-  position: relative;
-  display: inline-block;
-  background: linear-gradient(
-    90deg,
-    #3D5A73 0%,
-    #4A7060 25%,
-    #996B75 45%,
-    rgba(255, 255, 255, 0.8) 50%,
-    #996B75 55%,
-    #4A7060 75%,
-    #3D5A73 100%
-  );
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientTextShimmer 5s ease-in-out infinite;
-}
-
-.animated-gradient-text::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.25) 45%,
-    rgba(255, 255, 255, 0.25) 55%,
-    transparent 70%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shimmerSweep 4s ease-in-out infinite 1s;
-  pointer-events: none;
-}
-
-@keyframes gradientTextShimmer {
-  0%, 100% { background-position: 200% center; }
-  50% { background-position: 0% center; }
 }
 
 /* Aurora mesh gradient — GPU-composited only */
@@ -1113,14 +1097,6 @@ h1 {
 /* ── Mobile Overrides ──────────────────────────────── */
 
 @media (pointer: coarse) {
-  .animated-gradient-text {
-    animation: none;
-  }
-
-  .animated-gradient-text::after {
-    animation: none;
-  }
-
   .aurora-blob,
   .aurora-blob-alt {
     animation: none;
@@ -1223,35 +1199,6 @@ html.theme-fallback body *::after {
   background-image: linear-gradient(135deg, #0b1220 0%, #0f172a 50%, #0b1220 100%);
 }
 
-/* Section headings: lighter stops so gradient text stays legible on dark */
-.dark .animated-gradient-text {
-  background: linear-gradient(
-    90deg,
-    #9dc0d6 0%,
-    #8fd2b0 25%,
-    #e2b3bf 45%,
-    rgba(255, 255, 255, 0.95) 50%,
-    #e2b3bf 55%,
-    #8fd2b0 75%,
-    #9dc0d6 100%
-  );
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.dark .animated-gradient-text::after {
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.16) 45%,
-    rgba(255, 255, 255, 0.16) 55%,
-    transparent 70%
-  );
-  background-size: 200% 100%;
-}
-
 /* Card media fades into the surface colour so titles stay readable */
 .media-overlay {
   background: linear-gradient(
@@ -1285,8 +1232,6 @@ html.theme-fallback body *::after {
    moving, then resume the moment scrolling settles (see SmoothScrollContext). */
 html.is-scrolling .hero-shimmer::after,
 html.is-scrolling .badge-shimmer::after,
-html.is-scrolling .animated-gradient-text,
-html.is-scrolling .animated-gradient-text::after,
 html.is-scrolling .shimmer,
 html.is-scrolling .float-slow,
 html.is-scrolling .float-medium,
