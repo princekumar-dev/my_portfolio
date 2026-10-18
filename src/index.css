@@ -547,29 +547,31 @@ h1 {
 :root {
   /* Matches .text-light-900 per theme — hero and section titles both use it. */
   --shimmer-base: linear-gradient(#111827, #111827);
-  /* The travelling highlight itself. A narrow bright core with soft shoulders:
-     white reads as a gloss where it passes over the dark base. */
+  /* The travelling highlight. Near-opaque core with a wide, strong falloff:
+     as it crosses, the glyphs lift almost to paper-white — a gloss you notice,
+     not a whisper of sheen. */
   --shimmer-sheen: linear-gradient(
     102deg,
-    rgba(255, 255, 255, 0) 36%,
-    rgba(255, 255, 255, 0.22) 46%,
-    rgba(255, 255, 255, 0.55) 50%,
-    rgba(255, 255, 255, 0.22) 54%,
-    rgba(255, 255, 255, 0) 64%
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.5) 43%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.5) 57%,
+    rgba(255, 255, 255, 0) 70%
   );
 }
 .dark {
   --shimmer-base: linear-gradient(#f8fafc, #f8fafc);
-  /* White sheen would be invisible here — it composites over near-white text
-     and disappears. Cool the sheen toward ice-blue instead: same motion, but
-     the hue shift against the #f8fafc base is what makes it register. */
+  /* White at ANY alpha composites over this near-white base and vanishes —
+     value contrast does not exist up there. Switch axis: a saturated rose core
+     (the site's pink accent family) cuts across #f8fafc by HUE instead,
+     landing as a vivid pink glint as it travels. */
   --shimmer-sheen: linear-gradient(
     102deg,
-    rgba(165, 220, 255, 0) 36%,
-    rgba(165, 220, 255, 0.3) 46%,
-    rgba(165, 220, 255, 0.72) 50%,
-    rgba(165, 220, 255, 0.3) 54%,
-    rgba(165, 220, 255, 0) 64%
+    rgba(255, 164, 200, 0) 30%,
+    rgba(255, 164, 200, 0.5) 43%,
+    rgba(255, 164, 200, 0.92) 50%,
+    rgba(255, 164, 200, 0.5) 57%,
+    rgba(255, 164, 200, 0) 70%
   );
 }
 
@@ -584,7 +586,7 @@ h1 {
   -webkit-text-fill-color: transparent;
   /* linear, not ease-in-out: the extremes of this sweep sit off the element,
      and an eased run would crawl through exactly those invisible tails. */
-  animation: shimmerSweep 9s linear infinite;
+  animation: shimmerSweep 6s linear infinite;
   animation-delay: 1.2s;
 }
 
@@ -613,7 +615,7 @@ h1 {
   overflow: hidden;
   --shimmer-base: linear-gradient(#15803d, #15803d);
   box-shadow: inset 0 0 0 100vmax rgba(74, 222, 128, 0.07);
-  animation-duration: 13s;
+  animation-duration: 8s;
   animation-delay: 2s;
 }
 .dark .badge-shimmer {
