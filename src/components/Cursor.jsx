@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { AnimatePresence, m, useReducedMotion, useSpring, useMotionValue, useMotionTemplate } from 'framer-motion'
+import { AnimatePresence, m, useReducedMotion, useSpring, useMotionValue, useMotionTemplate, useTransform } from 'framer-motion'
 import { usePointer } from '../context/PointerContext'
 import { useTheme } from '../context/ThemeContext'
 import { useTiltContext } from '../context/TiltContext'
@@ -41,8 +41,14 @@ const CursorDesktop = () => {
   const colorRef = useRef('#3D5A73')
   const borderRadiusRef = useRef('50%')
   const lastMoveTime = useRef(0)
-  const blurActiveRef = useRef(false)
   const isTiltCardRef = useRef(false)
+  // Adaptive suppression: if this device keeps dropping frames while the
+  // hover swell is on screen, drop the swell for the rest of the session
+  // rather than stay janky.
+  const liteRef = useRef(false)
+  const slowFramesRef = useRef(0)
+  const lastFrameTimeRef = useRef(0)
+  const lastRadiusRef = useRef('')
 
   const dotRef = useRef(null)
   const targetRectRef = useRef(null)
@@ -61,13 +67,18 @@ const CursorDesktop = () => {
   const sx = useSpring(posX, { stiffness: 180, damping: 18 })
   const sy = useSpring(posY, { stiffness: 180, damping: 18 })
 
+  // Size is set INSTANTLY, never sprung. Animating width/height makes the
+  // browser re-run layout and re-raster this layer — its gradients, its
+  // shadows and all four child elements — on every single frame of the
+  // transition, which is exactly what made hovering a card hitch. The reveal
+  // is carried by opacity and transform instead, both compositor-only.
   const targetW = useMotionValue(20)
   const targetH = useMotionValue(20)
-  const sw = useSpring(targetW, { stiffness: 200, damping: 25 })
-  const sh = useSpring(targetH, { stiffness: 200, damping: 25 })
+  const swellReveal = useSpring(0.92, { stiffness: 260, damping: 26 })
 
   const scaleVal = useMotionValue(1)
   const smoothScale = useSpring(scaleVal, { stiffness: 300, damping: 20 })
+  const revealScale = useTransform([smoothScale, swellReveal], ([a, b]) => a * b)
 
   const tiltXVal = useMotionValue(0)
   const tiltYVal = useMotionValue(0)
@@ -75,7 +86,7 @@ const CursorDesktop = () => {
   const tiltX = useSpring(tiltXVal, { stiffness: 300, damping: 30 })
   const tiltY = useSpring(tiltYVal, { stiffness: 300, damping: 30 })
   const rotateZ = useSpring(rotateZVal, { stiffness: 300, damping: 30 })
-  const transform = useMotionTemplate`translate(${sx}px, ${sy}px) translate(-50%, -50%) scale(${smoothScale}) perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotateZ(${rotateZ}deg)`
+  const transform = useMotionTemplate`translate(${sx}px, ${sy}px) translate(-50%, -50%) scale(${revealScale}) perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotateZ(${rotateZ}deg)`
 
   // Highly responsive tracking values for the cursor pointer dot
   const dx = useSpring(clientX, { stiffness: 900, damping: 32 })
@@ -85,6 +96,12 @@ const CursorDesktop = () => {
   useEffect(() => {
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return
     setVisible(true)
+
+    // Up-front capability floor: on a machine with very few cores or very
+    // little memory the swell is suppressed before it ever renders, so the
+    // cursor stays fluid instead of stuttering into existence.
+    if ((navigator.hardwareConcurrency || 8) <= 2) liteRef.current = true
+    if (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 2) liteRef.current = true
 
     let resizeObserver = null
     if (typeof window.ResizeObserver !== 'undefined') {
@@ -156,20 +173,15 @@ const CursorDesktop = () => {
       return (s && SECTION_COLORS[s.id]) || colorRef.current
     }
 
-    // The idle frosted-glass effect used to toggle a backdrop-filter on the
-    // cursor bubble. Capturing and blurring everything behind an element is
-    // one of the most expensive paint operations a browser performs, and this
-    // one repositions on every single frame — so it forced a full backdrop
-    // re-capture each time the pointer started and stopped moving. The bubble
-    // still reads as glass from its gradients, border and inset highlight.
-    const applyBlur = () => {}
-
     const paintHover = (c) => {
       const b = bubbleRef.current
       if (!b) return
       b.style.background = 'transparent'
       b.style.border = `1.5px solid ${c}55`
-      b.style.boxShadow = `0 0 24px ${c}22, 0 0 48px ${c}0c, inset 0 0 12px ${c}10`
+      // One glow rather than three. Box-shadow blur cost scales with the
+      // element's area, and at card size the wide second glow plus the inset
+      // ring were by far the most expensive thing this cursor painted.
+      b.style.boxShadow = `0 0 28px ${c}33`
       if (specular1Ref.current) specular1Ref.current.style.opacity = '0'
       if (specular2Ref.current) specular2Ref.current.style.opacity = '0'
       if (specular3Ref.current) specular3Ref.current.style.opacity = '0'
@@ -240,9 +252,9 @@ const CursorDesktop = () => {
       if (resizeObserver) resizeObserver.disconnect()
       borderRadiusRef.current = '50%'
       hoverRef.current = false
-      blurActiveRef.current = false
       isTiltCardRef.current = false
       hoveredElRef.current = null
+      swellReveal.set(0.92)
       paintIdle()
     }
 
@@ -276,8 +288,12 @@ const CursorDesktop = () => {
 
         if (ecx !== lastPosX.current) { posX.set(ecx); lastPosX.current = ecx }
         if (ecy !== lastPosY.current) { posY.set(ecy); lastPosY.current = ecy }
-        if (r.width + 8 !== lastW.current) { targetW.set(r.width + 8); lastW.current = r.width + 8 }
-        if (r.height + 8 !== lastH.current) { targetH.set(r.height + 8); lastH.current = r.height + 8 }
+        // Instant, never sprung — see the note by targetW. On a device that
+        // can't afford the swell, the bubble simply stays its resting size.
+        const w = liteRef.current ? 20 : r.width + 8
+        const h = liteRef.current ? 20 : r.height + 8
+        if (w !== lastW.current) { targetW.set(w); lastW.current = w }
+        if (h !== lastH.current) { targetH.set(h); lastH.current = h }
 
         const isMoving = (performance.now() - lastPointerTime.current) < 100
         if (isTiltCard) {
@@ -302,7 +318,12 @@ const CursorDesktop = () => {
         }
 
         const b = bubbleRef.current
-        if (b) b.style.borderRadius = borderRadiusRef.current
+        // Only write when the value actually changes: writing the same
+        // borderRadius every frame forces a style recalc 60x a second.
+        if (b && lastRadiusRef.current !== borderRadiusRef.current) {
+          b.style.borderRadius = borderRadiusRef.current
+          lastRadiusRef.current = borderRadiusRef.current
+        }
       } else {
         tiltX.set(0)
         tiltY.set(0)
@@ -310,16 +331,6 @@ const CursorDesktop = () => {
 
         const now = performance.now()
         const isIdle = now - lastMoveTime.current > 200
-
-        if (isIdle && !blurActiveRef.current) {
-          const b = bubbleRef.current
-          if (b && !hoverRef.current) applyBlur(b, true)
-          blurActiveRef.current = true
-        } else if (!isIdle && blurActiveRef.current) {
-          const b = bubbleRef.current
-          if (b) applyBlur(b, false)
-          blurActiveRef.current = false
-        }
 
         if (!isIdle) {
           bobT += 0.022
@@ -334,12 +345,31 @@ const CursorDesktop = () => {
         if (lastH.current !== 20) { targetH.set(20); lastH.current = 20 }
 
         const b = bubbleRef.current
-        if (b) b.style.borderRadius = '50%'
+        if (b && lastRadiusRef.current !== '50%') {
+          b.style.borderRadius = '50%'
+          lastRadiusRef.current = '50%'
+        }
       }
 
       const now = performance.now()
-      const isIdle = now - lastMoveTime.current > 2000
-      if (isIdle && !tgt) {
+
+      // Adaptive suppression. If the device keeps dropping to under ~25fps
+      // while the swell is on screen it cannot afford the effect — shrink
+      // back to the plain orb for the rest of the session rather than stay
+      // janky.
+      if (tgt) {
+        const dt = now - lastFrameTimeRef.current
+        lastFrameTimeRef.current = now
+        if (dt > 40) slowFramesRef.current += 1
+        if (slowFramesRef.current > 10 && !liteRef.current) {
+          liteRef.current = true
+          lastW.current = -1
+          lastH.current = -1
+        }
+      }
+
+      const idleLong = now - lastMoveTime.current > 2000
+      if (idleLong && !tgt) {
         loopRunning = false
         return
       }
@@ -423,9 +453,11 @@ const CursorDesktop = () => {
 
       const c = color(t)
       colorRef.current = c
-      const b = bubbleRef.current
-      if (b) applyBlur(b, false)
       paintHover(c)
+      // Compositor-only reveal: the size itself is applied instantly by the
+      // loop, so the transition must not come from animating layout.
+      swellReveal.set(0.92)
+      requestAnimationFrame(() => swellReveal.set(1))
       hoveredElRef.current = t
     }
 
@@ -442,9 +474,9 @@ const CursorDesktop = () => {
         borderRadiusRef.current = '50%'
       }
       hoverRef.current = false
-      blurActiveRef.current = false
       isTiltCardRef.current = false
       hoveredElRef.current = null
+      swellReveal.set(0.92)
       paintIdle()
     }
 
@@ -509,8 +541,8 @@ const CursorDesktop = () => {
           position: 'fixed',
           left: 0,
           top: 0,
-          width: sw,
-          height: sh,
+          width: targetW,
+          height: targetH,
           transform,
           willChange: 'transform',
           zIndex: 41,
@@ -533,7 +565,11 @@ const CursorDesktop = () => {
           boxShadow: isDark
             ? 'inset 0 2px 8px rgba(255,255,255,0.3), 0 0 20px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.15)'
             : 'inset 0 2px 8px rgba(255,255,255,0.8), 0 0 20px rgba(61,90,115,0.1), 0 4px 16px rgba(0,0,0,0.06)',
-          transition: 'background 0.55s, border 0.55s, box-shadow 0.55s, border-radius 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.45s',
+          // Short paint transitions only. border-radius is deliberately not
+          // eased: it now changes at the same instant as the size, and a
+          // 550ms radius morph on a card-sized layer is a lot of repainting
+          // for something the eye reads as a single snap.
+          transition: 'background 0.18s, border 0.18s, box-shadow 0.18s, opacity 0.3s',
         }}
       >
         <div ref={specular1Ref} style={{
