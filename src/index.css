@@ -309,15 +309,24 @@ h1 {
 .float-medium { animation: floaty 10s ease-in-out infinite; }
 .float-fast { animation: floaty 8s ease-in-out infinite; }
 
+/* The float used to combine translateY with a sub-degree rotate. That rotate
+   is not cosmetic-free: the wrapper holds a card with a perspective/rotateX
+   tilt, and rotating the wrapper re-projects its 3D child every animation
+   frame — measured as the single thing capping a card sweep at 30fps, because
+   a card you have just left resumes floating while its tilt spring is still
+   settling back to zero. Translation is uniform, so it composites without
+   re-projecting anything. will-change puts the wrapper's own animation on a
+   layer so a moving float never re-rasterises the card beneath it. */
 @keyframes tiltFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-3px) rotate(0.3deg); }
-  66% { transform: translateY(1.5px) rotate(-0.2deg); }
+  0%, 100% { transform: translateY(0); }
+  33% { transform: translateY(-3px); }
+  66% { transform: translateY(1.5px); }
 }
 
 .tilt-float {
   animation: tiltFloat 15s ease-in-out infinite;
   animation-play-state: running;
+  will-change: transform;
 }
 
 .tilt-float:hover {
