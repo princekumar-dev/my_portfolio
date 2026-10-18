@@ -55,6 +55,9 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [scrollDir, setScrollDir] = useState('up')
   const [scrollDepth, setScrollDepth] = useState(0)
+  // Set by the toggle (and nav links) to force the bar out of its auto-hid
+  // state so the click target is on-screen before anything snapshots it.
+  const [forceShow, setForceShow] = useState(false)
   const active = useActiveSection(sectionIds)
   const { isDark, toggleTheme } = useTheme()
   const lenisRef = useSmoothScroll()
@@ -103,6 +106,10 @@ const Navigation = () => {
             if (Math.abs(pending.total) >= 10) {
               const nextDir = pending.total > 0 && currentY > 80 ? 'down' : 'up'
               setScrollDir((prev) => (prev === nextDir ? prev : nextDir))
+              // A real downward scroll re-arms auto-hide. The reveal is only
+              // meant to survive long enough for the click that asked for it
+              // (and its snapshot) to land on a bar that is actually on screen.
+              if (nextDir === 'down') setForceShow(false)
               pending.total = 0
             }
             lastScrollY.current = currentY
@@ -161,6 +168,7 @@ const Navigation = () => {
 
   const scrollToSection = useCallback((href) => {
     document.body.style.overflow = ''
+    setForceShow(true)
     if (lenisRef?.current?.scrollTo) {
       lenisRef.current.scrollTo(href, { offset: -80, duration: 1.8 })
     } else {
@@ -180,7 +188,7 @@ const Navigation = () => {
       aria-label="Main navigation"
       initial={{ y: -100 }}
       animate={{
-        y: scrollDir === 'down' && scrollDepth > 0.1 ? -100 : 0,
+        y: scrollDir === 'down' && scrollDepth > 0.1 && !forceShow ? -100 : 0,
       }}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className="fixed w-full z-50 transition-[border-color] duration-500"
@@ -242,7 +250,23 @@ const Navigation = () => {
             <m.button
               whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
-              onClick={toggleTheme}
+              onClick={(e) => {
+                // The bar auto-hides on scroll-down. If it's tucked away when
+                // the toggle is hit, startViewTransition would snapshot it
+                // off-screen and the theme wave would grow from a button the
+                // user can't see — reading as "nothing happened". Reveal it and
+                // wait for the 0.3s settle before handing off to the spread, so
+                // the wave always blooms out of a visible control. (The toggle
+                // is only reachable when the bar is on-screen, so this is a
+                // no-op for mouse users — it matters for touch, where the bar
+                // can be mid-hide as a swipe passes over the control.)
+                if (scrollDir === 'down' && scrollDepth > 0.1) {
+                  setForceShow(true)
+                  window.setTimeout(() => toggleTheme(e), 320)
+                } else {
+                  toggleTheme(e)
+                }
+              }}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
               className="p-2.5 sm:p-2 rounded-full text-light-600 hover:text-accent-slate hover:bg-accent-slate/10 transition-colors duration-200"
             >
