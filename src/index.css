@@ -547,32 +547,25 @@ h1 {
 :root {
   /* Matches .text-light-900 per theme — hero and section titles both use it. */
   --shimmer-base: linear-gradient(#111827, #111827);
-  /* The travelling highlight. Near-opaque core with a wide, strong falloff:
-     as it crosses, the glyphs lift almost to paper-white — a gloss you notice,
-     not a whisper of sheen. */
+  /* The travelling highlight: green -> teal -> pink, the same colour family as
+     the Skills level bars (accent-sage / accent-slate / accent-rose), vivid
+     siblings so it actually reads on text. One gradient serves BOTH themes —
+     over the dark base the hues brighten the glyphs, over the near-white dark
+     base they saturate it, so contrast comes from hue either way. Alpha ramps
+     to 0 at both ends (same hue, not 'transparent') to keep the fringes clean,
+     hits 0.92 at the core, and the stops span wide enough that the band lays
+     the full green-to-pink ramp across the word as it crosses. */
   --shimmer-sheen: linear-gradient(
     102deg,
-    rgba(255, 255, 255, 0) 30%,
-    rgba(255, 255, 255, 0.5) 43%,
-    rgba(255, 255, 255, 0.95) 50%,
-    rgba(255, 255, 255, 0.5) 57%,
-    rgba(255, 255, 255, 0) 70%
+    rgba(74, 222, 128, 0) 28%,
+    rgba(74, 222, 128, 0.55) 40%,
+    rgba(45, 212, 191, 0.92) 50%,
+    rgba(244, 114, 182, 0.55) 60%,
+    rgba(244, 114, 182, 0) 72%
   );
 }
 .dark {
   --shimmer-base: linear-gradient(#f8fafc, #f8fafc);
-  /* White at ANY alpha composites over this near-white base and vanishes —
-     value contrast does not exist up there. Switch axis: a saturated rose core
-     (the site's pink accent family) cuts across #f8fafc by HUE instead,
-     landing as a vivid pink glint as it travels. */
-  --shimmer-sheen: linear-gradient(
-    102deg,
-    rgba(255, 164, 200, 0) 30%,
-    rgba(255, 164, 200, 0.5) 43%,
-    rgba(255, 164, 200, 0.92) 50%,
-    rgba(255, 164, 200, 0.5) 57%,
-    rgba(255, 164, 200, 0) 70%
-  );
 }
 
 .hero-shimmer,
