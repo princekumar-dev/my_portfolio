@@ -116,7 +116,7 @@ const About = () => {
           viewport={{ once: true }}
         >
           <m.div variants={itemVariants} className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-light-900">
+            <h2 className="text-shimmer text-3xl sm:text-4xl md:text-5xl font-bold text-light-900">
               About Me
             </h2>
           </m.div>

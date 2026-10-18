@@ -321,7 +321,7 @@ const Certifications = () => {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-light-900">
+          <h2 className="text-shimmer text-3xl sm:text-4xl md:text-5xl font-bold text-light-900">
             Certifications
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-light-600 text-sm sm:text-base">

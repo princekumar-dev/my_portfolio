@@ -386,11 +386,9 @@ h1 {
   animation: none;
 }
 
-.reduce-animations .hero-shimmer::after {
-  animation: none;
-}
-
-.reduce-animations .badge-shimmer::after {
+.reduce-animations .hero-shimmer,
+.reduce-animations .text-shimmer,
+.reduce-animations .badge-shimmer {
   animation: none;
 }
 
@@ -535,31 +533,54 @@ h1 {
   }
 }
 
-/* Hero text shimmer sweep */
-.hero-shimmer {
-  position: relative;
+/* ── Glyph-clipped text shimmer ─────────────────────
+   The sweep used to be an absolutely positioned ::after laid across the
+   element's entire BOX (inset: 0) with mix-blend-mode: overlay. Over text
+   that reads as a pale rectangle sitting on the words rather than a shine
+   crossing them: the band is opaque everywhere the box is — including the gaps
+   between and around the glyphs — so the eye picks out a box, not a glint.
+   Paint the sweep as a background and clip it to the element's own text, so
+   the highlight can only ever land on letterforms. A flat base-colour layer
+   rides underneath: with text-fill transparent that layer is what keeps the
+   glyphs legible everywhere the sheen is not, and it makes the heading paint
+   its ordinary colour at any moment the sweep happens to be off it. */
+:root {
+  /* Matches .text-light-900 per theme — hero and section titles both use it. */
+  --shimmer-base: linear-gradient(#111827, #111827);
 }
-.hero-shimmer::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.35) 45%,
-    rgba(255, 255, 255, 0.35) 55%,
-    transparent 60%
-  );
-  background-size: 200% 100%;
-  animation: shimmerSweep 12s ease-in-out infinite;
-  animation-delay: 1.5s;
-  pointer-events: none;
-  mix-blend-mode: overlay;
+.dark {
+  --shimmer-base: linear-gradient(#f8fafc, #f8fafc);
 }
 
+.hero-shimmer,
+.text-shimmer,
+.badge-shimmer {
+  background-image:
+    linear-gradient(
+      102deg,
+      rgba(255, 255, 255, 0) 34%,
+      rgba(255, 255, 255, 0.16) 46%,
+      rgba(255, 255, 255, 0.26) 50%,
+      rgba(255, 255, 255, 0.16) 54%,
+      rgba(255, 255, 255, 0) 66%
+    ),
+    var(--shimmer-base);
+  background-size: 240% 100%, 100% 100%;
+  background-repeat: no-repeat, no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerSweep 14s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+/* Second position is the flat base layer, pinned at 0 so only the sheen
+   travels. Sized 240% and swept 130% -> -30%, which puts the highlight off
+   one edge at each end while keeping ~45% of the cycle actually crossing the
+   glyphs — the old 200%/-200% pair spent most of its run off the element. */
 @keyframes shimmerSweep {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0%   { background-position: 130% 0, 0 0; }
+  100% { background-position: -30% 0, 0 0; }
 }
 
 /* Open to Work badge pulse ring */
@@ -568,25 +589,19 @@ h1 {
   100% { transform: scale(2.8); opacity: 0; }
 }
 
-/* Badge shimmer sweep */
+/* Same clipping on the green chips. Their tint comes from a Tailwind bg
+   utility on this very element, and background-clip: text would clip that
+   away along with the sheen — re-state the fill as an inset shadow, which the
+   clip does not touch and which the pill's own radius still bounds. */
 .badge-shimmer {
-  position: relative;
   overflow: hidden;
+  --shimmer-base: linear-gradient(#15803d, #15803d);
+  box-shadow: inset 0 0 0 100vmax rgba(74, 222, 128, 0.07);
+  animation-duration: 18s;
+  animation-delay: 2.5s;
 }
-.badge-shimmer::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.4) 45%,
-    rgba(255, 255, 255, 0.4) 55%,
-    transparent 70%
-  );
-  background-size: 200% 100%;
-  animation: shimmerSweep 16s ease-in-out infinite;
-  pointer-events: none;
+.dark .badge-shimmer {
+  --shimmer-base: linear-gradient(#4ade80, #4ade80);
 }
 
 /* ── Premium Enhancements ──────────────────────────── */
@@ -1067,9 +1082,10 @@ h1 {
     animation: none !important;
   }
 
-  .badge-shimmer::after,
-  .hero-shimmer::after {
-    display: none !important;
+  .badge-shimmer,
+  .hero-shimmer,
+  .text-shimmer {
+    animation: none !important;
   }
 
   .dark .glass {
@@ -1265,8 +1281,9 @@ html.theme-fallback body *::after {
 
 /* Decorative shimmer/float animations are paused while the page is actually
    moving, then resume the moment scrolling settles (see SmoothScrollContext). */
-html.is-scrolling .hero-shimmer::after,
-html.is-scrolling .badge-shimmer::after,
+html.is-scrolling .hero-shimmer,
+html.is-scrolling .text-shimmer,
+html.is-scrolling .badge-shimmer,
 html.is-scrolling .shimmer,
 html.is-scrolling .float-slow,
 html.is-scrolling .float-medium,
