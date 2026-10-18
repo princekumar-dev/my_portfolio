@@ -9,6 +9,10 @@ const isTouchDevice = () =>
   typeof window !== 'undefined' &&
   ('ontouchstart' in window || navigator.maxTouchPoints > 0)
 
+// Mirrors the nav bar's slide-in `transition={{ duration: 0.3 }}` below — the
+// only duration the settle waiter needs to match.
+const NAV_SETTLE_MS = 300
+
 const navItems = [
   { name: 'Home', href: '#home', id: 'home' },
   { name: 'About', href: '#about', id: 'about' },
@@ -55,6 +59,12 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [scrollDir, setScrollDir] = useState('up')
   const [scrollDepth, setScrollDepth] = useState(0)
+  // True only while the bar is actually sliding to y:-100. This is the
+  // authority for "is the toggle mid-flight", NOT scrollDir — scrollDir is
+  // sticky by design (it survives a frame where Lenis holds scrollY still), so
+  // it still reads 'down' after a scroll comes to rest and the bar is parked
+  // fully visible. Gating on it stalled the theme wave for a phantom 320ms.
+  const [hiding, setHiding] = useState(false)
   // Set by the toggle (and nav links) to force the bar out of its auto-hid
   // state so the click target is on-screen before anything snapshots it.
   const [forceShow, setForceShow] = useState(false)
@@ -64,6 +74,7 @@ const Navigation = () => {
   const lastScrollY = useRef(0)
   const menuRef = useRef(null)
   const menuButtonRef = useRef(null)
+  const navRef = useRef(null)
   const [touchDevice] = useState(isTouchDevice)
 
   useEffect(() => {
@@ -182,13 +193,39 @@ const Navigation = () => {
 
   const isScrolled = scrollDepth > 0.05
   const bgOpacity = isScrolled ? (0.88 + scrollDepth * 0.08) : 0
+  // Single source of truth for the bar's tucked-away state. Derived inline
+  // rather than kept in state so it can never drift from what the animation
+  // below is actually doing. Framer reads the new `animate.y` on every
+  // commit, so this mirrors exactly when the bar is in motion.
+  const isHiding = scrollDir === 'down' && scrollDepth > 0.1 && !forceShow
+
+  useEffect(() => {
+    setHiding(isHiding)
+  }, [isHiding])
+
+  // The bar slides to y:0 over 0.3s and startViewTransition snapshots the DOM
+  // the instant it runs, so the wave would otherwise grow out of a control
+  // that is still tucked away off-screen.
+  //
+  // Measured: the slide settles in ~220ms, so 300ms clears it with headroom.
+  // Polling the rect instead is a trap — a rAF polled before framer's first
+  // frame still reads -100, and rAF callbacks don't advance Date.now(), so the
+  // loop can decide it is "already settled" and fire the wave mid-slide.
+  // (There is no animationend to wait on either: the nav only transitions
+  // border-color in CSS, and framer drives the transform from JS.)
+  const waitForNavSettle = useCallback(() => {
+    const el = navRef.current
+    if (!el || Math.abs(el.getBoundingClientRect().top) < 1) return Promise.resolve()
+    return new Promise((resolve) => window.setTimeout(resolve, NAV_SETTLE_MS))
+  }, [])
 
   return (
     <m.nav
+      ref={navRef}
       aria-label="Main navigation"
       initial={{ y: -100 }}
       animate={{
-        y: scrollDir === 'down' && scrollDepth > 0.1 && !forceShow ? -100 : 0,
+        y: isHiding ? -100 : 0,
       }}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className="fixed w-full z-50 transition-[border-color] duration-500"
@@ -251,20 +288,25 @@ const Navigation = () => {
               whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
               onClick={(e) => {
-                // The bar auto-hides on scroll-down. If it's tucked away when
-                // the toggle is hit, startViewTransition would snapshot it
-                // off-screen and the theme wave would grow from a button the
-                // user can't see — reading as "nothing happened". Reveal it and
-                // wait for the 0.3s settle before handing off to the spread, so
-                // the wave always blooms out of a visible control. (The toggle
-                // is only reachable when the bar is on-screen, so this is a
-                // no-op for mouse users — it matters for touch, where the bar
-                // can be mid-hide as a swipe passes over the control.)
-                if (scrollDir === 'down' && scrollDepth > 0.1) {
+                // Capture the element NOW: React nulls `currentTarget` once
+                // the handler returns, so handing the raw event to the timeout
+                // below would leave the wave anchoring on <body> instead of
+                // this button.
+                const origin = e.currentTarget
+
+                // The bar auto-hides on scroll-down. If it's mid-slide when the
+                // toggle is hit, startViewTransition would snapshot it off-screen
+                // and the theme wave would grow from a control the user can't
+                // see — reading as "nothing happened". Reveal it and wait for
+                // the 0.3s settle so the wave always blooms from a visible
+                // button. Gated on `hiding` (is the bar actually moving) rather
+                // than scrollDir, which is sticky by design and still reads
+                // 'down' after a scroll has come to rest.
+                if (hiding) {
                   setForceShow(true)
-                  window.setTimeout(() => toggleTheme(e), 320)
+                  waitForNavSettle().then(() => toggleTheme(origin))
                 } else {
-                  toggleTheme(e)
+                  toggleTheme(origin)
                 }
               }}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}

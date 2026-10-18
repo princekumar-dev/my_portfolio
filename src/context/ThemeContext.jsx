@@ -50,21 +50,19 @@ const setSpreadOrigin = (source) => {
 
   for (const [el, t] of neutralized) el.style.transform = t
 
-  const scrollX = window.scrollX || 0
-  const scrollY = window.scrollY || 0
-
-  // clip-path on the root resolves against the DOCUMENT canvas, not the
-  // viewport (verified in Chrome: a viewport-space circle renders scrollY px
-  // above the button once the page is scrolled). Convert to document
-  // coordinates or the wave detaches from the control on any scrolled page.
-  const x = (rect ? rect.left + rect.width / 2 : window.innerWidth / 2) + scrollX
-  const y = (rect ? rect.top + rect.height / 2 : window.innerHeight / 2) + scrollY
+  // The clip resolves against the view-transition ROOT group, whose box is the
+  // viewport — not the document canvas. So the wave is built in viewport
+  // space; a document-space build put the whole wave one screenful above the
+  // button whenever the page was scrolled.
+  const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2
+  const y = rect ? rect.top + rect.height / 2 : window.innerHeight / 2
   const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
   const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
-  // Farthest corner of the VISIBLE viewport (document space spans scrollY..scrollY+vh).
-  const dyTop = y - scrollY
-  const dyBottom = scrollY + vh - y
-  const endRadius = Math.hypot(Math.max(x, vw - x), Math.max(dyTop, dyBottom))
+
+  // Reach the farthest viewport CORNER. Comparing viewport x against
+  // document-space vw collapsed the radius to ~150px once scrolled, so the
+  // spread never made it out of the top of the screen.
+  const endRadius = Math.hypot(Math.max(x, vw - x), Math.max(y, vh - y))
 
   // Roll a fresh wavefront: lobe count, band frequencies, band weights,
   // phases and amplitude — different on every single toggle.
@@ -105,9 +103,6 @@ const setSpreadOrigin = (source) => {
     return `path("${d} Z")`
   }
 
-  root.style.setProperty('--theme-spread-x', `${x}px`)
-  root.style.setProperty('--theme-spread-y', `${y}px`)
-  root.style.setProperty('--theme-spread-radius', `${endRadius}px`)
   root.style.setProperty('--wave-start', build(() => 1))
   root.style.setProperty('--wave-end', build((i) => radii[i]))
 }
@@ -134,8 +129,11 @@ export const ThemeProvider = ({ children }) => {
       .forEach((m) => m.setAttribute('content', color))
   }, [isDark])
 
+  // `origin` is the toggle ELEMENT (not the React event). React nulls
+  // `event.currentTarget` after the handler returns, so an event handed to a
+  // setTimeout arrives with a null target and the wave anchors on <body>.
   const toggleTheme = useCallback(
-    (event) => {
+    (origin) => {
       const next = !isDark
       const canSpread =
         typeof document !== 'undefined' &&
@@ -161,7 +159,13 @@ export const ThemeProvider = ({ children }) => {
           root.style.setProperty('--vt-new-z', '1')
           root.style.setProperty('--vt-old-z', '999999')
         }
-        setSpreadOrigin(event?.currentTarget || event?.target)
+        setSpreadOrigin(
+          origin && typeof origin.getBoundingClientRect === 'function'
+            ? origin
+            : // Last resort: the aria-label is unique to the toggle, so this
+              // still anchors the wave on the control rather than <body>.
+              document.querySelector('[aria-label*="mode"]')
+        )
 
         // Pre-snapshot freeze: the two things that make capturing the page
         // expensive are decorative CSS animations and backdrop-filters (nav,
