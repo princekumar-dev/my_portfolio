@@ -360,8 +360,17 @@ const CursorDesktop = () => {
       if (tgt) {
         const dt = now - lastFrameTimeRef.current
         lastFrameTimeRef.current = now
-        if (dt > 40) slowFramesRef.current += 1
-        if (slowFramesRef.current > 10 && !liteRef.current) {
+        // Only sustained jank may condemn this device. The loop stops when
+        // the pointer idles, so the first frame after a restart carries a dt
+        // spanning the whole idle gap — that must never count, or every
+        // restart reads as a dropped frame and the swell is suppressed almost
+        // immediately. Healthy frames decay the counter so one GC pause or a
+        // background tab doesn't condemn it either.
+        if (dt > 0 && dt < 200) {
+          if (dt > 50) slowFramesRef.current += 1
+          else if (slowFramesRef.current > 0) slowFramesRef.current -= 1
+        }
+        if (slowFramesRef.current > 40 && !liteRef.current) {
           liteRef.current = true
           lastW.current = -1
           lastH.current = -1
