@@ -13,6 +13,7 @@ import promptEngineeringCopilot from '../../CERTIFICATES/Introduction to prompt 
 import novitechFullstack from '../../CERTIFICATES/NOVITECH FULLSTACK.webp'
 import academicRank from '../../CERTIFICATES/ACADEMIC RANK 2.webp'
 import deloitteCert from '../../CERTIFICATES/Deloitte Data Analytics Job Simulation.webp'
+import tataCert from '../../CERTIFICATES/TATA GenAI Powered Data Analytics Job Simulation.webp'
 import elevateLabsIntern from '../../CERTIFICATES/INTERN/ELEVATE LAB INTERN.webp'
 import empowerIntern from '../../CERTIFICATES/INTERN/EMPOWER GUIDING HUB INTERN.webp'
 import zeptowareIntern from '../../CERTIFICATES/INTERN/ZEPTOWARE INTERN.webp'
@@ -31,6 +32,7 @@ import mongodbLogo from '../../logos/mongodb.webp'
 import empowerLogo from '../../logos/empower.webp'
 import saLogo from '../../logos/sa.webp'
 import deloitteLogo from '../../logos/deloitte.webp'
+import tataLogo from '../../logos/tata.webp'
 import nakshatraShipwreck from '../../CERTIFICATES/COMPETITIONS/SA SKIPWRECK WINNING.webp'
 import exploitX from '../../CERTIFICATES/COMPETITIONS/KPR EXPLOIX PARTICIPATION.webp'
 
@@ -62,6 +64,20 @@ export const certificationsData = [
     // The Deloitte wordmark is black-on-transparent — turn it white in dark
     // mode so it stays legible on the dark frosted thumbnail well.
     logoClass: 'dark:brightness-0 dark:invert',
+    credentialUrl: null,
+  },
+  {
+    id: 17,
+    title: 'GenAI Powered Data Analytics Job Simulation',
+    issuer: 'Tata',
+    date: 'Oct 2026',
+    issuedOn: '2026-10-20',
+    category: CERTIFICATION,
+    credentialId: '6BeKec758TTbdr1t69xdz3',
+    description:
+      'Certificate of Completion for the Tata GenAI Powered Data Analytics Job Simulation (via Forage), completed in October 2026 with practical tasks in exploratory data analysis and risk profiling, predictive modelling, business reporting, and an AI-driven collections strategy.',
+    image: tataLogo,
+    fullImage: tataCert,
     credentialUrl: null,
   },
   {
