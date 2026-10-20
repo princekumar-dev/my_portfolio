@@ -1,290 +1,176 @@
-# Prince R - Animated Portfolio
+<div align="center">
 
-A modern, full-motion animated portfolio website built with React, Framer Motion, and Tailwind CSS. Features smooth scroll animations, parallax effects, and a sleek dark theme.
+# 👋 Prince R — Portfolio
 
-## Features
+**Modern, fully-animated personal portfolio for an AI & Data Science Engineer**
 
-✨ **Modern Design**
-- Cool dark theme with neon gradient accents
-- Smooth scroll animations on all sections
-- Parallax effects while scrolling
-- Fully responsive design (mobile, tablet, desktop)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-4-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-animated-EB459E?style=flat-square&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-🎨 **Interactive Components**
-- Animated navigation with scroll detection
-- Hero section with staggered text animations
-- Hover card animations on projects
-- Timeline animations for experience
-- Rotating skill icons
-- Smooth transitions throughout
+**[🔗 Live Demo](https://princekumar-dev.github.io/my_portfolio/)** · **[🌐 GitHub](https://github.com/princekumar-dev/my_portfolio)** · **[💼 LinkedIn](https://www.linkedin.com/in/prince-r-b9685130b)**
 
-📱 **Sections**
-1. **Navigation** - Sticky header with smooth scroll links
-2. **Hero** - Animated intro with parallax background
-3. **About** - Personal introduction with stats
-4. **Skills** - Categorized tech stack (Frontend, Backend, Database, Tools)
-5. **Projects** - Featured projects with hover effects
-6. **Experience** - Timeline of internships and roles
-7. **Certifications** - Grid of certifications
-8. **Contact** - Get in touch section with social links
-9. **Footer** - Quick links and social connections
-
-## Tech Stack
-
-- **React 18** - UI library
-- **Framer Motion** - Animation library
-- **Tailwind CSS** - Utility-first CSS framework
-- **Vite** - Build tool
-- **React Icons** - Icon library
-
-## Installation
-
-### Prerequisites
-- Node.js (v14 or higher)
-- npm or yarn
-
-### Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd prince-animated-portfolio
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start development server**
-   ```bash
-   npm run dev
-   ```
-   The portfolio will open at `http://localhost:3000`
-
-4. **Build for production**
-   ```bash
-   npm run build
-   ```
-
-5. **Preview production build**
-   ```bash
-   npm run preview
-   ```
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── Navigation.jsx      # Sticky navigation bar
-│   ├── Hero.jsx            # Hero section with parallax
-│   ├── About.jsx           # About section
-│   ├── Skills.jsx          # Skills with icons
-│   ├── Projects.jsx        # Project cards
-│   ├── Experience.jsx      # Experience timeline
-│   ├── Certifications.jsx  # Certifications grid
-│   ├── Contact.jsx         # Contact section
-│   ├── Footer.jsx          # Footer
-│   └── ScrollToTop.jsx     # Scroll to top button
-├── data/
-│   ├── skillsData.js       # Skills and tech stack
-│   ├── projectsData.js     # Projects information
-│   ├── experienceData.js   # Experience timeline
-│   └── certificationsData.js # Certifications
-├── App.jsx                 # Main app component
-├── main.jsx                # Entry point
-└── index.css               # Global styles
-```
-
-## Customization
-
-### Update Personal Information
-
-1. **Hero Section** - Edit `src/components/Hero.jsx`
-   - Change name and title
-   - Update resume link
-
-2. **About Section** - Edit `src/components/About.jsx`
-   - Update personal description
-   - Modify stats
-
-3. **Skills** - Edit `src/data/skillsData.js`
-   - Add/remove technologies
-   - Update categories
-
-4. **Projects** - Edit `src/data/projectsData.js`
-   - Add your projects
-   - Update descriptions and links
-
-5. **Experience** - Edit `src/data/experienceData.js`
-   - Add internships/jobs
-   - Update achievements
-
-6. **Certifications** - Edit `src/data/certificationsData.js`
-   - Add your certifications
-   - Update issuer and dates
-
-7. **Contact** - Edit `src/components/Contact.jsx`
-   - Update email, LinkedIn, GitHub links
-
-### Add Images
-
-1. Create `/public/images/` folder
-2. Add your images (certifications, project screenshots, etc.)
-3. Update image paths in data files
-
-### Customize Colors
-
-Edit `tailwind.config.js` to change the neon color scheme:
-
-```javascript
-neon: {
-  blue: '#00d4ff',      // Change cyan color
-  purple: '#b026ff',    // Change purple color
-  pink: '#ff006e',      // Change pink color
-  cyan: '#00f5ff'       // Change cyan color
-}
-```
-
-## Deployment
-
-### Deploy to Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Import your repository
-4. Click Deploy
-
-### Deploy to Netlify
-
-1. Build the project: `npm run build`
-2. Go to [netlify.com](https://netlify.com)
-3. Drag and drop the `dist` folder
-
-### Deploy to GitHub Pages
-
-1. Update `vite.config.js` with your repo name
-2. Run: `npm run build`
-3. Push `dist` folder to `gh-pages` branch
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## Performance
-
-- Optimized animations with Framer Motion
-- Lazy loading of components
-- Smooth scroll behavior
-- Responsive images
-- Fast build with Vite
-
-## License
-
-MIT License - feel free to use this portfolio template for your own projects!
-
-## Contact
-
-- **Email**: prince55833kuma@gmail.com
-- **LinkedIn**: [Prince R](https://www.linkedin.com/in/prince-r-b9685130b)
-- **GitHub**: [princekumar-dev](https://github.com/princekumar-dev)
+</div>
 
 ---
 
-**Built with ❤️ by Prince R**# prince55833kumar-project
+## 📖 About
 
+A light-first, fully animated portfolio website showcasing projects, skills, certifications, and experience. Built with **React 18** and **Vite** for blazing-fast builds, animated with **Framer Motion**, styled with **Tailwind CSS**, and scrolled with **Lenis** smooth scrolling.
 
+Highlights include a custom cursor, 3D tilt cards, parallax sections, a scroll progress bar, and an animated dark-mode toggle that ripples outward in a unique random wave every time.
 
-## Getting started
+**Featured projects on the site:** [Academics](https://github.com/princekumar-dev/Academics--2), [Connect](https://github.com/princekumar-dev/Connect), [Busy Bot](https://github.com/princekumar-dev/Busy_Bot), and more.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## ✨ Features
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+**🎨 Design**
+- Light theme with an animated dark-mode toggle (wave-ripple transition from the button you press)
+- Elegant typography — Playfair Display, Sora, Inter, and JetBrains Mono
+- Fully responsive: mobile, tablet, and desktop
+- Respects `prefers-reduced-motion` for accessibility
 
-## Add your files
+**🎬 Animation & Interaction**
+- Lenis-powered smooth scrolling with parallax sections
+- Custom cursor with pointer context
+- 3D tilt cards on projects
+- Staggered hero text animations and scroll-triggered reveals
+- Scroll progress bar and scroll-to-top button
+- Animated gradient background
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+**⚡ Engineering**
+- Lazy-loaded sections via `React.lazy` + `Suspense` for code splitting
+- Error boundary so a bad section never blanks the whole page
+- Manual Vite chunks (react-vendor / framer / icons)
+- Brotli + gzip pre-compression
+- SEO-ready: Open Graph + Twitter card meta, theme-color, font preconnect
+- Auto-deploy to **GitHub Pages** on every push
+
+**📄 Sections**
+Navigation · Hero · About · Skills · Projects · Experience · Certifications · Contact · Footer
+
+## 🛠️ Tech Stack
+
+| Category | Tools |
+|----------|-------|
+| Frontend | React 18, JavaScript (ES2020) |
+| Build | Vite 4, PostCSS, Autoprefixer |
+| Styling | Tailwind CSS 3 |
+| Animation | Framer Motion, Lenis (smooth scroll) |
+| Icons | React Icons |
+| Deployment | GitHub Pages (Actions), Vercel, Netlify |
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js** 18 or newer
+- npm (or yarn / pnpm)
+
+### Setup
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/princekumar-dev/my_portfolio.git
+cd my_portfolio
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the dev server (opens at http://localhost:3000)
+npm run dev
+```
+
+### Production build
+
+```bash
+npm run build     # output in dist/
+npm run preview   # preview the production build locally
+```
+
+## 📁 Project Structure
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/prince55833kumar-group/prince55833kumar-project.git
-git branch -M main
-git push -uf origin main
+my_portfolio/
+├── index.html                 # SEO meta, fonts, OG/Twitter cards
+├── vite.config.js             # Vite build + compression + chunking
+├── tailwind.config.js         # Custom color palette & typography
+├── .github/workflows/
+│   └── static.yml             # Auto-deploy to GitHub Pages
+└── src/
+    ├── components/
+    │   ├── Navigation.jsx     # Sticky nav with scroll detection
+    │   ├── Hero.jsx           # Animated intro + parallax
+    │   ├── About.jsx          # Personal intro with stats
+    │   ├── Skills.jsx         # Categorized tech stack
+    │   ├── Projects.jsx       # 3D tilt project cards
+    │   ├── Experience.jsx     # Animated timeline
+    │   ├── Certifications.jsx # Certifications grid
+    │   ├── Contact.jsx        # Contact + social links
+    │   ├── Footer.jsx         # Footer with quick links
+    │   ├── Cursor.jsx         # Custom cursor
+    │   ├── TiltCard.jsx       # 3D tilt wrapper
+    │   ├── AnimatedBackground.jsx
+    │   ├── ScrollProgressBar.jsx
+    │   └── ScrollToTop.jsx
+    ├── context/               # Pointer, Scroll, SmoothScroll, Theme, Tilt
+    ├── hooks/                 # useActiveSection, useSectionParallax
+    ├── data/                  # skills, projects, experience, certifications
+    ├── App.jsx                # Providers, lazy sections, error boundary
+    ├── main.jsx               # Entry point
+    └── index.css              # Global styles
 ```
 
-## Integrate with your tools
+All content lives in `src/data/*.js` — edit those files to make the portfolio yours without touching any components.
 
-* [Set up project integrations](https://gitlab.com/prince55833kumar-group/prince55833kumar-project/-/settings/integrations)
+## 🎨 Customization
 
-## Collaborate with your team
+| What | Where |
+|------|-------|
+| Name, title, resume link | `src/components/Hero.jsx` |
+| Bio & stats | `src/components/About.jsx` |
+| Skills & categories | `src/data/skillsData.js` |
+| Projects | `src/data/projectsData.js` |
+| Experience timeline | `src/data/experienceData.js` |
+| Certifications | `src/data/certificationsData.js` |
+| Email & social links | `src/components/Contact.jsx` |
+| Colors & fonts | `tailwind.config.js` |
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+## 🌐 Deployment
 
-## Test and Deploy
+**GitHub Pages** (included) — the workflow in `.github/workflows/static.yml` builds with Vite and deploys `dist/` automatically on every push to `main`. Enable *Settings → Pages → Source: GitHub Actions*.
 
-Use the built-in continuous integration in GitLab.
+**Vercel** — import the repo at [vercel.com](https://vercel.com); framework auto-detected, done.
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+**Netlify** — run `npm run build`, then drag the `dist/` folder onto [netlify.com/drop](https://app.netlify.com/drop).
 
-***
+## ⚡ Performance
 
-# Editing this README
+- Section-level code splitting keeps the initial bundle tiny
+- Vendor chunks split into react / framer / icons bundles
+- Pre-compressed Brotli + gzip assets served by the host
+- Non-blocking Google Fonts (`preconnect` + `media="print"` swap)
+- Theme-aware `theme-color` meta keeps mobile browser chrome on-palette
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## 🌍 Browser Support
 
-## Suggestions for a good README
+Chrome · Firefox · Safari · Edge (latest versions)
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## 📄 License
 
-## Name
-Choose a self-explaining name for your project.
+MIT — free to use, modify, and share. A credit is appreciated but not required.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## 📬 Contact
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+- **Email:** prince55833kuma@gmail.com
+- **LinkedIn:** [Prince R](https://www.linkedin.com/in/prince-r-b9685130b)
+- **GitHub:** [@princekumar-dev](https://github.com/princekumar-dev)
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+---
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+<div align="center">
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+**Built with ❤️ by Prince R**
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+</div>

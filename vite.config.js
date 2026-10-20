@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react'
 import compression from 'vite-plugin-compression'
 
 export default defineConfig({
+  // Relative base so the built assets resolve correctly when hosted under a
+  // sub-path (GitHub Pages: /my_portfolio/) as well as on a custom domain.
+  base: './',
   plugins: [
     react(),
     compression({ algorithm: 'brotliCompress' }),
