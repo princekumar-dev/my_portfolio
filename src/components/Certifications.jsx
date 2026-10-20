@@ -80,8 +80,8 @@ const CertImage = memo(({ cert }) => {
             onLoad={() => setStatus('loaded')}
             onError={() => setStatus('error')}
             className={`max-h-[64%] max-w-[76%] object-contain transition-opacity duration-500 ${
-              status === 'loaded' ? 'opacity-100' : 'opacity-0'
-            }`}
+              cert.logoClass || ''
+            } ${status === 'loaded' ? 'opacity-100' : 'opacity-0'}`}
           />
         </div>
         {/* One light frost sheet over everything — a small, consistent smear
