@@ -14,6 +14,7 @@ import novitechFullstack from '../../CERTIFICATES/NOVITECH FULLSTACK.webp'
 import academicRank from '../../CERTIFICATES/ACADEMIC RANK 2.webp'
 import deloitteCert from '../../CERTIFICATES/Deloitte Data Analytics Job Simulation.webp'
 import tataCert from '../../CERTIFICATES/TATA GenAI Powered Data Analytics Job Simulation.webp'
+import bcgCert from '../../CERTIFICATES/BCG Gen AI.webp'
 import elevateLabsIntern from '../../CERTIFICATES/INTERN/ELEVATE LAB INTERN.webp'
 import empowerIntern from '../../CERTIFICATES/INTERN/EMPOWER GUIDING HUB INTERN.webp'
 import zeptowareIntern from '../../CERTIFICATES/INTERN/ZEPTOWARE INTERN.webp'
@@ -33,6 +34,7 @@ import empowerLogo from '../../logos/empower.webp'
 import saLogo from '../../logos/sa.webp'
 import deloitteLogo from '../../logos/deloitte.webp'
 import tataLogo from '../../logos/tata.webp'
+import bcgLogo from '../../logos/BCG logo.webp'
 import nakshatraShipwreck from '../../CERTIFICATES/COMPETITIONS/SA SKIPWRECK WINNING.webp'
 import exploitX from '../../CERTIFICATES/COMPETITIONS/KPR EXPLOIX PARTICIPATION.webp'
 
@@ -49,6 +51,22 @@ export const certificationCategories = [
 ]
 
 export const certificationsData = [
+  {
+    id: 18,
+    title: 'GenAI Job Simulation',
+    issuer: 'Boston Consulting Group',
+    date: 'Oct 2026',
+    issuedOn: '2026-10-25',
+    category: CERTIFICATION,
+    description:
+      'Certificate of Completion for the BCG GenAI Job Simulation (via Forage), completed in October 2026 with practical tasks in data extraction and critical analysis and in developing an AI-powered financial chatbot.',
+    image: bcgLogo,
+    fullImage: bcgCert,
+    // The wordmark ships as BCG green on transparency — on dark cards that green
+    // sits too close to the background, so lift it with a brightness boost.
+    logoClass: 'dark:brightness-200',
+    credentialUrl: null,
+  },
   {
     id: 16,
     title: 'Data Analytics Job Simulation',
